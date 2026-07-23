@@ -1,0 +1,138 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout active="fleet" title="Scale · Beadhive" description="A fleet of hives, one Head Office — bh sync aggregates every registered hive so you can ask what is actionable anywhere — plus where the source-of-truth docs live.">
+
+<section id="hq">
+  <div class="breakout">
+    <div class="wrap" style="padding:0">
+      <div class="eyebrow display">06 · Hives → HQ</div>
+      <h2 class="display">A fleet of hives, one Head Office</h2>
+      <p>Each hive owns its issues; the workspace owns the view. <code>bh sync</code> aggregates
+      every registered hive — cloned ones by local path, uncloned ones via a blobless
+      minimal-clone cache — so <code>bh hq bd ready</code> answers "what's actionable anywhere?"
+      even on a machine with <em>no code checked out</em>.</p>
+    </div>
+
+    <figure>
+      <div class="diagram">
+      <svg viewBox="0 0 1160 500" role="img" aria-label="Topology diagram: three hive repos each publish issue data to refs/dolt/data on their own git remote; bh sync aggregates all hives into the HQ store; the Head Office registry is partitioned across the four control seats.">
+        <defs>
+          <marker id="t-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#9A8C71"/></marker>
+          <marker id="t-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#C99038"/></marker>
+        </defs>
+
+        <text class="lane-label" x="36" y="34">$GIT_WORKSPACE — EACH REPO IS A HIVE</text>
+
+        <!-- hive hexes -->
+        <g>
+          <polygon class="gatehex" points="80,90 122,66 164,90 164,138 122,162 80,138"/>
+          <text class="nlabel" x="122" y="106">hive</text>
+          <text class="nsub" x="122" y="121">github/acme/api</text>
+          <text class="nsub" x="122" y="134">.beads/ (Dolt) + code</text>
+        </g>
+        <g>
+          <polygon class="gatehex" points="80,220 122,196 164,220 164,268 122,292 80,268"/>
+          <text class="nlabel" x="122" y="236">hive</text>
+          <text class="nsub" x="122" y="251">github/acme/web</text>
+          <text class="nsub" x="122" y="264">prefix: acme-web-N</text>
+        </g>
+        <g>
+          <polygon class="gatehex" points="80,350 122,326 164,350 164,398 122,422 80,398"/>
+          <text class="nlabel" x="122" y="366">hive</text>
+          <text class="nsub" x="122" y="381">gitea/lab/proto</text>
+          <text class="nsub" x="122" y="394">not even cloned here</text>
+        </g>
+
+        <!-- remotes -->
+        <path class="flow" d="M164,114 H236" marker-end="url(#t-n)"/>
+        <path class="flow" d="M164,244 H236" marker-end="url(#t-n)"/>
+        <path class="flow dashed" d="M164,374 H236" marker-end="url(#t-n)"/>
+        <text class="alabel" x="168" y="104">bd dolt push</text>
+
+        <g>
+          <rect class="node" x="240" y="82" width="216" height="64" rx="8"/>
+          <text class="nlabel" x="348" y="102">repo's own git remote</text>
+          <text class="nsub" x="348" y="118">refs/heads/*  · code, PRs</text>
+          <text class="nsub" x="348" y="132">refs/dolt/data · issue history</text>
+        </g>
+        <g>
+          <rect class="node" x="240" y="212" width="216" height="64" rx="8"/>
+          <text class="nlabel" x="348" y="232">repo's own git remote</text>
+          <text class="nsub" x="348" y="248">refs/heads/*  · code, PRs</text>
+          <text class="nsub" x="348" y="262">refs/dolt/data · issue history</text>
+        </g>
+        <g>
+          <rect class="node" x="240" y="342" width="216" height="64" rx="8"/>
+          <text class="nlabel" x="348" y="362">repo's own git remote</text>
+          <text class="nsub" x="348" y="378">refs/heads/*  · code, PRs</text>
+          <text class="nsub" x="348" y="392">refs/dolt/data · issue history</text>
+        </g>
+        <text class="alabel" x="240" y="440">no central server — issue data rides the repo's own remote,</text>
+        <text class="alabel" x="240" y="454">in a ref namespace branches and PRs never see</text>
+
+        <!-- sync funnel -->
+        <path class="flow-h" d="M456,114 C 560,120 620,170 668,210" marker-end="url(#t-h)"/>
+        <path class="flow-h" d="M456,244 C 540,246 600,248 660,248" marker-end="url(#t-h)"/>
+        <path class="flow-h" d="M456,374 C 560,368 620,320 668,286" marker-end="url(#t-h)"/>
+        <text class="alabel-h" x="520" y="200">bh sync</text>
+        <text class="alabel" x="520" y="216">cloned → by local path</text>
+        <text class="alabel" x="520" y="230">uncloned → blobless cache + bd bootstrap</text>
+
+        <!-- HQ hex -->
+        <polygon class="gatehex" points="678,248 728,162 828,162 878,248 828,334 728,334" style="stroke-width:2.2"/>
+        <text class="nlabel" x="778" y="230" style="font-size:16px">HQ / hub</text>
+        <text class="nsub" x="778" y="250">~/.ws/hq · ~/.ws/hub</text>
+        <text class="nsub" x="778" y="266">one aggregated beads DB</text>
+        <text class="nsub" x="778" y="282">read cache — hives stay authoritative</text>
+
+        <!-- queries -->
+        <path class="flow" d="M878,220 H938" marker-end="url(#t-n)"/>
+        <rect class="node" x="940" y="196" width="196" height="46" rx="8"/>
+        <text class="nlabel" x="1038" y="215">bh hq bd ready</text>
+        <text class="nsub" x="1038" y="230">actionable work, anywhere</text>
+
+        <path class="flow" d="M878,276 H938" marker-end="url(#t-n)"/>
+        <rect class="node" x="940" y="254" width="196" height="46" rx="8"/>
+        <text class="nlabel" x="1038" y="273">bh hq intake</text>
+        <text class="nsub" x="1038" y="288">director's fleet-wide inbox</text>
+
+        <!-- head office -->
+        <rect class="node-end" x="678" y="376" width="458" height="92" rx="10"/>
+        <text class="nlabel" x="907" y="400">Head Office — ~/.ws/config.yaml</text>
+        <text class="nsub" x="907" y="420">the partitioned workspace registry · least-privilege writes</text>
+        <text class="nsub" x="907" y="438">supervisor → policy · director → fleet membership</text>
+        <text class="nsub" x="907" y="452">custodian → hive config + secrets · controller → read-only</text>
+        <path class="flow dashed" d="M778,334 L778,374" marker-end="url(#t-n)"/>
+      </svg>
+      </div>
+      <figcaption>The hub (personal scale) and Factory HQ (shared scale) use the same aggregation
+      mechanism; when an HQ is registered, <code>bh hq</code> and <code>bh sync</code> use it.
+      The prefix is permanent and derived from org + repo; the provider — the thing most likely
+      to change — lives in a label, so a host migration is a label edit, not data surgery.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="pointers">
+  <div class="wrap">
+    <div class="eyebrow display">08 · Go deeper</div>
+    <h2 class="display">Where the source of truth lives</h2>
+    <div class="tablewrap">
+      <table>
+        <tr><th>Doc</th><th>Covers</th></tr>
+        <tr><td><code>docs/AGF.md</code></td><td>The tenets, naming, container branches, dispatch depth, role modes — the process overview.</td></tr>
+        <tr><td><code>docs/DESIGN.md</code></td><td>Hives, prefixes, labels, identity-over-time, git-native hosting — the <em>why</em>.</td></tr>
+        <tr><td><code>docs/WORK.md</code></td><td>Every <code>bh work</code> verb, refine plans, validation modes, conflict ladder, batches, PR-governed landing.</td></tr>
+        <tr><td><code>docs/PLANNING-PLANE.md</code></td><td>The two gates, fidelity tiers, spike loop, replan vs groom.</td></tr>
+        <tr><td><code>docs/CONTROL-PLANE.md</code></td><td>The four control seats, Head Office partitions, the commissioning loop.</td></tr>
+        <tr><td><code>docs/ASSURANCE.md</code></td><td>The warden, the <code>security:*</code> gate, the verifier lens.</td></tr>
+        <tr><td><code>docs/HUB.md</code> · <code>docs/HIVES.md</code></td><td>The cross-hive aggregate, onboarding, hive kinds and identity.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+</Layout>

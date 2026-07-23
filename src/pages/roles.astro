@@ -1,0 +1,135 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout active="roles" title="Roles & seats · Beadhive" description="One process, two kinds of worker: humans hold the gates, agents do the work — the four planes and the seats that sit in them, separated by blast radius.">
+
+<section id="humans">
+  <div class="wrap">
+    <div class="eyebrow display">04 · Humans + agents</div>
+    <h2 class="display">One process, two kinds of worker</h2>
+    <p>AGF doesn't split "human workflows" from "agent workflows" — it defines <b>seats</b>, and
+    either kind of worker can sit in one. A seat is launched as an agent sub-task, as the main
+    Claude Code loop (<code>bh role &lt;seat&gt;</code>), or occupied by a human doing the same
+    verbs by hand. What keeps the mix safe:</p>
+    <ul>
+      <li><b>Humans hold the gates.</b> Plan approval and kickoff approval are explicit human
+      checkpoints; the default review gate is <code>human</code>; a reviewer bounce sends the
+      bead back with written feedback rather than silently failing. <code>bd human</code>
+      exists to flag any decision for a person.</li>
+      <li><b>Every agent signs its work.</b> In <code>agent</code> identity mode each worktree
+      is stamped with a distinct author and a dedicated SSH signing key, so agent commits are
+      attributable and verifiable. In <code>supervised</code> mode the worktree inherits the
+      human's keys — "under my keys, with direct supervision."</li>
+      <li><b>Seat typing is enforced.</b> An epic can only be started by a dispatcher
+      (<code>disp/</code>), a leaf bead only claimed by a developer (<code>dev/</code>), a
+      <code>security:*</code> gate only resolved by a warden. Humans (non-seat identities)
+      are exempt — the machinery constrains agents, not people.</li>
+      <li><b>Escalation over silent failure.</b> A merge that can't auto-resolve bounces the
+      bead with its branch restored; a broken shared branch escalates loudly for a forward fix.
+      Work is never dropped.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="seats">
+  <div class="wrap">
+    <div class="eyebrow display">07 · Roles &amp; seats</div>
+    <h2 class="display">Four planes, one orchestration spine</h2>
+    <p>Seats are separated by <b>blast radius</b>: the seat that routes work holds no secrets,
+    the seat that holds secrets makes no decisions, the seat that observes writes nothing. A
+    small single-hive factory collapses the four control seats into just the supervisor —
+    deliberately, so the split is a designed merge, not an accident.</p>
+
+    <div class="spine display">
+      <b>supervisor</b> <span class="arr">→</span> <b>director</b> <span class="arr">→</span>
+      <b>dispatcher</b> <span class="arr">→</span> developer / reviewer / merger
+      <span class="arr" style="margin-left:auto">the 3-level orchestration spine (control → control → integration)</span>
+    </div>
+
+    <div class="plane">
+      <div class="plane-h"><b>Control plane</b><span>governs the factory itself · human-supervised ·
+        the one plane that never touches <code>bh work</code></span></div>
+      <div class="seatgrid">
+        <div class="seat"><div class="sid"><b>supervisor</b><code>super/</code></div>
+          <p>The root. Sets policy, launches and oversees the other control seats, owns
+          cross-plane decisions. Absorbs the other three in a small factory.</p>
+          <div class="auth">authority: ultimate · <span class="no">no code, no merge, no keys</span></div></div>
+        <div class="seat"><div class="sid"><b>director</b><code>dir/</code></div>
+          <p>The traffic layer. Fields the fleet-wide intake inbox (<code>bh hq intake</code>),
+          routes work to hives, interfaces with per-hive dispatchers, writes fleet membership.</p>
+          <div class="auth">authority: high (routing) · <span class="no">no secrets, no policy</span></div></div>
+        <div class="seat"><div class="sid"><b>custodian</b><code>cust/</code></div>
+          <p>The commissioning hands: discover → onboard → configure → verify → hand off
+          (→ retire). The <em>only</em> control seat touching secret/key material.</p>
+          <div class="auth">authority: mechanical — applies, doesn't decide</div></div>
+        <div class="seat"><div class="sid"><b>controller</b><code>ctrl/</code></div>
+          <p>The gauge. Reads throughput, health, and OTEL telemetry of the factory; writes
+          reports and dashboards, never the registry.</p>
+          <div class="auth">authority: low · read-mostly</div></div>
+      </div>
+    </div>
+
+    <div class="plane">
+      <div class="plane-h"><b>Planning plane</b><span>idea → gated molecule · human-interactive ·
+        beads + decision records, never code</span></div>
+      <div class="seatgrid">
+        <div class="seat"><div class="sid"><b>planner</b><code>plan</code></div>
+          <p>The cartographer. Drives ideate → research → architecture → decompose → file across
+          three fidelity tiers (quick / spec / deep); files spike molecules when feasibility is
+          open; owns replan and groom.</p>
+          <div class="auth">authority: decomposition · <span class="no">no implement, no dispatch</span></div></div>
+        <div class="seat"><div class="sid"><b>analyst</b><code>sub-agent</code></div>
+          <p>Fire-and-forget research: codebase discovery plus external docs/web research,
+          returning structured findings to the planner on deep-tier work.</p>
+          <div class="auth">authority: none · read-only</div></div>
+      </div>
+    </div>
+
+    <div class="plane">
+      <div class="plane-h"><b>Integration plane</b><span>molecule → merged · the
+        <code>bh work</code> loop · parallel devs, serial merge</span></div>
+      <div class="seatgrid">
+        <div class="seat"><div class="sid"><b>dispatcher</b><code>disp/</code></div>
+          <p>Delivers an epic: opens the container branch, assigns beads, fans out developer
+          sub-agents (model per bead) or collapses onto a shared batch branch, watches gates.</p>
+          <div class="auth">authority: scheduling · fanout mode never implements</div></div>
+        <div class="seat"><div class="sid"><b>developer</b><code>dev/</code></div>
+          <p>Implements one bead to a reviewable state in its own worktree: claim → implement →
+          show/refine → check → submit. Squashes its own noise into conventional digests.</p>
+          <div class="auth">authority: one bead · <span class="no">no merge, no lifecycle improv</span></div></div>
+        <div class="seat"><div class="sid"><b>reviewer</b><code>seat</code></div>
+          <p>Walks the submitted change: reads intent + diff, runs tests and a feature demo
+          locally, checks acceptance criteria, then approves or bounces with written feedback.</p>
+          <div class="auth">authority: gate verdict · <span class="no">read-only re: code</span></div></div>
+        <div class="seat"><div class="sid"><b>merger</b><code>seat</code></div>
+          <p>The merge owner. Serializes approved beads onto the green line via the merge slot,
+          <code>--no-ff</code>, conflict ladder, escalates rather than drops work.</p>
+          <div class="auth">authority: landing · <span class="no">no dispatch, no implement</span></div></div>
+      </div>
+    </div>
+
+    <div class="plane">
+      <div class="plane-h"><b>Assurance plane</b><span>the exception — a cross-cutting gate
+        layer, not a sequential stage</span></div>
+      <div class="seatgrid">
+        <div class="seat"><div class="sid"><b>warden</b><code>warden/</code></div>
+          <p>Security + policy verdict only: secret-scan, SBOM, policy-as-code. Holds the
+          <code>security:*</code> gate that runs parallel to review — and is the only seat that
+          can resolve it. Read-and-block; never writes.</p>
+          <div class="auth">authority: block · <span class="no">provenance not in scope</span></div></div>
+        <div class="seat"><div class="sid"><b>verifier</b><code>lens</code></div>
+          <p>Acceptance / e2e / QA — deliberately <em>not</em> a staffed seat yet. Covered by
+          developer self-checks, the reviewer's demo, and CI until end-to-end testing needs its
+          own identity.</p>
+          <div class="auth">status: a lens, promoted only when needed</div></div>
+      </div>
+    </div>
+
+    <p style="font-size:14.5px;color:var(--ink-3)">Roadmap seats: <b>releaser</b> (release plane),
+    <b>contributor</b> (<code>contrib/</code> — provenance scrub + human-only publish gate), and
+    <b>operator</b> (delivery). Any seat can be launched as the main loop:
+    <code>bh role &lt;seat&gt;</code> or <code>claude --agent agf:&lt;seat&gt;</code>.</p>
+  </div>
+</section>
+
+</Layout>

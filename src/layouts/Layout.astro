@@ -5,16 +5,20 @@
 // + is:inline means Astro emits it verbatim into the HTML rather than hoisting
 // it into a bundled/scoped stylesheet.
 import globalCss from '../styles/global.css?raw';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title?: string;
   description?: string;
+  active?: string;
 }
 
 const {
   title = 'Beadhive — Agentic Git Flow',
   description =
     'How the Beadhive factory turns raw ideas into an always-green integration branch — agents do the work, humans hold the gates, and beads (a dependency-linked issue tracker) is the shared memory that makes both possible.',
+  active,
 } = Astro.props;
 
 const ogImage = new URL('/og-default.png', Astro.site).href;
@@ -49,6 +53,8 @@ const canonical = new URL('/', Astro.site).href;
     <style is:inline set:html={globalCss}></style>
   </head>
   <body>
+    <Nav active={active} />
     <slot />
+    <Footer />
   </body>
 </html>

@@ -1,0 +1,266 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout active="process" title="How work flows · Beadhive" description="The Beadhive mental model in one breath and the full planning → dispatch → develop → review → merge pipeline, with its spike, bounce, and replan loops.">
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow display">02 · How it works</div>
+    <h2 class="display">The mental model in one breath</h2>
+    <p>Every repo is a <b>hive</b> — its own beads database, embedded as Dolt under the repo's
+    gitignored <code>.beads/</code>. Issues carry a short, stable <b>prefix</b>
+    (<code>ag-infra-1</code>) derived from the stable part of identity (org + repo); the parts
+    that can change (provider, org) live in <b>labels</b>. Issue history publishes to
+    <code>refs/dolt/data</code> on the repo's <em>own git remote</em> — a separate ref namespace
+    that never touches branches or PRs, so there is <b>no server to run</b>. A workspace-level
+    aggregate (the <b>hub</b>, or its evolved form <b>Factory HQ</b>) pulls every hive into one
+    view, so you can ask "what's ready to work on anywhere?"</p>
+    <p><code>bh</code> is deliberately a thin orchestrator: <code>bd</code> (beads) owns issues,
+    <code>git</code> owns history, <code>git-workspace</code> owns cloning. What <code>bh</code>
+    adds is the process — <code>bh work</code> drives a bead through its lifecycle so agents never
+    improvise raw <code>git</code> / <code>gh pr</code> for the lifecycle itself.</p>
+
+    <h3 class="display">The tenets</h3>
+    <div class="cardgrid">
+      <div class="card"><h4><span class="hexdot">⬢</span>Planes, kept separate</h4>
+        <p><b>Control</b> governs the factory. <b>Planning</b> turns ideas into molecules.
+        <b>Integration</b> executes them. Each plane has its own verbs and seats; they hand off
+        sequentially and never step into each other's role. <b>Assurance</b> is the one
+        exception — a cross-cutting gate layer, not a sequential plane.</p></div>
+      <div class="card"><h4><span class="hexdot">⬢</span>Merging is not releasing</h4>
+        <p>Integration is high-frequency and dirty: each bead gets a worktree, and lands on an
+        <b>always-green</b> line. Release is a separate, deliberate, gated act.</p></div>
+      <div class="card"><h4><span class="hexdot">⬢</span>Lossless history</h4>
+        <p>Agents do the merging, so history is audited: merge <code>--no-ff</code> at the
+        boundary, <b>never squash there</b>. Workers squash only their own local checkpoints
+        into clean conventional digests <em>before</em> submit (tiered retention).</p></div>
+      <div class="card"><h4><span class="hexdot">⬢</span>Unit of work = a bead</h4>
+        <p>Worktree → implement → refine → check → submit → review → merge. One bead, one
+        branch (<code>wt/bead/issue/&lt;id&gt;</code>), one reviewable change.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="pipeline">
+  <div class="breakout">
+    <div class="wrap" style="padding:0">
+      <div class="eyebrow display">05 · The pipeline</div>
+      <h2 class="display">Planning → dispatch → develop → review → merge</h2>
+      <p>The full state machine, with its three feedback loops: the <b>spike loop</b> (settle
+      feasibility before implementation beads exist), the <b>bounce loop</b>
+      (review → changes-requested → resume), and the <b>replan door</b> (a mid-execution
+      blocker re-enters planning). Hexagons are gates — nothing passes one without the
+      right seat resolving it.</p>
+    </div>
+
+    <figure>
+      <div class="diagram">
+      <svg viewBox="0 0 1160 700" role="img" aria-label="State diagram of the AGF pipeline: planning plane stages flow through plan and kickoff gates into the integration plane, where beads are assigned, implemented, submitted through review and security gates, merged into a container, and finished onto main. Feedback loops: spike molecules, review bounce, and the replan door.">
+        <defs>
+          <marker id="m-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#9A8C71"/></marker>
+          <marker id="m-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#C99038"/></marker>
+          <marker id="m-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#C0563C"/></marker>
+          <marker id="m-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#55996F"/></marker>
+        </defs>
+
+        <!-- ================= lanes ================= -->
+        <rect class="lane-p" x="16" y="16" width="1128" height="240" rx="10"/>
+        <text class="lane-label" x="32" y="38">PLANNING PLANE — HUMAN-INTERACTIVE · OUTPUTS BEADS + DECISION RECORDS, NEVER CODE</text>
+        <rect class="lane-i" x="16" y="272" width="1128" height="330" rx="10"/>
+        <text class="lane-label" x="32" y="294">INTEGRATION PLANE — DISPATCHER · DEVELOPER · REVIEWER · MERGER</text>
+
+        <!-- ================= planning row ================= -->
+        <rect class="node" x="40" y="56" width="84" height="40" rx="7"/>
+        <text class="nlabel" x="82" y="74">ideate</text>
+        <text class="nsub" x="82" y="88">frame + triage</text>
+        <path class="flow" d="M124,76 H146" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="148" y="56" width="96" height="40" rx="7"/>
+        <text class="nlabel" x="196" y="74">research</text>
+        <text class="nsub" x="196" y="88">analyst agents</text>
+        <path class="flow" d="M244,76 H266" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="268" y="56" width="118" height="40" rx="7"/>
+        <text class="nlabel" x="327" y="74">architecture</text>
+        <text class="nsub" x="327" y="88">decisions / ADRs</text>
+        <path class="flow" d="M386,76 H408" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="410" y="56" width="112" height="40" rx="7"/>
+        <text class="nlabel" x="466" y="74">decompose</text>
+        <text class="nsub" x="466" y="88">spec · check · preview</text>
+        <path class="flow" d="M522,76 H546" marker-end="url(#m-n)"/>
+
+        <polygon class="gatehex" points="550,76 569,43 607,43 626,76 607,109 569,109"/>
+        <text class="glabel" x="588" y="73">PLAN</text>
+        <text class="gsub" x="588" y="87">bh plan file</text>
+        <path class="flow" d="M626,76 H658" marker-end="url(#m-n)"/>
+
+        <polygon class="gatehex" points="662,76 681,43 719,43 738,76 719,109 700,109 681,109"/>
+        <text class="glabel" x="700" y="73">KICKOFF</text>
+        <text class="gsub" x="700" y="87">bh plan approve</text>
+        <path class="flow" d="M738,76 H768" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="770" y="56" width="140" height="40" rx="7"/>
+        <text class="nlabel" x="840" y="74">roots surface</text>
+        <text class="nsub" x="840" y="88">bd ready</text>
+
+        <!-- ready -> integration start -->
+        <path class="flow" d="M840,96 C840,180 700,240 240,240 C130,240 100,270 100,312" marker-end="url(#m-n)"/>
+        <text class="alabel" x="855" y="150">a dispatcher picks it up</text>
+
+        <!-- ================= spike loop ================= -->
+        <path class="flow-h" d="M310,96 C300,120 296,138 300,158" marker-end="url(#m-h)"/>
+        <text class="alabel-h" x="150" y="132">open GO / NO-GO?</text>
+        <rect class="node" x="268" y="160" width="150" height="40" rx="7"/>
+        <text class="nlabel" x="343" y="178">file spike molecule</text>
+        <text class="nsub" x="343" y="192">tag:spike + decision bead</text>
+
+        <path class="flow" d="M418,180 H466" marker-end="url(#m-n)"/>
+        <rect class="node" x="468" y="160" width="150" height="40" rx="7"/>
+        <text class="nlabel" x="543" y="178">verdict lands</text>
+        <text class="nsub" x="543" y="192">decision bead close reason</text>
+
+        <!-- spike executes on integration plane -->
+        <path class="flow dashed" d="M343,200 L343,306" marker-end="url(#m-n)"/>
+        <path class="flow dashed" d="M520,308 L530,204" marker-end="url(#m-n)"/>
+        <text class="alabel" x="190" y="248">spikes dispatch like any molecule</text>
+
+        <!-- GO / NO-GO -->
+        <path class="flow-h" d="M480,158 C440,120 400,104 360,96" marker-end="url(#m-h)"/>
+        <text class="alabel-h" x="378" y="126">GO → replan</text>
+        <path class="flow" d="M618,180 H656" marker-end="url(#m-n)"/>
+        <rect class="node-end" x="658" y="160" width="170" height="40" rx="7"/>
+        <text class="nlabel" x="743" y="178">NO-GO → ADR, close</text>
+        <text class="nsub" x="743" y="192">nothing orphaned</text>
+
+        <!-- ================= integration row 1 ================= -->
+        <rect class="node" x="40" y="316" width="120" height="42" rx="7"/>
+        <text class="nlabel" x="100" y="333">start &lt;epic&gt;</text>
+        <text class="nsub" x="100" y="348">disp/ opens container</text>
+        <path class="flow" d="M160,337 H182" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="184" y="316" width="94" height="42" rx="7"/>
+        <text class="nlabel" x="231" y="333">assign</text>
+        <text class="nsub" x="231" y="348">--to dev/&lt;name&gt;</text>
+        <path class="flow" d="M278,337 H298" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="300" y="316" width="86" height="42" rx="7"/>
+        <text class="nlabel" x="343" y="333">claim</text>
+        <text class="nsub" x="343" y="348">identity + signing</text>
+        <path class="flow" d="M386,337 H408" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="410" y="316" width="112" height="42" rx="7"/>
+        <text class="nlabel" x="466" y="333">implement</text>
+        <text class="nsub" x="466" y="348">wt/bead/issue/&lt;id&gt;</text>
+        <path class="flow" d="M522,337 H544" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="546" y="316" width="112" height="42" rx="7"/>
+        <text class="nlabel" x="602" y="333">show · refine</text>
+        <text class="nsub" x="602" y="348">squash → digests</text>
+        <path class="flow" d="M658,337 H678" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="680" y="316" width="80" height="42" rx="7"/>
+        <text class="nlabel" x="720" y="333">check</text>
+        <text class="nsub" x="720" y="348">validate_cmd</text>
+        <path class="flow" d="M760,337 H780" marker-end="url(#m-n)"/>
+
+        <rect class="node" x="782" y="316" width="86" height="42" rx="7"/>
+        <text class="nlabel" x="825" y="333">submit</text>
+        <text class="nsub" x="825" y="348">opens gates</text>
+
+        <!-- parallel gates -->
+        <path class="flow" d="M868,330 C 890,322 900,322 912,328" marker-end="url(#m-n)"/>
+        <polygon class="gatehex" points="916,342 935,309 973,309 992,342 973,375 935,375"/>
+        <text class="glabel" x="954" y="339">REVIEW</text>
+        <text class="gsub" x="954" y="353">human · timer · gh</text>
+
+        <path class="flow" d="M868,346 C 950,390 1010,390 1032,372" marker-end="url(#m-n)"/>
+        <polygon class="gatehex" points="1016,342 1035,309 1073,309 1092,342 1073,375 1035,375"/>
+        <text class="glabel" x="1054" y="339">SECURITY</text>
+        <text class="gsub" x="1054" y="353">warden/ only</text>
+        <text class="alabel" x="920" y="300">parallel gates — both must clear</text>
+
+        <!-- approve -> merge -->
+        <path class="flow-h" d="M954,375 L968,438" marker-end="url(#m-h)"/>
+        <text class="alabel-h" x="975" y="410">approve</text>
+        <path class="flow-h" d="M1054,375 C 1050,405 1035,425 1020,438" marker-end="url(#m-h)"/>
+
+        <rect class="node" x="880" y="440" width="180" height="44" rx="7"/>
+        <text class="nlabel" x="970" y="458">merge · merger seat</text>
+        <text class="nsub" x="970" y="473">--no-ff → container · merge-slot</text>
+
+        <!-- bounce loop -->
+        <path class="flow-r" d="M930,375 C 850,450 770,468 700,466" marker-end="url(#m-r)"/>
+        <text class="alabel-r" x="742" y="428">bounce · changes-requested</text>
+        <rect class="node" x="560" y="446" width="136" height="42" rx="7"/>
+        <text class="nlabel" x="628" y="463">resume</text>
+        <text class="nsub" x="628" y="478">re-attach + read feedback</text>
+        <path class="flow-r" d="M558,466 C 500,466 470,420 466,362" marker-end="url(#m-r)"/>
+
+        <!-- merge loop back to next bead -->
+        <path class="flow" d="M958,438 C 700,398 420,398 236,360" marker-end="url(#m-n)"/>
+        <text class="alabel" x="410" y="390">next ready bead — parallel devs, serial merge</text>
+
+        <!-- finish -->
+        <path class="flow" d="M970,484 C 970,510 930,524 900,530" marker-end="url(#m-n)"/>
+        <rect class="node" x="660" y="516" width="230" height="44" rx="7"/>
+        <text class="nlabel" x="775" y="534">finish &lt;epic&gt;</text>
+        <text class="nsub" x="775" y="549">all children closed · validate assembled container</text>
+
+        <path class="flow-g" d="M775,560 L775,636" marker-end="url(#m-g)"/>
+        <text class="alabel-g" x="790" y="600">one --no-ff merge bubble</text>
+
+        <!-- replan door -->
+        <path class="flow-r dashed" d="M448,314 C 448,260 452,230 458,204" marker-end="url(#m-r)"/>
+        <text class="alabel-r" x="560" y="264">blocker / discovery → replan (the one re-entry door)</text>
+
+        <!-- main -->
+        <line class="mainline" x1="40" y1="644" x2="1120" y2="644"/>
+        <circle cx="775" cy="644" r="6" fill="#55996F"/>
+        <text class="alabel-g" x="40" y="668">main — always green</text>
+        <text class="alabel-g" x="1120" y="668" text-anchor="end">merging ≠ releasing — release is a separate, gated act</text>
+      </svg>
+      </div>
+      <div class="legend display">
+        <span><span class="sw hex"></span>gate (bd gate — seat-resolved)</span>
+        <span><span class="sw" style="background:#C99038"></span>approval / verdict</span>
+        <span><span class="sw" style="background:#C0563C"></span>feedback loop</span>
+        <span><span class="sw" style="background:#55996F"></span>always-green integration line</span>
+        <span><span class="sw" style="background:#9A8C71"></span>forward flow</span>
+      </div>
+      <figcaption>The two-gate planning exit is deliberate: <b>plan approval</b> gates whether the
+      decomposition is right; <b>kickoff approval</b> gates whether the work should start now.
+      Inside a molecule, every bead forks off the epic's container branch
+      (<code>wt/bead/epic/&lt;id&gt;</code>) so bead B sees bead A's merged work; the container
+      lands on <code>main</code> only when the whole molecule is done — one recursive rule that
+      scales to N tiers (issue → epic → workstream → main).</figcaption>
+    </figure>
+
+    <div class="wrap" style="padding:0">
+      <h3 class="display">What keeps the line green</h3>
+      <ul>
+        <li><b>Serialized merges.</b> Merge is a separate seat (the merger) gated by
+        <code>bd merge-slot</code> — parallel developers, one merge at a time.</li>
+        <li><b>The conflict ladder.</b> <code>clean → rebased → union → bounce</code>: try a
+        clean <code>--no-ff</code>, then rebase-and-retry, then path-whitelisted union merge
+        (append-only files only, re-validated), else bounce with the branch restored. No work
+        is ever lost.</li>
+        <li><b>Validation modes.</b> Every bead validates in isolation at submit;
+        <code>relaxed</code> / <code>conservative</code> / <code>loose</code> tune how often the
+        <em>combination</em> is re-tested. If a re-validation fails on a safe-to-rewrite branch,
+        the tip is rolled back before anyone can observe it; a shared branch escalates for a
+        forward fix instead.</li>
+        <li><b>The batch exception.</b> Cohesive linear chains can run as one shared
+        <code>wt/batch/&lt;group&gt;</code> worktree, merged once — guarded by cohesion, a size
+        cap of 5, one model tier, one review gate. A batch fails and bounces as a unit; per-bead
+        commits stay bisectable inside the bubble.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</Layout>
