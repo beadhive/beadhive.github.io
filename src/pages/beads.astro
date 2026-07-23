@@ -2,6 +2,16 @@
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout active="beads" title="The substrate · Beadhive" description="What beads is: a lightweight, git-embedded issue tracker with first-class dependency support — and the opinions on why it is the right substrate for agents.">
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#beads">First, what is beads?</a>
+    <a class="sub" href="#beads-efficient">Efficiency for agents</a>
+    <a class="sub" href="#beads-workgraph">The work-graph</a>
+    <a class="sub" href="#beads-sync">Bi-directional sync</a>
+    <a class="head" href="#why">Why beads is the right substrate</a>
+  </nav>
+  <div class="pagemain">
 
 <section id="beads">
   <div class="breakout">
@@ -16,7 +26,7 @@ import Layout from '../layouts/Layout.astro';
       no hosted service to run: the entire tracker is a local CLI, which is exactly what makes
       it the right substrate for agents.</p>
 
-      <h3 class="display">Why it's more efficient for agents than a hosted tracker</h3>
+      <h3 class="display" id="beads-efficient">Why it's more efficient for agents than a hosted tracker</h3>
       <p>An agent's scarcest resources are <b>context tokens</b> and <b>round-trips</b>. A
       hosted tracker spends both: auth handshakes, paginated API payloads, HTML noise, rate
       limits. Beads answers in one local, zero-latency command with compact structured output:</p>
@@ -33,7 +43,7 @@ import Layout from '../layouts/Layout.astro';
         persist insights next to the work, so learning survives the session that produced it.</li>
       </ul>
 
-      <h3 class="display">The work-graph: one DAG across every repo and product</h3>
+      <h3 class="display" id="beads-workgraph">The work-graph: one DAG across every repo and product</h3>
       <p>Because dependencies are typed edges (<em>blocks</em>, <em>related</em>,
       <em>parent-child</em>, <em>discovered-from</em>), the backlog isn't a list — it's a
       traversable graph. Epics group beads into molecules; a <b>workstream</b> is just an epic
@@ -43,7 +53,7 @@ import Layout from '../layouts/Layout.astro';
       <code>bd ready</code> / <code>bd blocked</code> compute the frontier and the bottlenecks
       across the entire portfolio at once.</p>
 
-      <h3 class="display">Bi-directional sync: humans keep their boards</h3>
+      <h3 class="display" id="beads-sync">Bi-directional sync: humans keep their boards</h3>
       <p>Beads ships sync integrations for <b>GitHub Issues, GitLab, Jira, Linear, and Azure
       DevOps</b> — <code>bd github sync</code> / <code>push</code> / <code>pull</code> and
       friends — so the graph mirrors into the trackers humans already visualize with. A PM
@@ -164,7 +174,6 @@ bd github sync           # mirror to / from the humans' board</code></pre>
     </div>
   </div>
 </section>
-
 <section id="why">
   <div class="wrap">
     <div class="eyebrow display">03 · The opinions</div>
@@ -212,4 +221,6 @@ bd github sync           # mirror to / from the humans' board</code></pre>
   </div>
 </section>
 
+  </div>
+</div>
 </Layout>

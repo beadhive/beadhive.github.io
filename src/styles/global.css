@@ -65,13 +65,13 @@
   }
 
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; font-size: clamp(16px, 15px + 0.16vw, 21px); }
   body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
     font-family: "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
-    font-size: 17px;
+    font-size: 1rem;
     line-height: 1.62;
   }
   .display { font-family: "Avenir Next", "Futura", "Century Gothic", "Segoe UI", system-ui, sans-serif; }
@@ -96,8 +96,8 @@
   pre code { background: none; padding: 0; font-size: inherit; }
   a { color: var(--honey-strong); text-decoration-thickness: 1px; text-underline-offset: 2px; }
 
-  .wrap { max-width: 760px; margin: 0 auto; padding: 0 24px; }
-  .breakout { max-width: 1180px; margin-left: auto; margin-right: auto; padding: 0 24px; }
+  .wrap { max-width: 48rem; margin: 0 auto; padding: 0 24px; }
+  .breakout { max-width: min(92rem, 94vw); margin-left: auto; margin-right: auto; padding: 0 24px; }
 
   /* ---------- header ---------- */
   header { padding: 64px 0 20px; }
@@ -108,17 +108,17 @@
   }
   .brandline svg { flex: none; }
   h1 {
-    font-size: clamp(34px, 6vw, 54px);
+    font-size: clamp(2rem, 6vw, 3.18rem);
     line-height: 1.05;
     margin: 18px 0 14px;
     font-weight: 700;
     letter-spacing: -0.01em;
     text-wrap: balance;
   }
-  .lede { font-size: 20px; line-height: 1.55; color: var(--ink-2); max-width: 62ch; margin: 0; }
+  .lede { font-size: 1.18rem; line-height: 1.55; color: var(--ink-2); max-width: 62ch; margin: 0; }
   .namestack {
     margin-top: 34px;
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 12px;
   }
   .namecard {
     background: var(--panel); border: 1px solid var(--hairline); border-radius: 10px;
@@ -137,10 +137,10 @@
   }
   .eyebrow::after { content: ""; height: 1px; background: var(--hairline); flex: 1; }
   h2 {
-    font-size: clamp(24px, 3.4vw, 32px); line-height: 1.15;
+    font-size: clamp(1.4rem, 3.4vw, 1.88rem); line-height: 1.15;
     margin: 0 0 16px; font-weight: 700; letter-spacing: -0.005em; text-wrap: balance;
   }
-  h3 { font-size: 19px; margin: 30px 0 8px; font-weight: 650; }
+  h3 { font-size: 1.12rem; margin: 30px 0 8px; font-weight: 650; }
   p { margin: 0 0 16px; max-width: 68ch; }
   ul { margin: 0 0 16px; padding-left: 22px; max-width: 66ch; }
   li { margin-bottom: 7px; }
@@ -152,7 +152,7 @@
   .note b { color: var(--honey-strong); }
 
   /* ---------- cards ---------- */
-  .cardgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin: 22px 0; }
+  .cardgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 14px; margin: 22px 0; }
   .card {
     background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px;
     padding: 18px 20px; box-shadow: var(--shadow);
@@ -211,7 +211,7 @@
   }
   .plane-h b { font-size: 17px; font-weight: 700; font-family: "Avenir Next","Futura",system-ui,sans-serif; }
   .plane-h span { font-size: 13.5px; color: var(--ink-3); }
-  .seatgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+  .seatgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 12px; }
   .seat {
     background: var(--panel); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px;
   }
@@ -257,7 +257,9 @@
   /* ---------- top nav ---------- */
   .topnav {
     position: sticky; top: 0; z-index: 50;
-    background: var(--bg);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    -webkit-backdrop-filter: saturate(1.4) blur(10px);
+    backdrop-filter: saturate(1.4) blur(10px);
     border-bottom: 1px solid var(--hairline);
   }
   .topnav-inner {
@@ -298,3 +300,57 @@
 
   /* ---------- footer links ---------- */
   .footlinks a { color: var(--honey-strong); }
+
+  /* ---------- theme-toggle icon (sun in dark, moon in light) ---------- */
+  .themetoggle .tt-sun-core, .themetoggle .tt-sun-rays { display: none; }
+  .themetoggle .tt-moon { display: inline; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .themetoggle .tt-moon { display: none; }
+    :root:not([data-theme="light"]) .themetoggle .tt-sun-core,
+    :root:not([data-theme="light"]) .themetoggle .tt-sun-rays { display: inline; }
+  }
+  :root[data-theme="dark"] .themetoggle .tt-moon { display: none; }
+  :root[data-theme="dark"] .themetoggle .tt-sun-core,
+  :root[data-theme="dark"] .themetoggle .tt-sun-rays { display: inline; }
+  :root[data-theme="light"] .themetoggle .tt-moon { display: inline; }
+  :root[data-theme="light"] .themetoggle .tt-sun-core,
+  :root[data-theme="light"] .themetoggle .tt-sun-rays { display: none; }
+
+  /* ---------- content-page layout + sticky side TOC ---------- */
+  .pagegrid { display: block; }
+  .toc { display: none; }
+  .toc-title {
+    font-size: 11px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 700; margin: 0 0 10px;
+  }
+  .toc a {
+    display: block; color: var(--ink-2); text-decoration: none;
+    font-size: .82rem; line-height: 1.4; padding: 4px 0;
+  }
+  .toc a:hover { color: var(--honey-strong); }
+  .toc a.sub { padding-left: 12px; color: var(--ink-3); font-size: .78rem; }
+  .toc a.head { margin-top: 12px; font-weight: 650; color: var(--ink); }
+  .toc a.head:first-child { margin-top: 0; }
+
+  @media (min-width: 1280px) {
+    .pagegrid {
+      display: grid;
+      grid-template-columns: 14rem minmax(0, 1fr);
+      gap: 2.5rem;
+      max-width: min(94rem, 94vw);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    /* inner .wrap/.breakout already center within the main column */
+    .pagegrid > .pagemain { min-width: 0; }
+    .pagegrid > .pagemain .breakout,
+    .pagegrid > .pagemain .wrap { padding-left: 0; padding-right: 0; }
+    .toc {
+      display: block;
+      position: sticky;
+      top: 4.75rem;
+      align-self: start;
+      padding-top: 3.5rem;
+      font-family: "Avenir Next", "Futura", "Century Gothic", "Segoe UI", system-ui, sans-serif;
+    }
+  }

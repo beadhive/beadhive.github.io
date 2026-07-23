@@ -2,6 +2,15 @@
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout active="process" title="How work flows · Beadhive" description="The Beadhive mental model in one breath and the full planning → dispatch → develop → review → merge pipeline, with its spike, bounce, and replan loops.">
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#how">The mental model</a>
+    <a class="sub" href="#how-tenets">The tenets</a>
+    <a class="head" href="#pipeline">The pipeline</a>
+    <a class="sub" href="#pipeline-green">What keeps the line green</a>
+  </nav>
+  <div class="pagemain">
 
 <section id="how">
   <div class="wrap">
@@ -20,7 +29,7 @@ import Layout from '../layouts/Layout.astro';
     adds is the process — <code>bh work</code> drives a bead through its lifecycle so agents never
     improvise raw <code>git</code> / <code>gh pr</code> for the lifecycle itself.</p>
 
-    <h3 class="display">The tenets</h3>
+    <h3 class="display" id="how-tenets">The tenets</h3>
     <div class="cardgrid">
       <div class="card"><h4><span class="hexdot">⬢</span>Planes, kept separate</h4>
         <p><b>Control</b> governs the factory. <b>Planning</b> turns ideas into molecules.
@@ -40,7 +49,6 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </div>
 </section>
-
 <section id="pipeline">
   <div class="breakout">
     <div class="wrap" style="padding:0">
@@ -241,7 +249,7 @@ import Layout from '../layouts/Layout.astro';
     </figure>
 
     <div class="wrap" style="padding:0">
-      <h3 class="display">What keeps the line green</h3>
+      <h3 class="display" id="pipeline-green">What keeps the line green</h3>
       <ul>
         <li><b>Serialized merges.</b> Merge is a separate seat (the merger) gated by
         <code>bd merge-slot</code> — parallel developers, one merge at a time.</li>
@@ -263,4 +271,6 @@ import Layout from '../layouts/Layout.astro';
   </div>
 </section>
 
+  </div>
+</div>
 </Layout>

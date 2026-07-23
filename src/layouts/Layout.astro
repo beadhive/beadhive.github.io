@@ -29,6 +29,16 @@ const canonical = new URL('/', Astro.site).href;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      // Pre-paint: apply the persisted theme before first paint (no flash of
+      // wrong theme). With no stored choice, leave it to CSS prefers-color-scheme.
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+        } catch (e) {}
+      })();
+    </script>
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -56,5 +66,21 @@ const canonical = new URL('/', Astro.site).href;
     <Nav active={active} />
     <slot />
     <Footer />
+    <script is:inline>
+      (function () {
+        var btn = document.querySelector('.themetoggle');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          var root = document.documentElement;
+          var cur = root.dataset.theme;
+          if (cur !== 'light' && cur !== 'dark') {
+            cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          var next = cur === 'dark' ? 'light' : 'dark';
+          root.dataset.theme = next;
+          try { localStorage.setItem('theme', next); } catch (e) {}
+        });
+      })();
+    </script>
   </body>
 </html>

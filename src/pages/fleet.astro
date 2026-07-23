@@ -2,6 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout active="fleet" title="Scale · Beadhive" description="A fleet of hives, one Head Office — bh sync aggregates every registered hive so you can ask what is actionable anywhere — plus where the source-of-truth docs live.">
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#hq">A fleet of hives, one Head Office</a>
+    <a class="head" href="#pointers">Where the source of truth lives</a>
+  </nav>
+  <div class="pagemain">
 
 <section id="hq">
   <div class="breakout">
@@ -115,7 +122,6 @@ import Layout from '../layouts/Layout.astro';
     </figure>
   </div>
 </section>
-
 <section id="pointers">
   <div class="wrap">
     <div class="eyebrow display">08 · Go deeper</div>
@@ -135,4 +141,6 @@ import Layout from '../layouts/Layout.astro';
   </div>
 </section>
 
+  </div>
+</div>
 </Layout>

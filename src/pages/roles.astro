@@ -2,6 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 ---
 <Layout active="roles" title="Roles & seats · Beadhive" description="One process, two kinds of worker: humans hold the gates, agents do the work — the four planes and the seats that sit in them, separated by blast radius.">
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#humans">One process, two kinds of worker</a>
+    <a class="head" href="#seats">Four planes, one spine</a>
+  </nav>
+  <div class="pagemain">
 
 <section id="humans">
   <div class="wrap">
@@ -30,7 +37,6 @@ import Layout from '../layouts/Layout.astro';
     </ul>
   </div>
 </section>
-
 <section id="seats">
   <div class="wrap">
     <div class="eyebrow display">07 · Roles &amp; seats</div>
@@ -132,4 +138,6 @@ import Layout from '../layouts/Layout.astro';
   </div>
 </section>
 
+  </div>
+</div>
 </Layout>
