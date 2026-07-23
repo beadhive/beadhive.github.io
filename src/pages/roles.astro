@@ -12,12 +12,12 @@ import Layout from '../layouts/Layout.astro';
 
 <section id="humans">
   <div class="wrap">
-    <div class="eyebrow display">04 · Humans + agents</div>
+    <div class="eyebrow display">05 · Humans + agents</div>
     <h2 class="display">One process, two kinds of worker</h2>
     <p>AGF doesn't split "human workflows" from "agent workflows" — it defines <b>seats</b>, and
-    either kind of worker can sit in one. A seat is launched as an agent sub-task, as the main
-    Claude Code loop (<code>bh role &lt;seat&gt;</code>), or occupied by a human doing the same
-    verbs by hand. What keeps the mix safe:</p>
+    either kind of worker can sit in one. A seat can be filled by an agent sub-task, by the main
+    Claude Code loop (<code>bh role &lt;seat&gt;</code>), or by a human doing the same verbs by
+    hand. What keeps the mix safe:</p>
     <ul>
       <li><b>Humans hold the gates.</b> Plan approval and kickoff approval are explicit human
       checkpoints; the default review gate is <code>human</code>; a reviewer bounce sends the
@@ -39,7 +39,7 @@ import Layout from '../layouts/Layout.astro';
 </section>
 <section id="seats">
   <div class="wrap">
-    <div class="eyebrow display">07 · Roles &amp; seats</div>
+    <div class="eyebrow display">06 · Roles &amp; seats</div>
     <h2 class="display">Four planes, one orchestration spine</h2>
     <p>Seats are separated by <b>blast radius</b>: the seat that routes work holds no secrets,
     the seat that holds secrets makes no decisions, the seat that observes writes nothing. A

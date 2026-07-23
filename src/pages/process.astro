@@ -14,11 +14,11 @@ import Layout from '../layouts/Layout.astro';
 
 <section id="how">
   <div class="wrap">
-    <div class="eyebrow display">02 · How it works</div>
+    <div class="eyebrow display">03 · How it works</div>
     <h2 class="display">The mental model in one breath</h2>
     <p>Every repo is a <b>hive</b> — its own beads database, embedded as Dolt under the repo's
     gitignored <code>.beads/</code>. Issues carry a short, stable <b>prefix</b>
-    (<code>ag-infra-1</code>) derived from the stable part of identity (org + repo); the parts
+    (<code>acme-api-1</code>) derived from the stable part of identity (org + repo); the parts
     that can change (provider, org) live in <b>labels</b>. Issue history publishes to
     <code>refs/dolt/data</code> on the repo's <em>own git remote</em> — a separate ref namespace
     that never touches branches or PRs, so there is <b>no server to run</b>. A workspace-level
@@ -37,8 +37,8 @@ import Layout from '../layouts/Layout.astro';
         sequentially and never step into each other's role. <b>Assurance</b> is the one
         exception — a cross-cutting gate layer, not a sequential plane.</p></div>
       <div class="card"><h4><span class="hexdot">⬢</span>Merging is not releasing</h4>
-        <p>Integration is high-frequency and dirty: each bead gets a worktree, and lands on an
-        <b>always-green</b> line. Release is a separate, deliberate, gated act.</p></div>
+        <p>Integration is high-frequency and dirty: each bead gets its own worktree and lands on
+        an <b>always-green</b> line. Release is a separate, deliberate, gated act.</p></div>
       <div class="card"><h4><span class="hexdot">⬢</span>Lossless history</h4>
         <p>Agents do the merging, so history is audited: merge <code>--no-ff</code> at the
         boundary, <b>never squash there</b>. Workers squash only their own local checkpoints
@@ -52,7 +52,7 @@ import Layout from '../layouts/Layout.astro';
 <section id="pipeline">
   <div class="breakout">
     <div class="wrap" style="padding:0">
-      <div class="eyebrow display">05 · The pipeline</div>
+      <div class="eyebrow display">04 · The pipeline</div>
       <h2 class="display">Planning → dispatch → develop → review → merge</h2>
       <p>The full state machine, with its three feedback loops: the <b>spike loop</b> (settle
       feasibility before implementation beads exist), the <b>bounce loop</b>

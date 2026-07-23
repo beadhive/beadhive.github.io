@@ -283,8 +283,18 @@
   }
   .navlinks a:hover { color: var(--ink); background: var(--panel); }
   .navlinks a[aria-current="page"] { color: var(--honey-strong); background: var(--honey-wash); }
-  .themetoggle {
+  .ghlink {
     margin-left: auto; flex: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 34px; padding: 0 10px;
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: 8px;
+    color: var(--ink-2); text-decoration: none;
+    font-size: 12.5px; font-weight: 600;
+  }
+  .ghlink:hover { border-color: var(--honey); color: var(--ink); }
+  .ghstars { color: var(--honey-strong); }
+  .themetoggle {
+    flex: none;
     display: inline-flex; align-items: center; justify-content: center;
     width: 34px; height: 34px; padding: 0;
     background: var(--panel); border: 1px solid var(--hairline); border-radius: 8px;
@@ -292,11 +302,47 @@
   }
   .themetoggle:hover { border-color: var(--honey); color: var(--ink); }
 
+  /* ---------- mobile nav menu (native <details> dropdown) ---------- */
+  .navmenu { display: none; position: relative; flex: none; }
+  .navmenu > summary {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; list-style: none; cursor: pointer;
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: 8px;
+    color: var(--ink-2);
+  }
+  .navmenu > summary::-webkit-details-marker { display: none; }
+  .navmenu[open] > summary { border-color: var(--honey); color: var(--ink); }
+  .navmenu-panel {
+    position: absolute; right: 0; top: calc(100% + 10px); min-width: 11rem;
+    background: var(--bg); border: 1px solid var(--hairline); border-radius: 10px;
+    padding: 6px; box-shadow: var(--shadow), 0 10px 30px rgba(0, 0, 0, 0.12);
+  }
+  .navmenu-panel a {
+    display: block; padding: 9px 12px; border-radius: 7px;
+    color: var(--ink-2); text-decoration: none; font-size: 15px; font-weight: 600;
+  }
+  .navmenu-panel a:hover { color: var(--ink); background: var(--panel); }
+  .navmenu-panel a[aria-current="page"] { color: var(--honey-strong); background: var(--honey-wash); }
+  @media (max-width: 719.98px) {
+    .navlinks { display: none; }
+    .navmenu { display: block; }
+    .topnav-inner { gap: 10px; }
+  }
+  @media (max-width: 359.98px) {
+    .ghstars { display: none; }
+  }
+
   /* ---------- teaser cards (home) ---------- */
   .teaser { text-decoration: none; color: inherit; display: block; }
   .teaser h4 { color: var(--ink); }
   .teaser p { color: var(--ink-2); }
-  .teaser:hover { border-color: var(--honey); }
+  .teaser:hover { border-color: var(--honey); box-shadow: var(--shadow), 0 6px 20px rgba(0, 0, 0, 0.07); }
+  .teaser .cardcta {
+    display: inline-block; margin-top: 12px;
+    color: var(--honey-strong); font-size: 13px; font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .teaser:hover .cardcta { text-decoration: underline; text-underline-offset: 3px; }
 
   /* ---------- footer links ---------- */
   .footlinks a { color: var(--honey-strong); }

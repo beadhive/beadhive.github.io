@@ -82,5 +82,28 @@ const canonical = new URL('/', Astro.site).href;
         });
       })();
     </script>
+    <script is:inline>
+      // GitHub star count in the nav badge. Cached for an hour; on any failure
+      // (rate limit, offline) the count stays hidden and the badge is just a link.
+      (function () {
+        var el = document.querySelector('.ghstars');
+        if (!el) return;
+        function fmt(n) { return n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : String(n); }
+        function show(n) { el.textContent = '★ ' + fmt(n); el.hidden = false; }
+        var KEY = 'gh-stars';
+        try {
+          var c = JSON.parse(localStorage.getItem(KEY) || 'null');
+          if (c && typeof c.n === 'number' && Date.now() - c.t < 3600000) return show(c.n);
+        } catch (e) {}
+        fetch('https://api.github.com/repos/beadhive/beadhive')
+          .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+          .then(function (d) {
+            if (typeof d.stargazers_count !== 'number') return;
+            show(d.stargazers_count);
+            try { localStorage.setItem(KEY, JSON.stringify({ n: d.stargazers_count, t: Date.now() })); } catch (e) {}
+          })
+          .catch(function () {});
+      })();
+    </script>
   </body>
 </html>
