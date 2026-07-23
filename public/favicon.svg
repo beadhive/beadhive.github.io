@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+<rect width="64" height="64" fill="#110D06"/>
+<svg x="6" y="6" width="52" height="52" viewBox="-11 -11 142 142">
+  <!-- Tier 2 · core mark (24–64px): three-cell honeycomb pyramid rotated 30°
+       onto the lattice's flat-top orientation, fat pony bead threaded on the
+       shared wall between the base cells.
+       GEOMETRY IS LAW: the three-cell junction vertex is pinned at (60,60) —
+       the exact icon center — BEFORE the rotate(30 60 60) is applied. The
+       cluster is 3-fold symmetric about that point, so the mark stays
+       rotationally balanced in both square and circle crops. Move nothing. -->
+  <defs>
+    <clipPath id="bead-core"><rect x="40" y="64" width="40" height="24" rx="11"/></clipPath>
+  </defs>
+  <g transform="rotate(30 60 60)">
+    <g fill="none" stroke="#8F6D22" stroke-width="4.5" stroke-linejoin="round">
+      <polygon points="60,-4 87.7,12 87.7,44 60,60 32.3,44 32.3,12"/>
+      <polygon points="32.3,44 60,60 60,92 32.3,108 4.6,92 4.6,60"/>
+      <polygon points="87.7,44 115.4,60 115.4,92 87.7,108 60,92 60,60"/>
+    </g>
+    <rect x="40" y="64" width="40" height="24" rx="11" fill="#F0B429"/>
+    <g clip-path="url(#bead-core)"><rect x="36" y="71.5" width="48" height="9" fill="#110D06"/></g>
+  </g>
+</svg>
+</svg>
