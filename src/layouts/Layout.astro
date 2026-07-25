@@ -22,7 +22,9 @@ const {
 } = Astro.props;
 
 const ogImage = new URL('/og-default.png', Astro.site).href;
-const canonical = new URL('/', Astro.site).href;
+// Per-page, not the site root: a hardcoded '/' made every content page declare
+// itself a duplicate of the homepage to search engines.
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
 ---
 <!doctype html>
 <html lang="en">
