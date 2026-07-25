@@ -6,6 +6,8 @@ import Layout from '../layouts/Layout.astro';
   <nav class="toc" aria-label="On this page">
     <p class="toc-title">On this page</p>
     <a class="head" href="#hq">A fleet of hives, one Head Office</a>
+    <a class="sub" href="#hq-sync">Keeping the fleet in sync</a>
+    <a class="sub" href="#hq-intake">Fielding what comes in</a>
     <a class="head" href="#pointers">Where the source of truth lives</a>
   </nav>
   <div class="pagemain">
@@ -91,7 +93,7 @@ import Layout from '../layouts/Layout.astro';
         <!-- HQ hex -->
         <polygon class="gatehex" points="678,248 728,162 828,162 878,248 828,334 728,334" style="stroke-width:2.2"/>
         <text class="nlabel" x="778" y="230" style="font-size:16px">HQ / hub</text>
-        <text class="nsub" x="778" y="250">~/.ws/hq · ~/.ws/hub</text>
+        <text class="nsub" x="778" y="250">~/.beadhive/hq · ~/.beadhive/hub</text>
         <text class="nsub" x="778" y="266">one aggregated beads DB</text>
         <text class="nsub" x="778" y="282">read cache — hives stay authoritative</text>
 
@@ -108,7 +110,7 @@ import Layout from '../layouts/Layout.astro';
 
         <!-- head office -->
         <rect class="node-end" x="678" y="376" width="458" height="92" rx="10"/>
-        <text class="nlabel" x="907" y="400">Head Office — ~/.ws/config.yaml</text>
+        <text class="nlabel" x="907" y="400">Head Office — ~/.beadhive/config.yaml</text>
         <text class="nsub" x="907" y="420">the partitioned workspace registry · least-privilege writes</text>
         <text class="nsub" x="907" y="438">supervisor → policy · director → fleet membership</text>
         <text class="nsub" x="907" y="452">custodian → hive config + secrets · controller → read-only</text>
@@ -120,6 +122,37 @@ import Layout from '../layouts/Layout.astro';
       The prefix is permanent and derived from org + repo; the provider — the thing most likely
       to change — lives in a label, so a host migration is a label edit, not data surgery.</figcaption>
     </figure>
+
+    <div class="wrap" style="padding:0">
+      <h3 class="display" id="hq-sync">Keeping the fleet in sync</h3>
+      <p><code>bh hive sync</code> reconciles a hive against the fleet in both directions. Where
+      the two disagree it surfaces the disagreement <em>as data</em> rather than picking a winner
+      quietly — a conflict is something you read and decide, not something a sync resolves
+      silently while you're not looking. <code>bh sync</code> is the fleet-wide pass: it adds
+      every registered hive, clone-caching the ones that aren't checked out locally.</p>
+
+      <h3 class="display" id="hq-intake">Fielding what comes in</h3>
+      <p>Work also arrives from outside the plan. <code>bh report</code> files a bug or request
+      into any hive you own — including from a different hive entirely, which is how one repo
+      tells another that something it depends on is broken. <code>bh escalate</code> is the
+      lighter move: name a tool problem, hand it up, and keep working rather than stopping to
+      route it yourself.</p>
+      <p>Both land in one queue. <code>bh work intake</code> is the per-hive view and
+      <code>bh hq intake</code> the fleet-wide inbox, and the queue is source-agnostic — a
+      cross-hive report, an imported GitHub issue, and a legacy import all triage the same way,
+      with duplicate detection running on entry <em>and</em> again at triage so a colliding
+      request doesn't bury the queue. Four verbs dispose of anything in it:</p>
+      <ul>
+        <li><code>bh work accept</code> — real work: set type and priority, clear it into the
+        backlog, where it flows through the ordinary ready/dispatch loop.</li>
+        <li><code>bh work reject</code> — not a bug, or won't do: close it with a reason the
+        reporter can actually read.</li>
+        <li><code>bh work reroute</code> — filed against the wrong hive: re-file it into the
+        right one, or bounce it up when it's genuinely ambiguous.</li>
+        <li><code>bh work promote</code> — too big to simply accept: hand it to the planner,
+        which adopts it into a gated molecule instead of letting it sit as an oversized ticket.</li>
+      </ul>
+    </div>
   </div>
 </section>
 <section id="pointers">
@@ -129,13 +162,13 @@ import Layout from '../layouts/Layout.astro';
     <div class="tablewrap">
       <table>
         <tr><th>Doc</th><th>Covers</th></tr>
-        <tr><td><code>docs/AGF.md</code></td><td>The tenets, naming, container branches, dispatch depth, role modes — the process overview.</td></tr>
-        <tr><td><code>docs/DESIGN.md</code></td><td>Hives, prefixes, labels, identity-over-time, git-native hosting — the <em>why</em>.</td></tr>
-        <tr><td><code>docs/WORK.md</code></td><td>Every <code>bh work</code> verb, refine plans, validation modes, conflict ladder, batches, PR-governed landing.</td></tr>
-        <tr><td><code>docs/PLANNING-PLANE.md</code></td><td>The two gates, fidelity tiers, spike loop, replan vs groom.</td></tr>
-        <tr><td><code>docs/CONTROL-PLANE.md</code></td><td>The four control seats, Head Office partitions, the commissioning loop.</td></tr>
-        <tr><td><code>docs/ASSURANCE.md</code></td><td>The warden, the <code>security:*</code> gate, the verifier lens.</td></tr>
-        <tr><td><code>docs/HUB.md</code> · <code>docs/HIVES.md</code></td><td>The cross-hive aggregate, onboarding, hive kinds and identity.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/AGF.md"><code>docs/AGF.md</code></a></td><td>The tenets, naming, container branches, dispatch depth, role modes — the process overview.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/DESIGN.md"><code>docs/DESIGN.md</code></a></td><td>Hives, prefixes, labels, identity-over-time, git-native hosting — the <em>why</em>.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/WORK.md"><code>docs/WORK.md</code></a></td><td>Every <code>bh work</code> verb, refine plans, validation modes, conflict ladder, batches, PR-governed landing.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/PLANNING-PLANE.md"><code>docs/PLANNING-PLANE.md</code></a></td><td>The two gates, fidelity tiers, spike loop, replan vs groom.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/CONTROL-PLANE.md"><code>docs/CONTROL-PLANE.md</code></a></td><td>The four control seats, Head Office partitions, the commissioning loop.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/ASSURANCE.md"><code>docs/ASSURANCE.md</code></a></td><td>The warden, the <code>security:*</code> gate, the verifier lens.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/HUB.md"><code>docs/HUB.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/HIVES.md"><code>docs/HIVES.md</code></a></td><td>The cross-hive aggregate, onboarding, hive kinds and identity.</td></tr>
       </table>
     </div>
   </div>
