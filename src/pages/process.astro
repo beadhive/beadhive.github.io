@@ -267,6 +267,16 @@ import Layout from '../layouts/Layout.astro';
         cap of 5, one model tier, one review gate. A batch fails and bounces as a unit; per-bead
         commits stay bisectable inside the bubble.</li>
       </ul>
+
+      <div class="note"><b>Where the ideas come from.</b> The pipeline starts at
+      <em>ideate</em>, which quietly assumes someone showed up with an idea — capping the whole
+      factory at one person's imagination on a given afternoon. Upstream of planning there's a
+      loop that doesn't: read the repo's own vision and strategy documents, derive candidate
+      topics from how those documents are actually structured rather than from a generic
+      checklist, then generate against each topic in parallel — deliberately blind to the
+      others, so the batch stays divergent instead of converging on the same three obvious
+      ideas. Survivors are deduplicated, judged against the vision, and filed through
+      <code>bh plan file</code> like any other molecule, so nothing skips the kickoff gate.</div>
     </div>
   </div>
 </section>
