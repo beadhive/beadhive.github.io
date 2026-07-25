@@ -7,6 +7,7 @@ import Layout from '../layouts/Layout.astro';
     <p class="toc-title">On this page</p>
     <a class="head" href="#humans">One process, two kinds of worker</a>
     <a class="head" href="#seats">Four planes, one spine</a>
+    <a class="head" href="#next">What's next</a>
   </nav>
   <div class="pagemain">
 
@@ -131,10 +132,25 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
 
-    <p style="font-size:14.5px;color:var(--ink-3)">Roadmap seats: <b>releaser</b> (release plane),
-    <b>contributor</b> (<code>contrib/</code> — provenance scrub + human-only publish gate), and
-    <b>operator</b> (delivery). Any seat can be launched as the main loop:
+    <p style="font-size:14.5px;color:var(--ink-3)">Any seat can be launched as the main loop:
     <code>bh role &lt;seat&gt;</code> or <code>claude --agent agf:&lt;seat&gt;</code>.</p>
+  </div>
+</section>
+
+<section id="next">
+  <div class="wrap">
+    <div class="eyebrow display">What's next</div>
+    <h2 class="display">Planes the factory is growing into</h2>
+    <p>Four more planes are designed and filed. They aren't described here because they aren't
+    built yet — and a process guide that documents unbuilt work reads as finished when it
+    isn't.</p>
+    <ul>
+      <li><b>Release</b> · cutting a version from the green line</li>
+      <li><b>Contribution</b> · gated upstream PRs over repos we don't own</li>
+      <li><b>Build</b> · pulling upstream progress into local build branches</li>
+      <li><b>Delivery</b> · reconciling a release into running systems</li>
+    </ul>
+    <p style="color:var(--ink-3)">Designed, not shipped. Details land with the code.</p>
   </div>
 </section>
 
