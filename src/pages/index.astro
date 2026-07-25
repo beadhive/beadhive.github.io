@@ -30,6 +30,31 @@ import Layout from '../layouts/Layout.astro';
   </div>
 </header>
 
+<section class="install">
+  <div class="wrap">
+    <div class="eyebrow display">Install · two commands</div>
+    <p><code>bh</code> is a Python CLI. It drives <code>bd</code> (beads) for issues and
+    <code>git</code> for history — there is no server to run and nothing to sign up for.</p>
+<pre><code>uv tool install 'beadhive[otel]'
+bh config init</code></pre>
+    <p>That leaves you a working <code>bh</code> and a config home at <code>~/.beadhive/</code>.
+    Point it at a repo with <code>bh hive onboard</code>, then ask what's actionable with
+    <code>bh work ready</code>.</p>
+
+    <h3 class="display" style="margin-top:1.6rem">Using Claude Code? Add the plugin</h3>
+    <p>Recommended, not required. The plugin vends the seat agent definitions and role skills —
+    planner, dispatcher, developer, reviewer, merger and the rest — so an agent can take a seat
+    directly instead of improvising the lifecycle. The last line wires the MCP server.</p>
+<pre><code>claude plugin marketplace add beadhive/claude-plugin
+claude plugin install bh@beadhive
+bh mcp install</code></pre>
+    <p style="color:var(--ink-3);font-size:.94rem">Full setup, from a fresh machine to a
+    configured workspace with registered hives:
+    <a href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">INSTALL.md</a> ·
+    <a href="https://github.com/beadhive/beadhive/blob/main/docs/ONBOARDING.md">docs/ONBOARDING.md</a></p>
+  </div>
+</section>
+
 <section class="teasers">
   <div class="wrap">
     <div class="eyebrow display">The field guide · four chapters</div>
