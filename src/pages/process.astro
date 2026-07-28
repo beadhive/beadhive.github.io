@@ -9,6 +9,7 @@ import Layout from '../layouts/Layout.astro';
     <a class="sub" href="#how-tenets">The tenets</a>
     <a class="head" href="#pipeline">The pipeline</a>
     <a class="sub" href="#pipeline-green">What keeps the line green</a>
+    <a class="head" href="#release">Merge order is planned</a>
   </nav>
   <div class="pagemain">
 
@@ -278,6 +279,41 @@ import Layout from '../layouts/Layout.astro';
       ideas. Survivors are deduplicated, judged against the vision, and filed through
       <code>bh plan file</code> like any other molecule, so nothing skips the kickoff gate.</div>
     </div>
+  </div>
+</section>
+
+<section id="release">
+  <div class="wrap">
+    <div class="eyebrow display">05 · Merge order</div>
+    <h2 class="display">Merge order is planned, not first-come-first-served</h2>
+    <p>Landing approved beads in whatever order they clear review is fine until a molecule mixes
+    <em>kinds</em> of change — a hotfix for the released version, additive features that should
+    ship as one clean minor bump, and a breaking change that must not leak into a patch. Review
+    order produces a history nobody can version cleanly. So a bead can carry its semantic-version
+    impact, and the merge sequence is computed from it:</p>
+    <ul>
+      <li><code>release:</code> — <code>breaking</code>, <code>feature</code> or <code>fix</code>.
+      A fixed vocabulary, identical in every hive, so the ordering means the same thing
+      everywhere.</li>
+      <li><code>wave:</code> — a free-form label grouping additive features that should land
+      together as one bump. Distinct from the worktree batching label.</li>
+    </ul>
+    <p>The default strategy, <em>stable-versioning</em>, orders in four tiers: fixes for the
+    released version flush first, up to a churn budget; then additive features, grouped by wave;
+    then any fixes past that budget; then breaking changes last, so they never leak into a patch
+    or minor window early. Both knobs are per-hive configuration
+    (<code>release.strategy</code>, <code>release.fix_churn_budget</code>).</p>
+<pre><code>bh release order   # the strategy-preferred merge sequence, read-only</code></pre>
+    <p>It is <b>advisory</b>. It decides sequence and nothing else — it never claims, merges or
+    mutates anything, and the scheduler consults the same scorer so dispatch and merge never
+    disagree about the order. The one hard counterpart is opt-in per hive: with
+    <code>release.enforce_hold</code> on, a <code>release:breaking</code> bead gets a
+    <code>release-hold:</code> gate that blocks its merge until a releaser resolves it — and only
+    a releaser can.</p>
+
+    <div class="note"><b>Merging is still not releasing.</b> All of this orders the green line;
+    it does not cut from it. Version determination, the changelog and the tag are the next piece
+    of the release plane, and they aren't built yet.</div>
   </div>
 </section>
 
