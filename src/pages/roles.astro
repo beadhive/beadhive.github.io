@@ -1,12 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
 ---
-<Layout active="roles" title="Roles & seats · Beadhive" description="One process, two kinds of worker: humans hold the gates, agents do the work — the four planes and the seats that sit in them, separated by blast radius.">
+<Layout active="roles" title="Roles & seats · Beadhive" description="One process, two kinds of worker: humans hold the gates, agents do the work — the four planes and the seats that sit in them, separated by blast radius, and the agent harnesses a seat can run under.">
 <div class="pagegrid">
   <nav class="toc" aria-label="On this page">
     <p class="toc-title">On this page</p>
     <a class="head" href="#humans">One process, two kinds of worker</a>
     <a class="head" href="#seats">Four planes, one spine</a>
+    <a class="head" href="#harnesses">Which harness a seat runs under</a>
     <a class="head" href="#next">What's next</a>
   </nav>
   <div class="pagemain">
@@ -15,10 +16,11 @@ import Layout from '../layouts/Layout.astro';
   <div class="wrap">
     <div class="eyebrow display">05 · Humans + agents</div>
     <h2 class="display">One process, two kinds of worker</h2>
-    <p>AGF doesn't split "human workflows" from "agent workflows" — it defines <b>seats</b>, and
-    either kind of worker can sit in one. A seat can be filled by an agent sub-task, by the main
-    Claude Code loop (<code>bh role &lt;seat&gt;</code>), or by a human doing the same verbs by
-    hand. What keeps the mix safe:</p>
+    <p>The factory doesn't split "human workflows" from "agent workflows" — it defines
+    <b>seats</b>, and either kind of worker can sit in one. A seat is a set of functional inputs,
+    outputs and permissions, so it can be filled by an agent sub-task, by a main harness loop
+    (<code>bh role &lt;seat&gt;</code>), or by a human doing the same verbs by hand. What keeps
+    the mix safe:</p>
     <ul>
       <li><b>Humans hold the gates.</b> Plan approval and kickoff approval are explicit human
       checkpoints; the default review gate is <code>human</code>; a reviewer bounce sends the
@@ -132,8 +134,69 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
 
-    <p style="font-size:14.5px;color:var(--ink-3)">Any seat can be launched as the main loop:
-    <code>bh role &lt;seat&gt;</code> or <code>claude --agent agf:&lt;seat&gt;</code>.</p>
+  </div>
+</section>
+
+<section id="harnesses">
+  <div class="wrap">
+    <div class="eyebrow display">07 · Harnesses</div>
+    <h2 class="display">Which harness a seat runs under</h2>
+    <p>A seat is defined by what it takes in, what it puts out, and what it is allowed to touch —
+    not by the agent CLI executing it. So the harness is <b>configuration</b>. Any seat launches
+    as a main loop with <code>bh role &lt;seat&gt;</code>, which resolves the harness from
+    <code>--harness</code>, then <code>BH_HARNESS</code>, then the hive's setting, then the
+    global one:</p>
+<pre><code>bh role dispatcher                      # the configured harness
+bh role dispatcher --harness opencode   # override for one launch
+bh hive onboard --claude                # furnish a hive for Claude Code
+bh hive onboard --opencode              # …or for OpenCode</code></pre>
+    <p>Two harnesses are furnished today. A third, Codex, reads the managed
+    <code>AGENTS.md</code> steering hint natively but is not launched or furnished by
+    <code>bh</code>.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Capability</th><th>claude</th><th>opencode</th><th>codex</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Seat launch</td>
+            <td><code>claude --agent</code>, plugin-scoped or local override</td>
+            <td><code>opencode --agent</code>, local override</td>
+            <td>—</td></tr>
+          <tr><td>Hive furnishing</td>
+            <td><code>--claude</code>: plugin mode, or copy mode into <code>.claude/</code></td>
+            <td><code>--opencode</code>: <code>opencode.json</code> + translated seat defs</td>
+            <td><code>--agents</code>: the <code>AGENTS.md</code> hint only</td></tr>
+          <tr><td>Role skills</td>
+            <td>bundled in the plugin, or committed in-repo</td>
+            <td>installed globally, zero repo footprint</td>
+            <td>—</td></tr>
+          <tr><td>MCP server</td>
+            <td>bundled, auto-registered by the plugin</td>
+            <td><code>mcp.bh</code> entry in <code>opencode.json</code></td>
+            <td>—</td></tr>
+          <tr><td>Hooks / permissions</td>
+            <td>session steering hook + a deny rule</td>
+            <td>read-only allow-list + a steering plugin</td>
+            <td>—</td></tr>
+          <tr><td>Sub-agent fan-out</td>
+            <td>yes — a dispatcher delegates each bead to its own developer</td>
+            <td>Claude only today; pin <code>harness: claude</code> for molecules that fan out</td>
+            <td>—</td></tr>
+          <tr><td>Session telemetry</td>
+            <td>full seat + hive attribution</td>
+            <td>full seat + hive attribution</td>
+            <td>—</td></tr>
+          <tr><td>Statusline</td>
+            <td><code>⬡ &lt;hive&gt; · &lt;seat&gt;</code> in the TUI</td>
+            <td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:14.5px;color:var(--ink-3)">Worktree provisioning is harness-independent:
+    <code>bh worktree add --preview --json</code> and <code>bh worktree status --json</code> give
+    any external orchestrator the same porcelain the seats use.</p>
   </div>
 </section>
 
@@ -141,16 +204,16 @@ import Layout from '../layouts/Layout.astro';
   <div class="wrap">
     <div class="eyebrow display">What's next</div>
     <h2 class="display">Planes the factory is growing into</h2>
-    <p>Four more planes are designed and filed. They aren't described here because they aren't
-    built yet — and a process guide that documents unbuilt work reads as finished when it
-    isn't.</p>
+    <p>These are named so the direction is visible, not described — a guide that documents
+    unbuilt work reads as finished when it isn't. Detail lands with the code.</p>
     <ul>
-      <li><b>Release</b> · cutting a version from the green line</li>
-      <li><b>Contribution</b> · gated upstream PRs over repos we don't own</li>
+      <li><b>Release</b> · cutting the version itself. The <a href="/process/#release">ordering
+      half already ships</a>; determination, changelog and tag are next</li>
+      <li><b>Contribution</b> · gated contributions to repos we don't own</li>
       <li><b>Build</b> · pulling upstream progress into local build branches</li>
-      <li><b>Delivery</b> · reconciling a release into running systems</li>
+      <li><b>Delivery</b> · reconciling a cut release into running systems</li>
+      <li><b>Ideation</b> · deriving candidate work from a repo's own vision documents</li>
     </ul>
-    <p style="color:var(--ink-3)">Designed, not shipped. Details land with the code.</p>
   </div>
 </section>
 
