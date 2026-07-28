@@ -1,89 +1,220 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Mark from '../components/Mark.astro';
+import LoopHex from '../components/LoopHex.astro';
+import { hero } from '../copy/heroes.ts';
 ---
 <Layout active="home">
+
 <header>
   <div class="wrap">
-    <div class="brandline display">
-      <svg width="22" height="24" viewBox="0 0 22 24" aria-hidden="true">
-        <polygon points="11,1 20.5,6.5 20.5,17.5 11,23 1.5,17.5 1.5,6.5"
-                 fill="none" stroke="currentColor" stroke-width="2"/>
-      </svg>
-      Beadhive · Field Guide
-    </div>
-    <h1 class="display">Agentic Git Flow, driven by beads</h1>
-    <p class="lede">How the Beadhive factory turns raw ideas into an always-green integration
-    branch — with agents doing the work, humans holding the gates, and a dependency-linked
-    issue tracker (<em>beads</em>) as the shared memory that makes both possible.</p>
-
-    <div class="namestack display">
-      <div class="namecard"><b>AGF — Agentic Git Flow</b>
-        <span>The abstract, tracker-independent process: operational planes, seats,
-        worktree-per-bead, review gates, serialized merges.</span></div>
-      <div class="namecard"><b>Beadflow</b>
-        <span>AGF implemented on beads — the concrete process this repo runs. Same behavior,
-        bead-backed.</span></div>
-      <div class="namecard"><b>Beadhive · <code>bh</code></b>
-        <span>The umbrella brand and its CLI: the integration-plane driver that encodes the
-        conventions, registry, validation, and routing.</span></div>
+    <Mark tier="core" size={54} class="hero-mark" />
+    <div class="brandline display">{hero.eyebrow}</div>
+    <h1 class="display">{hero.title}</h1>
+    <p class="lede">{hero.lede}</p>
+    <div class="herobar">
+      <a class="btn btn-primary" href="#try">Run it in five minutes</a>
+      <a class="btn btn-ghost" href="https://github.com/beadhive/beadhive">Read the source</a>
     </div>
   </div>
 </header>
 
-<section class="install">
+<section id="loop" class="reveal">
   <div class="wrap">
-    <div class="eyebrow display">Install · two commands</div>
-    <p><code>bh</code> is a Python CLI. It drives <code>bd</code> (beads) for issues and
-    <code>git</code> for history — there is no server to run and nothing to sign up for.</p>
-<pre><code>uv tool install 'beadhive[otel]'
-bh config init</code></pre>
-    <p>That leaves you a working <code>bh</code> and a config home at <code>~/.beadhive/</code>.
-    Point it at a repo with <code>bh hive onboard</code>, then ask what's actionable with
-    <code>bh work ready</code>.</p>
+    <div class="eyebrow display">The whole point</div>
+    <h2 class="display">Six phases, one ring — and one edge nobody closes</h2>
+    <p class="lede-sm">A merged change is not a finished car. What happens in production is the
+    only signal that says whether the last decision was any good, so it has to come back round to
+    the next one.</p>
+    <LoopHex />
+  </div>
+</section>
 
-    <h3 class="display" style="margin-top:1.6rem">Using Claude Code? Add the plugin</h3>
-    <p>Recommended, not required. The plugin vends the seat agent definitions and role skills —
-    planner, dispatcher, developer, reviewer, merger and the rest — so an agent can take a seat
-    directly instead of improvising the lifecycle. The last line wires the MCP server.</p>
-<pre><code>claude plugin marketplace add beadhive/claude-plugin
-claude plugin install bh@beadhive
-bh mcp install</code></pre>
-    <p style="color:var(--ink-3);font-size:.94rem">Full setup, from a fresh machine to a
-    configured workspace with registered hives:
-    <a href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">INSTALL.md</a> ·
-    <a href="https://github.com/beadhive/beadhive/blob/main/docs/ONBOARDING.md">docs/ONBOARDING.md</a></p>
+<div class="band">
+<section id="different">
+  <div class="wrap">
+    <div class="eyebrow display">What's different</div>
+    <h2 class="display">Three things, briefly</h2>
+
+    <div class="featrow reveal">
+      <div class="featrow-art">
+        <svg viewBox="0 0 100 76" aria-hidden="true">
+          <rect x="6" y="8" width="88" height="12" rx="6" fill="none" stroke="var(--mark-line)" stroke-width="2" opacity=".5"/>
+          <rect x="6" y="8" width="26" height="12" rx="6" fill="var(--honey)"/>
+          <rect x="6" y="32" width="88" height="12" rx="6" fill="none" stroke="var(--mark-line)" stroke-width="2" opacity=".5"/>
+          <rect x="6" y="32" width="55" height="12" rx="6" fill="var(--honey)"/>
+          <rect x="6" y="56" width="88" height="12" rx="6" fill="none" stroke="var(--mark-line)" stroke-width="2" opacity=".5"/>
+          <rect x="6" y="56" width="80" height="12" rx="6" fill="var(--honey)"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Automation is a dial, not a prerequisite</h3>
+        <p>Other factories assume you already have the test coverage, the observability, and the
+        trust to let agents run. Most teams have none of the three, so adoption dies on contact.</p>
+        <ul class="bullets">
+          <li>Zero footprint in your repo until you ask for it</li>
+          <li>Every gate defaults to a human</li>
+          <li>Hand over one seat at a time, when the evidence earns it</li>
+        </ul>
+        <a class="deeplink" href="/roles/">See the seats and who holds what</a>
+      </div>
+    </div>
+
+    <div class="featrow reveal">
+      <div class="featrow-art">
+        <svg viewBox="0 0 100 76" aria-hidden="true">
+          <circle cx="30" cy="38" r="20" fill="none" stroke="var(--mark-line)" stroke-width="2" opacity=".55"/>
+          <circle cx="70" cy="38" r="20" fill="none" stroke="var(--honey)" stroke-width="2.4"/>
+          <path d="M50 20 a20 20 0 0 1 0 36 a20 20 0 0 1 0 -36" fill="var(--honey)" opacity=".18"/>
+          <text x="30" y="42" text-anchor="middle" font-size="9" fill="var(--ink-3)" font-family="monospace">code</text>
+          <text x="70" y="42" text-anchor="middle" font-size="9" fill="var(--ink-3)" font-family="monospace">ops</text>
+        </svg>
+      </div>
+      <div>
+        <h3>The coding framework and the SRE agent are one system</h3>
+        <p>Built as two products everywhere else — one writes code, another watches it run,
+        nothing connects them. An incident shouldn't just get mitigated once; it should change
+        what gets generated next time.</p>
+        <ul class="bullets">
+          <li>Shipped: planning, dispatch, review, merge, release ordering</li>
+          <li>Building: the return path — prod signal into plans and guardrails</li>
+        </ul>
+        <a class="deeplink" href="/process/">Follow a change through the line</a>
+      </div>
+    </div>
+
+    <div class="featrow reveal">
+      <div class="featrow-art">
+        <svg viewBox="0 0 100 76" aria-hidden="true">
+          <polygon points="50,6 78,22 78,54 50,70 22,54 22,22" fill="none" stroke="var(--mark-line)" stroke-width="2.4"/>
+          <path d="M50 6 L50 70 M22 22 L78 54 M78 22 L22 54" stroke="var(--honey)" stroke-width="1.4" opacity=".6"/>
+          <circle cx="50" cy="38" r="7" fill="var(--honey)"/>
+        </svg>
+      </div>
+      <div>
+        <h3>Open source, and made to be taken apart</h3>
+        <p>Developers don't adopt infrastructure they can't read. Run the whole factory on a hobby
+        project over a weekend and decide for yourself whether it's real.</p>
+        <ul class="bullets">
+          <li>No server, no signup, no hosted dependency</li>
+          <li>Managed deployments for teams who want it operated</li>
+        </ul>
+        <a class="deeplink" href="https://github.com/beadhive/beadhive">Read the source</a>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="eyebrow display">How it works</div>
+    <h2 class="display">The parts you actually touch</h2>
+    <p class="lede-sm"><code>bh</code> is a CLI. It drives <code>bd</code> for issues and
+    <code>git</code> for history — nothing to deploy, no database to run.</p>
+    <div class="bento reveal-stagger">
+      <div class="card">
+        <span class="kicker">substrate</span>
+        <h3><span class="hexdot">⬢</span>Work is a graph</h3>
+        <p>A git-embedded tracker with real dependency edges, so "what's next" is computed, and it
+        survives an agent losing its context.</p>
+      </div>
+      <div class="card">
+        <span class="kicker">roles</span>
+        <h3><span class="hexdot">⬢</span>Seats, not workflows</h3>
+        <p>Planner, dispatcher, developer, reviewer, merger, warden. A person or an agent fills
+        any of them.</p>
+      </div>
+      <div class="card">
+        <span class="kicker">control</span>
+        <h3><span class="hexdot">⬢</span>Humans hold the gates</h3>
+        <p>Gates are records, not vibes in a chat log. Merge refuses to land while one is open.</p>
+      </div>
+      <div class="card">
+        <span class="kicker">provenance</span>
+        <h3><span class="hexdot">⬢</span>Every change is signed</h3>
+        <p>Each agent works in its own worktree under its own identity. You can always see which
+        worker did what.</p>
+      </div>
+    </div>
+    <a class="deeplink" href="/beads/">Why a dependency graph beats a task list</a>
+  </div>
+</section>
+
+<div class="band">
+<section id="try">
+  <div class="wrap">
+    <div class="eyebrow display">Try it</div>
+    <h2 class="display">Five minutes, on a repo you don't care about</h2>
+    <p class="lede-sm">Nothing is written into your repo until you ask for it.</p>
+    <div class="term reveal" style="margin-top:18px">
+      <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
+<pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
+<span class="p">$</span> bh config init
+<span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
+<span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
+    </div>
+    <p style="margin-top:16px">Then furnish it for the harness you already run, and take a seat:</p>
+    <div class="term">
+<pre><code><span class="p">$</span> bh hive onboard --claude   <span class="c"># or --opencode</span>
+<span class="p">$</span> bh role planner            <span class="c"># turn an idea into a plan</span>
+<span class="p">$</span> bh role dispatcher         <span class="c"># deliver it, bead by bead</span></code></pre>
+    </div>
+    <div class="herobar">
+      <a class="btn btn-primary" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Full install guide</a>
+      <a class="btn btn-ghost" href="/roles/#harnesses">Harness support</a>
+    </div>
+  </div>
+</section>
+</div>
+
+<section id="teams">
+  <div class="wrap">
+    <div class="eyebrow display">For teams</div>
+    <h2 class="display">Open framework, managed deployment</h2>
+    <div class="bento reveal-stagger">
+      <div class="card">
+        <span class="kicker">free forever</span>
+        <h3><span class="hexdot">⬢</span>The framework</h3>
+        <p>Open source, the same code either way. Everything on this site runs from it.</p>
+      </div>
+      <div class="card">
+        <span class="kicker">licensed</span>
+        <h3><span class="hexdot">⬢</span>Managed deployment</h3>
+        <p>Rollout across existing teams, configuration and policy, the fleet view across every
+        repo — operated for you.</p>
+      </div>
+    </div>
+    <p>The pitch is the same either way, which is the point: start from the codebase and process
+    you already have, keep humans in every seat you don't want to give up, and move the dial as
+    your own evidence earns it.</p>
+    <a class="deeplink" href="https://github.com/beadhive/beadhive/discussions">Talk to us about a deployment</a>
   </div>
 </section>
 
 <section class="teasers">
   <div class="wrap">
-    <div class="eyebrow display">The field guide · four chapters</div>
-    <div class="cardgrid">
+    <div class="eyebrow display">Go deeper</div>
+    <h2 class="display">The field guide</h2>
+    <div class="cardgrid reveal-stagger">
       <a class="card teaser" href="/beads/">
-        <h4><span class="hexdot">⬢</span>The substrate</h4>
-        <p><b>Beads</b> (<code>bd</code>) is a lightweight, git-embedded issue tracker with
-        first-class dependency support — the durable shared memory that makes agents effective,
-        and the opinions on why it beats markdown TODOs or a hosted tracker.</p>
+        <h3><span class="hexdot">⬢</span>The substrate</h3>
+        <p>Why a git-embedded, dependency-linked tracker is the right memory for agents.</p>
         <span class="cardcta display">Read Beads →</span>
       </a>
       <a class="card teaser" href="/process/">
-        <h4><span class="hexdot">⬢</span>How work flows</h4>
-        <p>Every repo is a <b>hive</b>, and <code>bh</code> drives each bead through worktree →
-        implement → review → merge on an always-green line — the full state machine with its
-        plan, kickoff, and review gates.</p>
+        <h3><span class="hexdot">⬢</span>How work flows</h3>
+        <p>Worktree → implement → review → merge, with the plan, kickoff and review gates.</p>
         <span class="cardcta display">Read Process →</span>
       </a>
       <a class="card teaser" href="/roles/">
-        <h4><span class="hexdot">⬢</span>Who does what</h4>
-        <p>One process, two kinds of worker: humans hold the gates, agents do the work. Four
-        planes and their seats, separated by blast radius.</p>
+        <h3><span class="hexdot">⬢</span>Who does what</h3>
+        <p>Four planes, their seats, blast radius — and the harnesses a seat runs under.</p>
         <span class="cardcta display">Read Roles →</span>
       </a>
       <a class="card teaser" href="/fleet/">
-        <h4><span class="hexdot">⬢</span>Scale</h4>
-        <p>A fleet of hives, one Head Office: <code>bh sync</code> aggregates every registered
-        hive so you can ask what's actionable anywhere, plus where the source-of-truth docs
-        live.</p>
+        <h3><span class="hexdot">⬢</span>Scale</h3>
+        <p>A fleet of hives, one Head Office, and what's actionable anywhere.</p>
         <span class="cardcta display">Read Fleet →</span>
       </a>
     </div>

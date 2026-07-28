@@ -1,82 +1,139 @@
+  /* ============================================================================
+     BRAND TOKENS — "the tilt, in the hive · black & honey gold"
+     Values come from the Beadhive brand suite, not from taste:
+       base #110D06 · surface #191307 · text #F2EAD6 · muted #A2946F
+       accent #F0B429 (gold on dark) · accentDeep #C98F0A (gold on light)
+       line #8F6D22 (comb walls on dark) · cream #F7F1E1 (light ground)
+     Brand rules honored here: warm ink or cream grounds only, never pure
+     #000/#FFF; one gold per composition (bright on dark, deep on light).
+
+     TWO DELIBERATE DEPARTURES, both for contrast, both shades of a brand hue
+     rather than new ones:
+       1. accentDeep #C98F0A measures 2.51:1 on cream — it fails even large
+          text. It is a fill/stroke color, not a type color. `--honey` keeps it
+          for marks and borders; `--honey-strong` (#7E5C07, 5.44:1) carries
+          every TEXT use on the cream ground.
+       2. muted #7A6E52 lands at 4.46:1 on cream, a hair under AA body. `--ink-2`
+          uses #6B6047 (5.50:1) instead.
+     Dark ground needs no such adjustment — the brand palette passes cleanly
+     there (text 16.2:1, gold 10.4:1), which is where this palette is happiest.
+
+     `green`/`red` are diagram semantics (ready vs blocked, the always-green
+     line). The brand suite defines no such hues; these are warmed to sit in the
+     honey family rather than invented afresh.
+     ========================================================================= */
   :root {
-    --bg: #FAF7EF;
-    --panel: #F2EDDF;
-    --panel-2: #ECE5D2;
-    --ink: #262014;
-    --ink-2: #5C5142;
-    --ink-3: #8A7D68;
-    --hairline: #DDD3BC;
-    --honey: #B87A14;
-    --honey-strong: #96620D;
-    --honey-wash: #F3E3C2;
+    --bg: #F7F1E1;
+    --panel: #FFFBEE;
+    --panel-2: #F1EAD5;
+    --ink: #1D1708;
+    --ink-2: #6B6047;
+    --ink-3: #736850;
+    --hairline: #E4D9BC;
+    --honey: #C98F0A;
+    --honey-strong: #7E5C07;
+    --honey-wash: #F6E7C3;
     --green: #3E7D56;
     --green-wash: #DEEBDF;
     --red: #B5462C;
     --red-wash: #F4E0D8;
-    --node: #FFFDF7;
-    --node-stroke: #C9BC9F;
-    --lane: rgba(184, 122, 20, 0.045);
+    --node: #FFFBEE;
+    --node-stroke: #C9B98F;
+    --lane: rgba(201, 143, 10, 0.05);
     --lane-2: rgba(62, 125, 86, 0.05);
-    --code-bg: #EEE7d5;
-    --shadow: 0 1px 2px rgba(48, 38, 20, 0.06), 0 4px 14px rgba(48, 38, 20, 0.05);
+    --code-bg: #F1E8D0;
+    /* Brand `line` — the comb walls of the mark. */
+    --mark-line: #1D1708;
+    --shadow: 0 1px 2px rgba(29, 23, 8, 0.06), 0 4px 14px rgba(29, 23, 8, 0.05);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #191410;
-      --panel: #211B14;
-      --panel-2: #282017;
-      --ink: #EDE4D3;
-      --ink-2: #B4A78F;
-      --ink-3: #83775F;
-      --hairline: #372E20;
-      --honey: #E3A93F;
-      --honey-strong: #F0BC5B;
+      --bg: #110D06;
+      --panel: #191307;
+      --panel-2: #201908;
+      --ink: #F2EAD6;
+      --ink-2: #A2946F;
+      --ink-3: #9C8E6D;
+      --hairline: #2E2510;
+      --honey: #F0B429;
+      --honey-strong: #F5C55E;
       --honey-wash: #33270F;
       --green: #6FB388;
       --green-wash: #1C2B20;
       --red: #E07B5B;
       --red-wash: #382018;
-      --node: #241E15;
-      --node-stroke: #4A3F2B;
-      --lane: rgba(227, 169, 63, 0.05);
+      --node: #191307;
+      --node-stroke: #8F6D22;
+      --lane: rgba(240, 180, 41, 0.05);
       --lane-2: rgba(111, 179, 136, 0.055);
-      --code-bg: #2A2318;
+      --code-bg: #14100A;
+      --mark-line: #8F6D22;
       --shadow: none;
     }
   }
   :root[data-theme="light"] {
-    --bg: #FAF7EF; --panel: #F2EDDF; --panel-2: #ECE5D2; --ink: #26201A;
-    --ink-2: #5C5142; --ink-3: #8A7D68; --hairline: #DDD3BC;
-    --honey: #B87A14; --honey-strong: #96620D; --honey-wash: #F3E3C2;
+    --bg: #F7F1E1; --panel: #FFFBEE; --panel-2: #F1EAD5; --ink: #1D1708;
+    --ink-2: #6B6047; --ink-3: #736850; --hairline: #E4D9BC;
+    --honey: #C98F0A; --honey-strong: #7E5C07; --honey-wash: #F6E7C3;
     --green: #3E7D56; --green-wash: #DEEBDF; --red: #B5462C; --red-wash: #F4E0D8;
-    --node: #FFFDF7; --node-stroke: #C9BC9F;
-    --lane: rgba(184,122,20,.045); --lane-2: rgba(62,125,86,.05);
-    --code-bg: #EEE7D5;
-    --shadow: 0 1px 2px rgba(48,38,20,.06), 0 4px 14px rgba(48,38,20,.05);
+    --node: #FFFBEE; --node-stroke: #C9B98F;
+    --lane: rgba(201,143,10,.05); --lane-2: rgba(62,125,86,.05);
+    --code-bg: #F1E8D0; --mark-line: #1D1708;
+    --shadow: 0 1px 2px rgba(29,23,8,.06), 0 4px 14px rgba(29,23,8,.05);
   }
   :root[data-theme="dark"] {
-    --bg: #191410; --panel: #211B14; --panel-2: #282017; --ink: #EDE4D3;
-    --ink-2: #B4A78F; --ink-3: #83775F; --hairline: #372E20;
-    --honey: #E3A93F; --honey-strong: #F0BC5B; --honey-wash: #33270F;
+    --bg: #110D06; --panel: #191307; --panel-2: #201908; --ink: #F2EAD6;
+    --ink-2: #A2946F; --ink-3: #9C8E6D; --hairline: #2E2510;
+    --honey: #F0B429; --honey-strong: #F5C55E; --honey-wash: #33270F;
     --green: #6FB388; --green-wash: #1C2B20; --red: #E07B5B; --red-wash: #382018;
-    --node: #241E15; --node-stroke: #4A3F2B;
-    --lane: rgba(227,169,63,.05); --lane-2: rgba(111,179,136,.055);
-    --code-bg: #2A2318; --shadow: none;
+    --node: #191307; --node-stroke: #8F6D22;
+    --lane: rgba(240,180,41,.05); --lane-2: rgba(111,179,136,.055);
+    --code-bg: #14100A; --mark-line: #8F6D22; --shadow: none;
   }
 
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; font-size: clamp(16px, 15px + 0.16vw, 21px); }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: clamp(16px, 15px + 0.16vw, 21px);
+    /* Tell the UA which scheme is active so native scrollbars, form controls and
+       the pre-paint canvas follow the theme. The media query below only styles
+       OUR properties — without this the browser's own chrome stays light. */
+    color-scheme: light;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) { color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  :root[data-theme="light"] { color-scheme: light; }
+
+  /* The top nav is sticky, so anchor targets would otherwise land underneath it. */
+  [id] { scroll-margin-top: 5rem; }
+
+  /* Every interactive element is custom-styled and has a :hover; without this the
+     keyboard equivalent is whatever the UA happens to draw over a panel fill. */
+  :where(a, button, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--honey-strong);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
   body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
-    font-family: "Charter", "Iowan Old Style", "Palatino", Georgia, serif;
+    /* Brand: body is system-ui — "no brand dependency for readers". The former
+       Charter/Palatino serif was never a brand face, and a cream ground under a
+       high-contrast serif is the single most templated look in this genre. */
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     font-size: 1rem;
     line-height: 1.62;
   }
-  .display { font-family: "Avenir Next", "Futura", "Century Gothic", "Segoe UI", system-ui, sans-serif; }
+  /* Brand display face, Futura first as the suite specifies. */
+  .display { font-family: "Futura", "Avenir Next", "Century Gothic", "Segoe UI", system-ui, sans-serif; }
+  /* JetBrains Mono is the brand mono; not webfont-loaded (the site ships zero
+     external requests), so it applies when installed and falls back cleanly. */
   code, pre, .mono {
-    font-family: ui-monospace, "SF Mono", "Menlo", "Cascadia Code", monospace;
+    font-family: "JetBrains Mono", ui-monospace, "SF Mono", "Menlo", "Cascadia Code", monospace;
   }
   code {
     background: var(--code-bg);
@@ -103,7 +160,7 @@
   header { padding: 64px 0 20px; }
   .brandline {
     display: flex; align-items: center; gap: 12px;
-    color: var(--honey); font-size: 13px; letter-spacing: .16em;
+    color: var(--honey-strong); font-size: 13px; letter-spacing: .16em;
     text-transform: uppercase; font-weight: 600;
   }
   .brandline svg { flex: none; }
@@ -111,8 +168,9 @@
     font-size: clamp(2rem, 6vw, 3.18rem);
     line-height: 1.05;
     margin: 18px 0 14px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+    /* Brand display weight + tracking: 800 at -2%. */
+    font-weight: 800;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
   .lede { font-size: 1.18rem; line-height: 1.55; color: var(--ink-2); max-width: 62ch; margin: 0; }
@@ -131,14 +189,14 @@
   section { padding: 40px 0 8px; }
   .eyebrow {
     display: flex; align-items: center; gap: 10px;
-    color: var(--honey); font-size: 12.5px; font-weight: 600;
+    color: var(--honey-strong); font-size: 12.5px; font-weight: 600;
     letter-spacing: .18em; text-transform: uppercase;
     margin-bottom: 10px;
   }
   .eyebrow::after { content: ""; height: 1px; background: var(--hairline); flex: 1; }
   h2 {
     font-size: clamp(1.4rem, 3.4vw, 1.88rem); line-height: 1.15;
-    margin: 0 0 16px; font-weight: 700; letter-spacing: -0.005em; text-wrap: balance;
+    margin: 0 0 16px; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance;
   }
   h3 { font-size: 1.12rem; margin: 30px 0 8px; font-weight: 650; }
   p { margin: 0 0 16px; max-width: 68ch; }
@@ -157,8 +215,10 @@
     background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px;
     padding: 18px 20px; box-shadow: var(--shadow);
   }
-  .card h4 { margin: 0 0 8px; font-size: 16px; font-weight: 650; display: flex; gap: 9px; align-items: baseline; }
-  .card h4 .hexdot { color: var(--honey); font-size: 13px; }
+  /* Card titles are h3 or h4 depending on the heading depth of the section that
+     holds them — the level is the document's business, the styling is ours. */
+  .card :is(h3, h4) { margin: 0 0 8px; font-size: 16px; font-weight: 650; display: flex; gap: 9px; align-items: baseline; }
+  .card :is(h3, h4) .hexdot { color: var(--honey-strong); font-size: 13px; }
   .card p { font-size: 14.5px; color: var(--ink-2); margin: 0; line-height: 1.58; }
   .card p code { font-size: .85em; }
 
@@ -180,22 +240,22 @@
   .lane-p { fill: var(--lane); }
   .lane-i { fill: var(--lane-2); }
   .lane-label { fill: var(--ink-3); font-size: 11px; letter-spacing: .18em; font-weight: 600;
-                font-family: "Avenir Next","Futura",system-ui,sans-serif; }
+                font-family: "Futura","Avenir Next",system-ui,sans-serif; }
   .node { fill: var(--node); stroke: var(--node-stroke); stroke-width: 1.2; rx: 7; }
   .node-end { fill: var(--panel-2); stroke: var(--node-stroke); stroke-width: 1.2; }
   .gatehex { fill: var(--honey-wash); stroke: var(--honey); stroke-width: 1.6; }
   .nlabel { fill: var(--ink); font-size: 12.5px; font-weight: 600; text-anchor: middle;
-            font-family: "Avenir Next","Futura",system-ui,sans-serif; }
+            font-family: "Futura","Avenir Next",system-ui,sans-serif; }
   .nsub { fill: var(--ink-3); font-size: 9.5px; text-anchor: middle;
           font-family: ui-monospace,"SF Mono",Menlo,monospace; }
   .glabel { fill: var(--honey-strong); font-size: 11px; font-weight: 700; text-anchor: middle;
-            letter-spacing: .06em; font-family: "Avenir Next","Futura",system-ui,sans-serif; }
+            letter-spacing: .06em; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
   .gsub { fill: var(--ink-3); font-size: 8.5px; text-anchor: middle; font-family: ui-monospace,"SF Mono",Menlo,monospace; }
-  .alabel { fill: var(--ink-2); font-size: 10.5px; font-family: "Avenir Next","Futura",system-ui,sans-serif; }
-  .alabel-r { fill: var(--red); font-size: 10.5px; font-weight: 600; font-family: "Avenir Next","Futura",system-ui,sans-serif; }
-  .alabel-h { fill: var(--honey-strong); font-size: 10.5px; font-weight: 600; font-family: "Avenir Next","Futura",system-ui,sans-serif; }
+  .alabel { fill: var(--ink-2); font-size: 10.5px; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
+  .alabel-r { fill: var(--red); font-size: 10.5px; font-weight: 600; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
+  .alabel-h { fill: var(--honey-strong); font-size: 10.5px; font-weight: 600; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
   .alabel-g { fill: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .04em;
-              font-family: "Avenir Next","Futura",system-ui,sans-serif; }
+              font-family: "Futura","Avenir Next",system-ui,sans-serif; }
   .flow  { stroke: #9A8C71; stroke-width: 1.4; fill: none; }
   .flow-h { stroke: #C99038; stroke-width: 1.6; fill: none; }
   .flow-r { stroke: #C0563C; stroke-width: 1.5; fill: none; }
@@ -209,24 +269,24 @@
     display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px;
     border-bottom: 1px solid var(--hairline); padding-bottom: 8px;
   }
-  .plane-h b { font-size: 17px; font-weight: 700; font-family: "Avenir Next","Futura",system-ui,sans-serif; }
+  .plane-h b { font-size: 17px; font-weight: 700; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
   .plane-h span { font-size: 13.5px; color: var(--ink-3); }
   .seatgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: 12px; }
   .seat {
     background: var(--panel); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px;
   }
   .seat .sid { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-  .seat .sid b { font-size: 15px; font-family: "Avenir Next","Futura",system-ui,sans-serif; }
+  .seat .sid b { font-size: 15px; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
   .seat .sid code { font-size: 11.5px; color: var(--honey-strong); background: var(--honey-wash); }
   .seat p { font-size: 13.5px; color: var(--ink-2); margin: 0 0 8px; line-height: 1.55; }
   .seat .auth { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3);
-                font-family: "Avenir Next","Futura",system-ui,sans-serif; font-weight: 600; }
+                font-family: "Futura","Avenir Next",system-ui,sans-serif; font-weight: 600; }
   .seat .no { color: var(--red); }
   .spine {
     display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
     background: var(--panel-2); border: 1px solid var(--hairline); border-radius: 10px;
     padding: 12px 18px; margin: 18px 0; font-size: 14px;
-    font-family: "Avenir Next","Futura",system-ui,sans-serif;
+    font-family: "Futura","Avenir Next",system-ui,sans-serif;
   }
   .spine b { color: var(--honey-strong); }
   .spine .arr { color: var(--ink-3); }
@@ -235,7 +295,7 @@
   .tablewrap { overflow-x: auto; margin: 18px 0; border: 1px solid var(--hairline); border-radius: 10px; }
   table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
   th {
-    text-align: left; font-family: "Avenir Next","Futura",system-ui,sans-serif;
+    text-align: left; font-family: "Futura","Avenir Next",system-ui,sans-serif;
     font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3);
     padding: 10px 14px; border-bottom: 1px solid var(--hairline); background: var(--panel);
   }
@@ -254,6 +314,16 @@
     .card:hover, .seat:hover { border-color: var(--honey); }
   }
 
+  /* ---------- skip link ---------- */
+  /* Visible only on keyboard focus; the nav is sticky so it sits above it. */
+  .skiplink {
+    position: absolute; left: 12px; top: -100px; z-index: 100;
+    background: var(--panel); color: var(--ink);
+    border: 1px solid var(--honey); border-radius: 8px;
+    padding: 10px 16px; text-decoration: none; font-weight: 650; font-size: 14px;
+  }
+  .skiplink:focus-visible { top: 12px; }
+
   /* ---------- top nav ---------- */
   .topnav {
     position: sticky; top: 0; z-index: 50;
@@ -266,11 +336,18 @@
     display: flex; align-items: center; gap: 18px;
     padding-top: 12px; padding-bottom: 12px;
   }
+  /* Drop the ~300ms synthetic-click delay on the nav's tap targets. */
+  .navlinks a, .ghlink, .themetoggle, .navmenu > summary, .navmenu-panel a {
+    touch-action: manipulation;
+  }
+  /* Brand wordmark: heavy geometric lowercase, tracking -2%, "hive" takes the
+     gold (brand suite §02). "bead" stays ink — never both halves in gold. */
   .brand {
     display: inline-flex; align-items: center; gap: 9px; flex: none;
-    color: var(--honey); font-weight: 700; font-size: 16px;
-    letter-spacing: .02em; text-decoration: none;
+    color: var(--ink); font-weight: 800; font-size: 17px;
+    letter-spacing: -.02em; text-transform: lowercase; text-decoration: none;
   }
+  .brand .wm-gold { color: var(--honey-strong); }
   .brand svg { flex: none; }
   .navlinks {
     display: flex; align-items: center; gap: 4px;
@@ -334,7 +411,7 @@
 
   /* ---------- teaser cards (home) ---------- */
   .teaser { text-decoration: none; color: inherit; display: block; }
-  .teaser h4 { color: var(--ink); }
+  .teaser :is(h3, h4) { color: var(--ink); }
   .teaser p { color: var(--ink-2); }
   .teaser:hover { border-color: var(--honey); box-shadow: var(--shadow), 0 6px 20px rgba(0, 0, 0, 0.07); }
   .teaser .cardcta {
@@ -397,6 +474,196 @@
       top: 4.75rem;
       align-self: start;
       padding-top: 3.5rem;
-      font-family: "Avenir Next", "Futura", "Century Gothic", "Segoe UI", system-ui, sans-serif;
+      font-family: "Futura", "Avenir Next", "Century Gothic", "Segoe UI", system-ui, sans-serif;
     }
+  }
+
+  /* ==========================================================================
+     LANDING-PAGE LAYER — the parts that stop this reading as a wiki.
+     Everything here is CSS-only: no JS, no library, no scroll listener.
+     ========================================================================== */
+
+  /* ---------- scroll-linked reveal ----------
+     Native scroll-driven animation, so there is nothing to hydrate. Three
+     safeguards, because "content invisible" is the classic failure of this
+     pattern:
+       1. wrapped in prefers-reduced-motion: no-preference
+       2. wrapped in @supports — where unsupported (Firefox today) elements are
+          simply always visible, never stuck hidden
+       3. only transform/opacity animate; no layout properties, no jank */
+  .reveal { transform-origin: center top; }
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .reveal {
+        animation: reveal-in linear both;
+        animation-timeline: view();
+        animation-range: entry 4% cover 26%;
+      }
+      /* Stagger a grid's children without per-element markup. */
+      .reveal-stagger > * {
+        animation: reveal-in linear both;
+        animation-timeline: view();
+        animation-range: entry 2% cover 30%;
+      }
+      .reveal-stagger > :nth-child(2) { animation-range: entry 6% cover 34%; }
+      .reveal-stagger > :nth-child(3) { animation-range: entry 10% cover 38%; }
+      .reveal-stagger > :nth-child(4) { animation-range: entry 14% cover 42%; }
+    }
+  }
+  @keyframes reveal-in {
+    from { opacity: .001; transform: translateY(14px) scale(.994); }
+    to   { opacity: 1;    transform: none; }
+  }
+
+  /* ---------- hero ---------- */
+  .hero-mark { margin-bottom: 2px; }
+  .herobar { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin-top: 22px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 9px;
+    font-family: "Futura", "Avenir Next", system-ui, sans-serif;
+    font-weight: 700; font-size: 15px; text-decoration: none;
+    touch-action: manipulation; white-space: nowrap;
+  }
+  .btn-primary { background: var(--honey); color: #110D06; border: 1px solid var(--honey); }
+  .btn-primary:hover { background: var(--honey-strong); border-color: var(--honey-strong); color: var(--bg); }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--hairline); }
+  .btn-ghost:hover { border-color: var(--honey); }
+
+  /* Terminal block — an artifact from the subject's own world, not a code fence. */
+  .term {
+    background: var(--code-bg); border: 1px solid var(--hairline); border-radius: 10px;
+    padding: 0; overflow: hidden; margin: 0; max-width: 34rem;
+  }
+  .term-bar {
+    display: flex; align-items: center; gap: 7px;
+    padding: 8px 12px; border-bottom: 1px solid var(--hairline);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .term-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--node-stroke); flex: none; }
+  .term pre { border: 0; border-radius: 0; margin: 0; background: transparent; }
+  .term .p { color: var(--honey-strong); }
+  .term .c { color: var(--ink-3); }
+
+  /* ---------- stat strip ---------- */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+    gap: 1px; background: var(--hairline);
+    border: 1px solid var(--hairline); border-radius: 12px; overflow: hidden;
+    margin: 26px 0;
+  }
+  .stat { background: var(--panel); padding: 16px 18px; }
+  .stat b {
+    display: block; font-family: "Futura", "Avenir Next", system-ui, sans-serif;
+    font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; color: var(--ink);
+    font-variant-numeric: tabular-nums; line-height: 1.1;
+  }
+  .stat span { display: block; font-size: 12.5px; color: var(--ink-3); margin-top: 3px; line-height: 1.4; }
+
+  /* ---------- feature rows: graphic + tight copy + deep link ---------- */
+  .featrow {
+    display: grid; grid-template-columns: 8.5rem minmax(0, 1fr);
+    gap: 1.6rem; align-items: start;
+    padding: 26px 0; border-top: 1px solid var(--hairline);
+  }
+  .featrow:first-of-type { border-top: 0; }
+  .featrow-art {
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 12px; display: grid; place-items: center;
+  }
+  .featrow-art svg { display: block; width: 100%; height: auto; }
+  .featrow h3 { margin: 0 0 6px; font-size: 1.12rem; font-weight: 700; letter-spacing: -.01em; }
+  .featrow p { margin: 0 0 10px; font-size: .95rem; color: var(--ink-2); max-width: 54ch; }
+  .featrow .bullets { margin: 0 0 10px; padding-left: 0; list-style: none; max-width: 54ch; }
+  .featrow .bullets li {
+    display: grid; grid-template-columns: 1.1rem 1fr; gap: .5rem;
+    font-size: .9rem; color: var(--ink-2); margin-bottom: 5px;
+  }
+  .featrow .bullets li::before { content: "⬢"; color: var(--honey-strong); font-size: 10px; line-height: 1.7; }
+  .deeplink {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: "Futura", "Avenir Next", system-ui, sans-serif;
+    font-size: 13.5px; font-weight: 700; color: var(--honey-strong);
+    text-decoration: none; letter-spacing: .02em;
+  }
+  .deeplink:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .deeplink::after { content: "→"; }
+  @media (prefers-reduced-motion: no-preference) {
+    .deeplink::after { transition: transform .15s ease; }
+    .deeplink:hover::after { transform: translateX(3px); }
+  }
+  @media (max-width: 639.98px) {
+    .featrow { grid-template-columns: 1fr; gap: 1rem; }
+    .featrow-art { max-width: 8.5rem; }
+  }
+
+  /* ---------- bento ---------- */
+  .bento { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 12px; margin: 22px 0; }
+  .bento > .card { margin: 0; }
+  .card .kicker {
+    display: block; font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--honey-strong); margin-bottom: 6px;
+  }
+
+
+  /* ---------- section rhythm ---------- */
+  .band { background: var(--panel-2); border-block: 1px solid var(--hairline); margin-top: 44px; }
+  .lede-sm { font-size: 1.02rem; color: var(--ink-2); max-width: 58ch; margin: 0 0 4px; }
+
+  /* ---------- the loop hexagon: the signature element ---------- */
+  .loophex { margin: 22px 0 8px; }
+  .loophex-frame {
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: 16px;
+    padding: 12px 8px 4px;
+  }
+  .loophex-frame svg { display: block; width: 100%; height: auto; max-width: 44rem; margin: 0 auto; }
+
+  .lh-cell { fill: var(--panel-2); stroke: var(--mark-line); stroke-width: 2.4; }
+  .lh-cell.is-prod { stroke: var(--honey); }
+  .lh-edge { stroke: var(--mark-line); stroke-width: 2.4; opacity: .75; }
+  .lh-edge.is-missing {
+    stroke: var(--honey); stroke-width: 2.8; opacity: 1;
+    stroke-dasharray: 8 7; stroke-linecap: round;
+  }
+  .lh-phase {
+    fill: var(--ink); font-size: 15px; font-weight: 800; letter-spacing: -.01em;
+    font-family: "Futura","Avenir Next",system-ui,sans-serif;
+  }
+  .lh-fn {
+    fill: var(--ink-2); font-size: 12px; font-weight: 600;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  }
+  /* The missing edge's name, outside the ring — the one label allowed to shout. */
+  .lh-feedback {
+    fill: var(--honey-strong); font-size: 15px; font-weight: 800; letter-spacing: -.01em;
+    font-family: "Futura","Avenir Next",system-ui,sans-serif;
+  }
+  .lh-span { stroke: var(--ink-3); stroke-width: 1.4; fill: none; opacity: .45; stroke-dasharray: 2 5; }
+  .lh-span-label {
+    fill: var(--ink-3); font-size: 11px; font-weight: 600;
+    font-family: "Futura","Avenir Next",system-ui,sans-serif;
+  }
+
+  /* The orbiting bead was removed deliberately. It was scroll-scrubbed, so any
+     trackpad micro-scroll made it twitch while the pointer was anywhere on the
+     page — motion that drew the eye without carrying meaning, and competed with
+     the one element that does. The dashed feedback edge keeps a single scrubbed
+     reveal: it draws the missing link, which is the diagram's whole argument. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .lh-edge.is-missing {
+        animation: lh-dash linear both;
+        animation-timeline: view();
+        animation-range: entry 55% cover 92%;
+      }
+    }
+  }
+  @keyframes lh-dash { from { stroke-dashoffset: 90; opacity: .3; } to { stroke-dashoffset: 0; opacity: 1; } }
+
+  @media (max-width: 560px) {
+    .lh-phase { font-size: 17px; }
+    .lh-fn { font-size: 13px; }
+    .lh-span-label { display: none; }
   }

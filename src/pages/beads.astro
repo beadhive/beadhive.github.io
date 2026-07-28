@@ -183,31 +183,31 @@ bd github sync           # mirror to / from the humans' board</code></pre>
     are LLM agents:</p>
 
     <div class="cardgrid">
-      <div class="card"><h4><span class="hexdot">⬢</span>Agents forget; beads don't</h4>
+      <div class="card"><h3><span class="hexdot">⬢</span>Agents forget; beads don't</h3>
         <p>Context windows compact, sessions die, threads reset. Beads is the durable shared
         memory that survives all of it: any agent runs <code>bd prime</code> and recovers the
         full project state. Work that must outlive a session goes in a bead, never a scratch
         file — markdown TODOs as source of truth are explicitly prohibited.</p></div>
-      <div class="card"><h4><span class="hexdot">⬢</span>"What next?" is computable</h4>
+      <div class="card"><h3><span class="hexdot">⬢</span>"What next?" is computable</h3>
         <p>Issues form a dependency DAG, so <code>bd ready</code> mechanically yields the
         unblocked frontier. An agent never has to infer priorities from prose — the tracker
         answers the single question agents ask most, and answers it across every repo via
         <code>bh hq bd ready</code>.</p></div>
-      <div class="card"><h4><span class="hexdot">⬢</span>Atomic claims, many workers</h4>
+      <div class="card"><h3><span class="hexdot">⬢</span>Atomic claims, many workers</h3>
         <p><code>bd update --claim</code> is an atomic take. Parallel developers can't collide
         on a bead, and every claim/assign is stamped with a per-agent actor
         (<code>bd --actor</code>) so the audit trail says exactly who did what.</p></div>
-      <div class="card"><h4><span class="hexdot">⬢</span>Git-native, serverless</h4>
+      <div class="card"><h3><span class="hexdot">⬢</span>Git-native, serverless</h3>
         <p>Issue history rides <code>refs/dolt/data</code> on the repo's own remote.
         Nothing to provision, nothing to pay for, nothing to be down: a fresh clone plus
         <code>bd bootstrap</code> is a fully hydrated tracker. Backup rides wherever the repo
         is mirrored. Distribution to a fleet of agents is just git.</p></div>
-      <div class="card"><h4><span class="hexdot">⬢</span>Gates are machine-readable state</h4>
+      <div class="card"><h3><span class="hexdot">⬢</span>Gates are machine-readable state</h3>
         <p>Human checkpoints — plan approval, kickoff, review, security — are
         <code>bd gate</code> records, not vibes in a chat thread. The merge path refuses to
         land while any gate naming the bead is open. Agents can see, open, and wait on gates;
         only the right seat can resolve them.</p></div>
-      <div class="card"><h4><span class="hexdot">⬢</span>Discovered work becomes durable work</h4>
+      <div class="card"><h3><span class="hexdot">⬢</span>Discovered work becomes durable work</h3>
         <p>Implementation always uncovers follow-ups. With beads, the reflex is
         <code>bd create</code> + a dependency link — the discovery enters the same DAG the
         next agent will pull from, instead of dying in a session summary.</p></div>

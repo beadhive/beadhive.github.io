@@ -7,6 +7,9 @@
 import globalCss from '../styles/global.css?raw';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+// The site-wide title/description track whichever hero variant is active, so a
+// positioning change can't leave the <title> describing the previous pitch.
+import { hero } from '../copy/heroes.ts';
 
 interface Props {
   title?: string;
@@ -15,9 +18,8 @@ interface Props {
 }
 
 const {
-  title = 'Beadhive — Agentic Git Flow',
-  description =
-    'How the Beadhive factory turns raw ideas into an always-green integration branch — agents do the work, humans hold the gates, and beads (a dependency-linked issue tracker) is the shared memory that makes both possible.',
+  title = hero.siteTitle,
+  description = hero.siteDescription,
   active,
 } = Astro.props;
 
@@ -44,18 +46,32 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {/* Match the two ground colors in global.css so the browser chrome doesn't
+        flash a different shade than the page behind it. */}
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F7F1E1" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#110D06" />
+    {/* The nav's star badge fetches from api.github.com after paint; warm the
+        connection so it isn't a cold DNS + TLS round trip. */}
+    <link rel="preconnect" href="https://api.github.com" crossorigin />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Beadhive" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    {/* Declared dimensions let Slack/Discord/iMessage reserve the card before
+        the image lands, instead of reflowing the unfurl. 1280×640 is what
+        brand/render.mjs emits, and is 1200×630 crop-safe. */}
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="640" />
+    <meta property="og:image:alt" content="Beadhive — from idea to production, and back." />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
@@ -65,8 +81,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <style is:inline set:html={globalCss}></style>
   </head>
   <body>
+    <a class="skiplink display" href="#main">Skip to content</a>
     <Nav active={active} />
-    <slot />
+    <main id="main">
+      <slot />
+    </main>
     <Footer />
     <script is:inline>
       (function () {
