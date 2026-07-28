@@ -670,3 +670,21 @@
     .lh-fn { font-size: 13px; }
     .lh-span-label { display: none; }
   }
+
+  /* ---------- 404 ---------- */
+  .notfound { padding: 64px 0 40px; text-align: center; }
+  .cellart { margin: 0 0 30px; }
+  .cellart svg { width: 100%; max-width: 200px; height: auto; display: block; margin: 0 auto; }
+  .nf-cell { fill: var(--panel-2); stroke: var(--hairline); stroke-width: 1.5; }
+  .nf-bead { fill: var(--honey); opacity: .55; }
+  .nf-cell.is-empty { fill: none; stroke: var(--honey); stroke-width: 2; stroke-dasharray: 5 5; }
+  .nf-q {
+    fill: var(--honey-strong); font-size: 34px; font-weight: 800;
+    text-anchor: middle; dominant-baseline: central;
+  }
+  /* The section eyebrow trails a hairline rule via ::after, which only reads
+     right when the text is left-aligned. Centered it would need a rule on both
+     sides or none — none. */
+  .notfound .eyebrow { justify-content: center; margin-bottom: 12px; }
+  .notfound .eyebrow::after { display: none; }
+  .notfound h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 26px; }
