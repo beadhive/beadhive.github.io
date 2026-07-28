@@ -124,6 +124,24 @@ const jsonLd = isHome
 
     {jsonLd && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />}
 
+    {/* GoatCounter — no cookies, no personal data, no cross-site tracking.
+        The BEACON is first-party: stats.beadhive.ai is a CNAME to the hosted
+        site (infra tofu/porkbun_dns.tf), so hits POST to our own host. Only
+        count.js is remote, and that fetch is a recorded exception to the
+        site's no-external-requests default — infra
+        docs/design/site-external-requests.md.
+        Guarded to the production host so `just site-preview` on localhost
+        does not pollute the stats. */}
+    <script is:inline define:vars={{ analyticsHost: 'beadhive.ai' }}>
+      if (location.hostname === analyticsHost) {
+        window.goatcounter = { endpoint: 'https://stats.beadhive.ai/count' };
+        var gc = document.createElement('script');
+        gc.async = true;
+        gc.src = 'https://gc.zgo.at/count.js';
+        document.head.appendChild(gc);
+      }
+    </script>
+
     <style is:inline set:html={globalCss}></style>
   </head>
   <body>
