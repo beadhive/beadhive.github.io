@@ -148,8 +148,9 @@ import { hero } from '../copy/heroes.ts';
 <section id="try">
   <div class="wrap">
     <div class="eyebrow display">Try it</div>
-    <h2 class="display">Five minutes, on a repo you don't care about</h2>
-    <p class="lede-sm">Nothing is written into your repo until you ask for it.</p>
+    <h2 class="display">Start with the arc that hurts most</h2>
+    <p class="lede-sm">Point it at a real repo. A hive writes nothing into yours until you ask
+    it to, and you don't have to run the whole ring to get something out of it.</p>
     <div class="term reveal" style="margin-top:18px">
       <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
 <pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
@@ -157,10 +158,34 @@ import { hero } from '../copy/heroes.ts';
 <span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
 <span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
     </div>
-    <p style="margin-top:16px">Then furnish it for the harness you already run, and take a seat:</p>
+
+    <h3 style="margin-top:1.8rem">Bring the planning you already have</h3>
+    <p>Most repos are already full of it: ADRs, design notes, a <code>.planning/</code>
+    directory, a spec folder some other markdown framework generated. That is good information
+    in the wrong storage format. A file tree is a poor search index — an agent can read it, but
+    it can't ask what's blocked, what this depends on, or what's ready.</p>
+    <p><b>Backfill</b> reads your git history and those documents and proposes them as beads,
+    reconciling against anything already tracked so nothing is duplicated. It never
+    blind-imports: every proposal stops for you to confirm, reclassify, or throw away.</p>
     <div class="term">
 <pre><code><span class="p">$</span> bh hive onboard --claude   <span class="c"># or --opencode</span>
-<span class="p">$</span> bh role planner            <span class="c"># turn an idea into a plan</span>
+<span class="p">$</span> claude
+<span class="p">&gt;</span> /bh:backfill               <span class="c"># propose history + docs as beads</span></code></pre>
+    </div>
+
+    <h3 style="margin-top:1.8rem">Take as much of the ring as you want</h3>
+    <p>Nobody adopts a lifecycle in one go. Plenty of reasonable places to stop:</p>
+    <ul class="bullets">
+      <li>Start at <b>idea → plan → build</b> alone, if planning is where the pain is, and keep
+      reviewing, releasing and operating exactly as you do today</li>
+      <li>Add review and merge when the volume of agent output makes doing it by hand the
+      bottleneck</li>
+      <li>Close the rest when — and only when — your own evidence says it's worth it</li>
+    </ul>
+    <p>Every seat you haven't handed over is simply a seat a person still holds. That is the
+    normal state, not a degraded one.</p>
+    <div class="term">
+<pre><code><span class="p">$</span> bh role planner            <span class="c"># turn an idea into a gated plan</span>
 <span class="p">$</span> bh role dispatcher         <span class="c"># deliver it, bead by bead</span></code></pre>
     </div>
     <div class="herobar">
