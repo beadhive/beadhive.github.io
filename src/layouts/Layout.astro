@@ -27,6 +27,50 @@ const ogImage = new URL('/og-default.png', Astro.site).href;
 // Per-page, not the site root: a hardcoded '/' made every content page declare
 // itself a duplicate of the homepage to search engines.
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+// JSON-LD — the one thing jekyll-seo-tag gives agentguides.io for free that this
+// hand-rolled <head> did not have. HOMEPAGE ONLY: an Organization block on every
+// interior page would have each of them claiming to BE the organization.
+//
+// Deliberately minimal and true. No aggregateRating, no offers, no review counts
+// — fabricated structured data is a manual-action risk, not just noise, and
+// nothing here has ratings or a price.
+const isHome = Astro.url.pathname === '/';
+const siteUrl = new URL('/', Astro.site).href;
+const jsonLd = isHome
+  ? {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'Organization',
+          '@id': `${siteUrl}#organization`,
+          name: 'Beadhive',
+          url: siteUrl,
+          logo: new URL('/logo.svg', Astro.site).href,
+          description: hero.siteDescription,
+          sameAs: ['https://github.com/beadhive'],
+        },
+        {
+          '@type': 'WebSite',
+          '@id': `${siteUrl}#website`,
+          name: 'Beadhive',
+          url: siteUrl,
+          description: hero.siteDescription,
+          publisher: { '@id': `${siteUrl}#organization` },
+        },
+        {
+          '@type': 'SoftwareApplication',
+          name: 'Beadhive',
+          applicationCategory: 'DeveloperApplication',
+          operatingSystem: 'macOS, Linux',
+          url: siteUrl,
+          codeRepository: 'https://github.com/beadhive/beadhive',
+          description: hero.siteDescription,
+          publisher: { '@id': `${siteUrl}#organization` },
+        },
+      ],
+    }
+  : null;
 ---
 <!doctype html>
 <html lang="en">
@@ -77,6 +121,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+
+    {jsonLd && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />}
 
     <style is:inline set:html={globalCss}></style>
   </head>

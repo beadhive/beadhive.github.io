@@ -1,7 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
+
+// Exported so /llms.txt can enumerate this page without a second copy of its
+// title and description. A new page with a `meta` export appears there for free.
+export const meta = {
+  order: 3,
+  label: 'How work flows',
+  title: 'How work flows · Beadhive',
+  description: 'The Beadhive mental model in one breath and the full planning → dispatch → develop → review → merge pipeline, with its spike, bounce, and replan loops.',
+};
 ---
-<Layout active="process" title="How work flows · Beadhive" description="The Beadhive mental model in one breath and the full planning → dispatch → develop → review → merge pipeline, with its spike, bounce, and replan loops.">
+<Layout active="process" title={meta.title} description={meta.description}>
 <div class="pagegrid">
   <nav class="toc" aria-label="On this page">
     <p class="toc-title">On this page</p>

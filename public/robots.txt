@@ -1,0 +1,7 @@
+# Everything here is public and meant to be read — by people, crawlers and
+# agents alike. This file exists to advertise the sitemap, not to fence anything
+# off; if something should not be public it should not be in the build.
+User-agent: *
+Allow: /
+
+Sitemap: https://beadhive.ai/sitemap-index.xml

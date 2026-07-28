@@ -3,6 +3,15 @@ import Layout from '../layouts/Layout.astro';
 import Mark from '../components/Mark.astro';
 import LoopHex from '../components/LoopHex.astro';
 import { hero } from '../copy/heroes.ts';
+
+// Exported so /llms.txt can enumerate this page. Sourced from the hero rather
+// than restated, so the homepage still has exactly one description of itself.
+export const meta = {
+  order: 1,
+  label: 'Home',
+  title: hero.siteTitle,
+  description: hero.siteDescription,
+};
 ---
 <Layout active="home">
 

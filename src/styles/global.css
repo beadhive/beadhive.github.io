@@ -130,8 +130,11 @@
   }
   /* Brand display face, Futura first as the suite specifies. */
   .display { font-family: "Futura", "Avenir Next", "Century Gothic", "Segoe UI", system-ui, sans-serif; }
-  /* JetBrains Mono is the brand mono; not webfont-loaded (the site ships zero
-     external requests), so it applies when installed and falls back cleanly. */
+  /* JetBrains Mono is the brand mono, applied when installed and falling back
+     cleanly. Not webfont-loaded: webfonts are a category the site's
+     external-request policy does not grant — see infra
+     docs/design/site-external-requests.md, which records what IS granted and
+     why, so this stays a weighed trade rather than an inherited reflex. */
   code, pre, .mono {
     font-family: "JetBrains Mono", ui-monospace, "SF Mono", "Menlo", "Cascadia Code", monospace;
   }
