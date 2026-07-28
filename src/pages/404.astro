@@ -1,0 +1,40 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// No `meta` export on purpose — llms.txt and the sitemap list content pages, and
+// an error page is neither. src/pages/llms.txt.ts skips this route by name.
+//
+// Broken backlinks need no button here: GoatCounter already logs the 404 path
+// and its referrer. Only add a "what were you looking for?" prompt if the stats
+// ever show a 404 whose referrer doesn't explain itself.
+---
+<Layout
+  title="Not found · Beadhive"
+  description="No page at this address."
+>
+<section class="notfound">
+  <div class="wrap">
+    <figure class="cellart">
+      {/* Flat-top hexes, circumradius 30 → width 60, height 52; a honeycomb of
+          this orientation tiles at Δx = 1.5R = 45 and Δy = √3R = 52, hence the
+          six neighbours at (±45, ±26) and (0, ±52) from centre. */}
+      <svg viewBox="70 0 160 156" role="img"
+           aria-label="Six filled honeycomb cells surrounding one empty cell marked with a question mark.">
+        {[[150, 26], [105, 52], [195, 52], [105, 104], [195, 104], [150, 130]].map(([cx, cy]) => (
+          <>
+            <polygon class="nf-cell" points={`${cx - 30},${cy} ${cx - 15},${cy - 26} ${cx + 15},${cy - 26} ${cx + 30},${cy} ${cx + 15},${cy + 26} ${cx - 15},${cy + 26}`} />
+            <rect x={cx - 9} y={cy - 6} width="18" height="12" rx="6" class="nf-bead" />
+          </>
+        ))}
+        <polygon class="nf-cell is-empty" points="120,78 135,52 165,52 180,78 165,104 135,104" />
+        <text class="nf-q display" x="150" y="78">?</text>
+      </svg>
+    </figure>
+
+    <div class="eyebrow display">404 · Signal received</div>
+    <h1 class="display">Nothing has been built here</h1>
+
+    <a class="btn btn-primary" href="/">Back to the start</a>
+  </div>
+</section>
+</Layout>

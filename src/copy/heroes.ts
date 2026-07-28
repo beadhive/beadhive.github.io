@@ -5,11 +5,14 @@
 // That comparison is settled (bh-infra-3m4.1); the losers are deleted rather
 // than left switched off.
 //
-// The headline and the OG card are deliberately long-form and short-form of ONE
-// idea, not two claims: the card (rendered from infra/brand/tokens.json) reads
-// "From idea to production, and back." and the lede opens with the same words.
-// Changing the h1 to something unrelated would put the two surfaces back into
-// disagreement, so change both or neither.
+// `title` below is the SAME SENTENCE as the OG card, which renders from
+// infra/brand/tokens.json — not a paraphrase of it. Editing one without the
+// other puts the page and every shared preview into disagreement, and the card
+// is a rendered PNG, so it needs `node brand/render.mjs` rather than a redeploy.
+//
+// The lede opens with "From idea to production — and back", the short form of
+// the same idea. That phrase is a supporting line, never the tagline: it reads
+// as a fragment anywhere it appears without the sentence it belongs to.
 
 export interface Hero {
   /** Small caps line above the headline. */

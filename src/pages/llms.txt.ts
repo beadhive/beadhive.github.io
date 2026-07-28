@@ -29,8 +29,13 @@ const routeOf = (file: string) => {
   return slug ? `/${slug}/` : '/';
 };
 
+// Routes that are real pages but not CONTENT — no `meta`, and no warning about
+// it. Keep this list tiny; the default for a new page is to be listed.
+const NOT_CONTENT = new Set(['/404/']);
+
 const pages = Object.entries(modules)
   .map(([file, mod]) => ({ file, meta: mod.meta }))
+  .filter((p) => !NOT_CONTENT.has(routeOf(p.file)))
   .filter((p): p is { file: string; meta: PageMeta } => {
     if (!p.meta) {
       // Loud, not silent: a page missing `meta` is a bug in the page, and the
