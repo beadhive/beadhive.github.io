@@ -649,21 +649,25 @@
     font-family: "Futura","Avenir Next",system-ui,sans-serif;
   }
 
-  /* The orbiting bead was removed deliberately. It was scroll-scrubbed, so any
-     trackpad micro-scroll made it twitch while the pointer was anywhere on the
-     page — motion that drew the eye without carrying meaning, and competed with
-     the one element that does. The dashed feedback edge keeps a single scrubbed
-     reveal: it draws the missing link, which is the diagram's whole argument. */
-  @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      .lh-edge.is-missing {
-        animation: lh-dash linear both;
-        animation-timeline: view();
-        animation-range: entry 55% cover 92%;
-      }
-    }
-  }
-  @keyframes lh-dash { from { stroke-dashoffset: 90; opacity: .3; } to { stroke-dashoffset: 0; opacity: 1; } }
+  /* THIS DIAGRAM DOES NOT ANIMATE. Three attempts were built and removed:
+       1. an orbiting bead, scroll-scrubbed — twitched on trackpad micro-scroll
+       2. a scrubbed draw-on of the dashed edge + staggered fade of the arcs
+       3. a time-based pulse travelling the ring, stopping at the dashed edge
+
+     Attempt 3 was verified attached and running — getAnimations() reported
+     5 x lh-pulse [running] with correct staggered delays in Brave 145 — and was
+     STILL not perceptible to a human. Leading theory: .75 → 1.0 opacity on a
+     2.4px line is too small a change to notice, i.e. it worked and nobody could
+     see it. Verify in a real window, not headless, before concluding otherwise.
+
+     Do NOT rebuild attempt 1. If you are adding motion here, read bh-infra-0ew
+     first — it carries what was tried, what was ruled out, and the bar any new
+     attempt has to clear: motion in this diagram must carry the argument, not
+     decorate it.
+
+     Section-level .reveal is a different thing and is working. Scroll-linked
+     motion suits a section ARRIVING; it does not suit a diagram of a process
+     that runs whether or not anyone is scrolling. */
 
   @media (max-width: 560px) {
     .lh-phase { font-size: 17px; }
