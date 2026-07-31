@@ -36,5 +36,5 @@ export const hero: Hero = {
   siteDescription:
     'An agentic software factory for the whole SDLC. Adopt it against the repo and workflow you ' +
     'already have, keep humans in the seats you don’t yet want to hand over, and let production ' +
-    'behaviour drive what gets built next. Open source, with managed deployments for teams.',
+    'behaviour drive what gets built next. Open source.',
 };
