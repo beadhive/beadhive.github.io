@@ -11,6 +11,27 @@ export const meta = {
   title: hero.siteTitle,
   description: hero.siteDescription,
 };
+
+// --- matched-lanes diagram (#why) ---------------------------------------
+// Two conveyor lanes, identical pitch. The sameness IS the argument: process
+// keeps pace with code instead of braking it. Honey "beat" chevrons sit at the
+// same x in both lanes, tied by dashed verticals — a shared metronome.
+const LANE_X = 48, LANE_W = 404, LANE_H = 44;
+const LANES = [
+  { label: 'code',    y: 100 },
+  { label: 'process', y: 216 },
+];
+const CHEV_XS = Array.from({ length: 10 }, (_, i) => 64 + i * 40);
+const BEATS = [184, 384];            // honey beat chevrons — same x in both lanes
+const TIES = BEATS.map((x) => x + 7); // dashed tempo ties between the lanes
+// process-lane phases: zones the flow passes through, not stops along it —
+// so the boundaries are ruler ticks under the lane, never walls across it.
+const PHASES_LANE = ['planning', 'review', 'release', 'ops'];
+const SEG = LANE_W / PHASES_LANE.length;
+const chev = (x: number, laneY: number) => {
+  const cy = laneY + LANE_H / 2;
+  return `M ${x} ${cy - 12} L ${x + 14} ${cy} L ${x} ${cy + 12}`;
+};
 ---
 <Layout active="home">
 
@@ -21,7 +42,7 @@ export const meta = {
     <h1 class="display">{hero.title}</h1>
     <p class="lede">{hero.lede}</p>
     <div class="herobar">
-      <a class="btn btn-primary" href="#try">Ship something real</a>
+      <a class="btn btn-primary" href="/start/">Ship something real</a>
       <a class="btn btn-ghost" href="/process/">See how the factory works</a>
     </div>
   </div>
@@ -30,20 +51,68 @@ export const meta = {
 <section id="why" class="reveal">
   <div class="wrap">
     <div class="eyebrow display">The problem</div>
-    <h2 class="display">Slop is a process problem, not an AI problem</h2>
-    <p class="lede-sm">Unmaintainable software existed long before agents — it's what happens
-    when nothing a builder ships has to answer to whoever maintains it next. AI didn't create
-    that problem; it multiplied the speed it happens at. And the old answer — process as
-    brakes — never worked either: discipline that slows builders down gets routed around.</p>
-    <p class="lede-sm">The right answer isn't slowing anything down. It's speeding everything
-    else up to match — the self-correcting practices of a mature engineering org, run by
-    agents at the same speed the code gets written:</p>
-    <ul class="bullets">
-      <li>Reviews that change the process, not just the code</li>
-      <li>Incidents that become guardrails, not just fixes</li>
-      <li>Retros that rewrite the next plan</li>
-    </ul>
-    <p class="lede-sm">Agents do the discipline. You hold the gates.</p>
+    <div class="why-grid">
+      <div class="why-copy">
+        <h2 class="display">Slop is a process problem, not an AI problem</h2>
+        <p class="lede-sm">Unmaintainable software existed long before agents — AI just multiplied
+        the speed it happens at. And process-as-brakes never worked either: discipline that slows
+        builders down gets routed around. The answer isn't slowing anything down — it's speeding
+        everything else up to match, the self-correcting practices of a mature engineering org run
+        by agents at the same speed the code gets written:</p>
+        <ul class="bullets">
+          <li>Reviews that change the process, not just the code</li>
+          <li>Incidents that become guardrails, not just fixes</li>
+          <li>Retros that rewrite the next plan</li>
+        </ul>
+        <p class="lede-sm">Agents do the discipline. You hold the gates.</p>
+      </div>
+      {/* The matched-lanes diagram: two conveyor lanes at identical pitch.
+          Process isn't a brake on code — it's a second lane running at the
+          same cadence. Geometry lives in the frontmatter above. */}
+      <div class="why-art" role="img"
+           aria-label="Diagram: two conveyor lanes moving at the same speed — a code lane, and a process lane passing through planning, review, release and ops. Matching tempo marks tie the lanes together: process keeps pace with code instead of braking it.">
+        <svg viewBox="24 64 452 240" aria-hidden="true">
+          {/* the two tracks */}
+          {LANES.map((lane) => (
+            <>
+              <text class="wa-lane" x={LANE_X} y={lane.y - 12}>{lane.label}</text>
+              <rect x={LANE_X} y={lane.y} width={LANE_W} height={LANE_H} rx="22"
+                    fill="var(--honey-wash)" opacity=".45"/>
+              <rect x={LANE_X} y={lane.y} width={LANE_W} height={LANE_H} rx="22"
+                    fill="none" stroke="var(--mark-line)" stroke-width="2" opacity=".5"/>
+              {CHEV_XS.map((x) => (
+                <path d={chev(x, lane.y)} fill="none"
+                      stroke={BEATS.includes(x) ? 'var(--honey)' : 'var(--mark-line)'}
+                      stroke-width={BEATS.includes(x) ? 3 : 2.5}
+                      opacity={BEATS.includes(x) ? 1 : 0.4}
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              ))}
+            </>
+          ))}
+
+          {/* the tempo ties: same beat, both lanes */}
+          {TIES.map((x) => (
+            <line x1={x} y1={LANES[0].y + LANE_H + 4} x2={x} y2={LANES[1].y - 4}
+                  stroke="var(--honey)" stroke-width="2" stroke-dasharray="2 6"
+                  stroke-linecap="round" opacity=".9"/>
+          ))}
+          <text class="wa-pace" x={(TIES[0] + TIES[1]) / 2}
+                y={(LANES[0].y + LANE_H + LANES[1].y) / 2 + 4}
+                text-anchor="middle">same cadence</text>
+
+          {/* phase ruler under the process lane — zones, not walls */}
+          {PHASES_LANE.slice(1).map((_, i) => (
+            <line x1={LANE_X + SEG * (i + 1)} y1={LANES[1].y + LANE_H}
+                  x2={LANE_X + SEG * (i + 1)} y2={LANES[1].y + LANE_H + 8}
+                  stroke="var(--mark-line)" stroke-width="1.5" opacity=".4"/>
+          ))}
+          {PHASES_LANE.map((p, i) => (
+            <text class="wa-phase" x={LANE_X + SEG * i + SEG / 2}
+                  y={LANES[1].y + LANE_H + 26} text-anchor="middle">{p}</text>
+          ))}
+        </svg>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -174,38 +243,12 @@ export const meta = {
 <span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
     </div>
 
-    <h3 style="margin-top:1.8rem">Bring the planning you already have</h3>
-    <p>Most repos are already full of it: ADRs, design notes, a <code>.planning/</code>
-    directory, a spec folder some other markdown framework generated. That is good information
-    in the wrong storage format. A file tree is a poor search index — an agent can read it, but
-    it can't ask what's blocked, what this depends on, or what's ready.</p>
-    <p><b>Backfill</b> reads your git history and those documents and proposes them as beads,
-    reconciling against anything already tracked so nothing is duplicated. It never
-    blind-imports: every proposal stops for you to confirm, reclassify, or throw away.</p>
-    <div class="term">
-<pre><code><span class="p">$</span> bh hive onboard --claude   <span class="c"># or --opencode</span>
-<span class="p">$</span> claude
-<span class="p">&gt;</span> /bh:backfill               <span class="c"># propose history + docs as beads</span></code></pre>
-    </div>
-
-    <h3 style="margin-top:1.8rem">Take as much of the ring as you want</h3>
-    <p>Nobody adopts a lifecycle in one go. Plenty of reasonable places to stop:</p>
-    <ul class="bullets">
-      <li>Start at <b>idea → plan → build</b> alone, if planning is where the pain is, and keep
-      reviewing, releasing and operating exactly as you do today</li>
-      <li>Add review and merge when the volume of agent output makes doing it by hand the
-      bottleneck</li>
-      <li>Close the rest when — and only when — your own evidence says it's worth it</li>
-    </ul>
-    <p>Every seat you haven't handed over is simply a seat a person still holds. That is the
-    normal state, not a degraded one.</p>
-    <div class="term">
-<pre><code><span class="p">$</span> bh role planner            <span class="c"># turn an idea into a gated plan</span>
-<span class="p">$</span> bh role dispatcher         <span class="c"># deliver it, bead by bead</span></code></pre>
-    </div>
+    <p>From there, the agents take it: a planner turns your idea into a gated plan, a
+    dispatcher delivers it bead by bead, and every gate defaults to you. The start guide walks
+    the whole first loop — including bringing in the planning your repo already has.</p>
     <div class="herobar">
-      <a class="btn btn-primary" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Full install guide</a>
-      <a class="btn btn-ghost" href="/roles/#harnesses">Harness support</a>
+      <a class="btn btn-primary" href="/start/">The full start guide</a>
+      <a class="btn btn-ghost" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Install reference</a>
     </div>
   </div>
 </section>
@@ -215,6 +258,9 @@ export const meta = {
   <div class="wrap">
     <div class="eyebrow display">Go deeper</div>
     <h2 class="display">The field guide</h2>
+    <p class="lede-sm">For the reader who has run these processes at scale and doubts agents
+    can: this is how they're encoded. Every claim on this page has its machinery documented
+    here — and the source is one link further.</p>
     <div class="cardgrid reveal-stagger">
       <a class="card teaser" href="/beads/">
         <h3><span class="hexdot">⬢</span>The substrate</h3>
@@ -236,8 +282,50 @@ export const meta = {
         <p>A fleet of hives, one Head Office, and what's actionable anywhere.</p>
         <span class="cardcta display">Read Fleet →</span>
       </a>
+      <a class="card teaser" href="/data/">
+        <h3><span class="hexdot">⬢</span>The ladder</h3>
+        <p>Why the tracker, the docs, the reviews and the telemetry move into the graph — one
+        rung at a time, each paying for itself.</p>
+        <span class="cardcta display">Read The ladder →</span>
+      </a>
     </div>
   </div>
 </section>
 
 </Layout>
+
+<style>
+  /* Art slot: invisible on a stacked layout (the copy carries the argument
+     there), a sized right column on a laptop. */
+  .why-art { display: none; }
+
+  .why-art text {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-weight: 600;
+  }
+  .wa-lane  { fill: var(--ink-3); font-size: 13px; }
+  .wa-phase { fill: var(--ink-3); font-size: 12px; }
+  .wa-pace  { fill: var(--honey-strong); font-size: 12px; }
+
+  @media (min-width: 1024px) {
+    #why > .wrap { max-width: 72rem; }
+    .why-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+      column-gap: 4rem;
+      align-items: stretch;
+      margin-top: 6px;
+    }
+    .why-copy > p:last-child { margin-bottom: 0; }
+    .why-art {
+      display: grid;
+      place-items: center;
+      min-height: 22rem;
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    .why-art svg { display: block; width: 94%; max-width: 30rem; height: auto; }
+  }
+</style>

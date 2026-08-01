@@ -64,7 +64,8 @@ export const GET: APIRoute = () => {
     // A one-line summary, not the homepage's meta description — that reappears
     // verbatim in the Field guide list below, and saying it twice wastes the
     // first thing a reader sees.
-    '> An agentic software factory that closes the loop: from idea to production, and back.',
+    '> An open-source agentic software factory that ships software, not slop — it runs the',
+    '> engineering process at the speed agents write code.',
     '',
     'Beadhive runs a software factory across the whole lifecycle: agents hold most of the',
     'seats, humans hold the ones that matter, and what production teaches is meant to come',

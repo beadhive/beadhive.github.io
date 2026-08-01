@@ -4,7 +4,7 @@ import Layout from '../layouts/Layout.astro';
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
 export const meta = {
-  order: 5,
+  order: 6,
   label: 'Scale',
   title: 'Scale · Beadhive',
   description: 'A fleet of hives, one Head Office — bh sync aggregates every registered hive so you can ask what is actionable anywhere, plus where the source-of-truth docs live.',
@@ -26,6 +26,8 @@ export const meta = {
     <div class="wrap" style="padding:0">
       <div class="eyebrow display">07 · Hives → HQ</div>
       <h2 class="display">A fleet of hives, one Head Office</h2>
+      <p class="lede-sm">One team working this way is a demo. This page is what it looks like
+      when every repo is a hive and you read the whole fleet from one seat.</p>
       <p>Each hive owns its issues; the workspace owns the view. <code>bh sync</code> aggregates
       every registered hive — cloned ones by local path, uncloned ones via a blobless
       minimal-clone cache — so <code>bh hq bd ready</code> answers "what's actionable anywhere?"

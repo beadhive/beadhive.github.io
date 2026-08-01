@@ -1,0 +1,360 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Exported so /llms.txt can enumerate this page without a second copy of its
+// title and description. A new page with a `meta` export appears there for free.
+//
+// Register (infra/docs/design/gtm-dual-icp.md): this page is ICP-1-voiced end
+// to end — what the agents will do FOR you, never process doctrine. Indict the
+// situation, not the reader; no org-chart vocabulary without an inline gloss.
+export const meta = {
+  order: 2,
+  label: 'Start',
+  title: 'Start · Beadhive',
+  description:
+    'From an idea to something real: install in five minutes, let the agents run the ' +
+    'engineering process, and hold only the decisions that matter. No engineering-org ' +
+    'experience required.',
+};
+
+// --- first-loop mini-ring -------------------------------------------------
+// LoopHex's little sibling (see components/LoopHex.astro for the full-size
+// diagram on /process). Same pointy-top geometry, ICP-1 vocabulary: idea →
+// plan → build → review → ship → learn. The one honey edge is learn → idea —
+// what you learn feeds the next plan, which is the whole reason to run a loop
+// rather than a line. Solid, not dashed: on /start it's a promise, not a gap.
+const CX = 170, CY = 156, R = 104, CELL_R = 14;
+const RAD = (deg: number) => (deg * Math.PI) / 180;
+const at = (deg: number, r: number): [number, number] =>
+  [CX + r * Math.cos(RAD(deg)), CY + r * Math.sin(RAD(deg))];
+const LOOP = ['idea', 'plan', 'build', 'review', 'ship', 'learn'].map((label, i) => {
+  const angle = -90 + i * 60;
+  const [x, y] = at(angle, R);
+  const [lx, ly] = at(angle, R + 30);
+  const c = Math.cos(RAD(angle));
+  return { label, x, y, lx, ly,
+           anchor: Math.abs(c) < 0.2 ? 'middle' : c > 0 ? 'start' : 'end' };
+});
+// flat-top comb cell at each vertex — the brand's lattice orientation
+const cell = (x: number, y: number, r = CELL_R) =>
+  `${x - r},${y} ${x - r / 2},${y - r * 0.866} ${x + r / 2},${y - r * 0.866} ` +
+  `${x + r},${y} ${x + r / 2},${y + r * 0.866} ${x - r / 2},${y + r * 0.866}`;
+// edges trimmed at both ends so the arrowheads clear the cells
+const loopEdges = LOOP.map((a, i) => {
+  const b = LOOP[(i + 1) % 6];
+  const [dx, dy] = [b.x - a.x, b.y - a.y];
+  const len = Math.hypot(dx, dy);
+  const [ux, uy] = [dx / len, dy / len];
+  return { closing: i === 5,
+    x1: a.x + ux * (CELL_R + 3), y1: a.y + uy * (CELL_R + 3),
+    x2: b.x - ux * (CELL_R + 9), y2: b.y - uy * (CELL_R + 9) };
+});
+// annotation beside the closing edge (its midpoint sits at 240°, upper-left)
+const [npX, npY] = at(240, R + 28);
+---
+<Layout active="start" title={meta.title} description={meta.description}>
+
+<section id="start" class="step">
+  <div class="wrap">
+    <div class="eyebrow display">Start here</div>
+    <div class="intro-grid">
+      <div class="intro-copy">
+        <h2 class="display">You bring the idea.<br class="herobr" /> The factory brings the discipline.</h2>
+        <p class="lede-sm">You don't need to know what a decision record is or why review gates
+        exist. The agents run that process for you — and explain why as it happens. You decide
+        what to build, and approve what ships.</p>
+      </div>
+      <figure class="miniloop" role="img"
+              aria-label="Your first loop: from idea to plan to build to review to ship to learn — and what you learn feeds the next plan.">
+        <svg viewBox="0 0 340 312" aria-hidden="true">
+          <defs>
+            <marker id="ml-arrow" viewBox="0 0 10 10" refX="8" refY="5"
+                    markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--mark-line)"/>
+            </marker>
+            <marker id="ml-arrow-gold" viewBox="0 0 10 10" refX="8" refY="5"
+                    markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/>
+            </marker>
+          </defs>
+          {loopEdges.map((e) => (
+            <line class={e.closing ? 'ml-edge is-closing' : 'ml-edge'}
+                  x1={e.x1} y1={e.y1} x2={e.x2} y2={e.y2}
+                  marker-end={e.closing ? 'url(#ml-arrow-gold)' : 'url(#ml-arrow)'} />
+          ))}
+          {LOOP.map((n) => (
+            <polygon class={n.label === 'idea' ? 'ml-cell is-next' : 'ml-cell'}
+                     points={cell(n.x, n.y)} />
+          ))}
+          {LOOP.map((n) => (
+            <text class="ml-label" x={n.lx} y={n.ly + 4} text-anchor={n.anchor}>{n.label}</text>
+          ))}
+          <text class="ml-note" x={npX} y={npY} text-anchor="end">
+            <tspan x={npX} dy="0">feeds the</tspan>
+            <tspan x={npX} dy="13">next plan</tspan>
+          </text>
+        </svg>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<div class="band">
+<section id="install" class="step">
+  <div class="wrap">
+    <div class="eyebrow display"><span class="stepno">01</span><span>Five minutes</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">A running factory, against the repo you already have</h2>
+        <p class="lede-sm">No server, no signup, no hosted dependency — and nothing written into
+        your repo until you ask for it.</p>
+      </div>
+      <div class="step-side">
+        <div class="term reveal">
+          <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
+<pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
+<span class="p">$</span> bh config init
+<span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
+<span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<section id="plan" class="step step--flip">
+  <div class="wrap">
+    <div class="eyebrow display"><span class="stepno">02</span><span>First loop</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">Turn the idea into a plan — by answering questions</h2>
+        <p>Tell the planner what you want to build. It interviews you, researches what exists,
+        writes the decisions down, and breaks the work into small, dependency-ordered pieces —
+        <b>beads</b> — each sized so an agent can finish it and you can judge it.</p>
+      </div>
+      <div class="step-side">
+        <div class="term">
+<pre><code><span class="p">$</span> bh role planner            <span class="c"># an idea in, a gated plan out</span>
+<span class="c"># decisions go on record — cite, don't re-decide</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="build" class="step">
+  <div class="wrap">
+    <div class="eyebrow display"><span class="stepno">03</span><span>Then</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">Watch it build — and hold the gates</h2>
+        <p>The dispatcher hands each bead to a developer agent in its own isolated copy of the
+        repo, under its own signed identity. Work comes back as a reviewable change, checks
+        already run. Nothing merges while a gate is open — and <b>every gate defaults to
+        you</b>.</p>
+      </div>
+      <div class="step-side">
+        <div class="term">
+<pre><code><span class="p">$</span> bh role dispatcher         <span class="c"># deliver the plan, bead by bead</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="band">
+<section id="bring" class="step step--flip">
+  <div class="wrap">
+    <div class="eyebrow display"><span class="stepno">04</span><span>Already started?</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">Bring the planning you already have</h2>
+        <p>Most repos already hold planning: decision records, design notes, a
+        <code>.planning/</code> directory. Good information in the wrong format — an agent can read a file tree, but it
+        can't ask what's blocked or what's ready. <b>Backfill</b> proposes that history and those
+        documents as beads, and every proposal stops for you to confirm, reclassify, or throw
+        away.</p>
+      </div>
+      <div class="step-side">
+        <div class="term">
+<pre><code><span class="p">$</span> bh hive onboard --claude   <span class="c"># or --opencode</span>
+<span class="p">$</span> claude
+<span class="p">&gt;</span> /bh:backfill               <span class="c"># propose history + docs as beads</span>
+<span class="c"># reconciled, never blind-imported</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<section id="pace" class="step step--top">
+  <div class="wrap">
+    <div class="eyebrow display"><span class="stepno">05</span><span>Your pace</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">Take as much of the ring as you want</h2>
+        <p>Nobody adopts a lifecycle in one go. Plenty of reasonable places to stop:</p>
+      </div>
+      <div class="step-side">
+        <div class="sidecard">
+          <ul class="bullets">
+            <li>Start at <b>idea → plan → build</b> alone — keep reviewing, releasing and
+            operating exactly as you do today</li>
+            <li>Add review and merge when doing them by hand becomes the bottleneck</li>
+            <li>Close the rest when — and only when — your own evidence says it's worth it</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="step-closer">Every seat you haven't handed over is simply a seat a person still
+    holds. That is the normal state, not a degraded one.</p>
+  </div>
+</section>
+
+<div class="band">
+<section id="learn" class="step step--flip">
+  <div class="wrap">
+    <div class="eyebrow display"><span class="stepno">06</span><span>The quiet part</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">You'll learn the process by watching it work</h2>
+        <p>Every time the factory does something that looks like ceremony — records a decision,
+        refuses a merge, writes up what an incident taught it — it says why. That knowledge is
+        yours to keep, whatever you build next.</p>
+      </div>
+      <div class="step-side">
+        <div class="sidecard herobar">
+          <a class="btn btn-primary" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Full install guide</a>
+          <a class="btn btn-ghost" href="/process/">See how the factory works</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+</Layout>
+
+<style>
+  /* ---------- numbered path ----------
+     The step number rides inside the existing eyebrow, so the hairline rule
+     still trails it and the label keeps its small-caps voice. Numbers stay at
+     the page's left edge on every step — the path reads top-to-bottom even
+     while the content below alternates sides. */
+  .stepno {
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--honey-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hero h2 used to balance-wrap after "The"; break at the sentence boundary
+     instead. Below 640px the line is too short for the br — let text-wrap:
+     balance handle it. */
+  .herobr { display: none; }
+  @media (min-width: 640px) {
+    .herobr { display: inline; }
+  }
+
+  /* ---------- first-loop mini-ring ----------
+     Stacked: a compact ring under the intro copy — the mental map for the six
+     numbered steps that follow. ≥1024px: the intro becomes the same two-column
+     shape as the step rows, ring on the right. */
+  .miniloop { margin: 0; }
+  .miniloop svg {
+    display: block; width: 100%; max-width: 17.5rem; height: auto;
+    margin: 26px auto 0;
+  }
+  .ml-cell { fill: var(--panel-2); stroke: var(--mark-line); stroke-width: 2; }
+  .ml-cell.is-next { stroke: var(--honey); stroke-width: 2.4; }
+  .ml-edge { stroke: var(--mark-line); stroke-width: 2; opacity: .7; }
+  .ml-edge.is-closing { stroke: var(--honey); stroke-width: 2.6; opacity: 1; }
+  .miniloop text { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; }
+  .ml-label { fill: var(--ink); font-size: 13px; font-weight: 600; }
+  .ml-note  { fill: var(--honey-strong); font-size: 11px; font-weight: 600; }
+
+  @media (min-width: 1024px) {
+    .intro-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      column-gap: 4.5rem;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .intro-copy > p:last-child { margin-bottom: 0; }
+    .miniloop svg { margin: 0 auto; max-width: 20rem; }
+  }
+
+  /* ---------- mobile-first: everything stacks ---------- */
+  .step-side { margin-top: 18px; }
+  .sidecard {
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+  /* The bare `.bullets` list has no global styling outside .featrow; give it
+     the same hex-bullet voice here. */
+  .sidecard .bullets {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+    max-width: none;
+  }
+  /* NOT the .featrow grid-li treatment: these li contain <b> children, and a
+     grid li promotes each child to its own grid item, shattering the line. */
+  .sidecard .bullets li {
+    position: relative;
+    padding-left: 1.25rem;
+    font-size: .93rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin-bottom: 12px;
+  }
+  .sidecard .bullets li:last-child { margin-bottom: 0; }
+  .sidecard .bullets li::before {
+    content: "⬢";
+    position: absolute;
+    left: 0;
+    top: .3em;
+    color: var(--honey-strong);
+    font-size: 10px;
+    line-height: 1;
+  }
+  .sidecard.herobar { margin-top: 0; gap: 12px; }
+  .sidecard.herobar .btn { flex: 1 1 auto; justify-content: center; }
+
+  /* ---------- ≥1024px: alternating two-column step rows ---------- */
+  @media (min-width: 1024px) {
+    .step > .wrap { max-width: 74rem; }
+    .step { padding: 52px 0 20px; }
+    .step-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      column-gap: 4.5rem;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .step--flip .step-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+    /* When the side block is taller than the text (the "your pace" card),
+       centering floats the heading into dead space — pin that row to the top. */
+    .step--top .step-grid { align-items: start; }
+    .step--top .step-side { margin-top: 8px; }
+    .step--flip .step-text { grid-column: 2; grid-row: 1; }
+    .step--flip .step-side { grid-column: 1; grid-row: 1; }
+    .step-side { margin-top: 0; }
+    /* Fill the column instead of stopping at the global 34rem cap — the column
+       itself is the width constraint here. */
+    .step-side .term { max-width: none; }
+    .step-text > p:last-child { margin-bottom: 0; }
+    /* Full-width closer under a two-column row (the "your pace" coda). */
+    .step-closer { margin-top: 26px; }
+    .sidecard { padding: 24px 26px; }
+    .sidecard.herobar .btn { flex: 1 1 100%; }
+  }
+</style>
