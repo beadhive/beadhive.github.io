@@ -1,7 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Mark from '../components/Mark.astro';
-import LoopHex from '../components/LoopHex.astro';
 import { hero } from '../copy/heroes.ts';
 
 // Exported so /llms.txt can enumerate this page. Sourced from the hero rather
@@ -22,21 +21,29 @@ export const meta = {
     <h1 class="display">{hero.title}</h1>
     <p class="lede">{hero.lede}</p>
     <div class="herobar">
-      <a class="btn btn-primary" href="#try">Run it in five minutes</a>
-      <a class="btn btn-ghost" href="https://github.com/beadhive/beadhive">Read the source</a>
+      <a class="btn btn-primary" href="#try">Ship something real</a>
+      <a class="btn btn-ghost" href="/process/">See how the factory works</a>
     </div>
   </div>
 </header>
 
-<section id="loop" class="reveal">
+<section id="why" class="reveal">
   <div class="wrap">
-    <div class="eyebrow display">The loop</div>
-    <h2 class="display">Six phases, one ring — and one edge nobody closes</h2>
-    <p class="lede-sm">A car factory isn't successful because the car left the line — it's
-    successful if the car survives the road. Software is no different: what happens in production
-    is the only signal that says whether the last decision was any good, so it has to come back
-    round to the next one.</p>
-    <LoopHex />
+    <div class="eyebrow display">The problem</div>
+    <h2 class="display">Slop is a process problem, not an AI problem</h2>
+    <p class="lede-sm">Unmaintainable software existed long before agents — it's what happens
+    when nothing a builder ships has to answer to whoever maintains it next. AI didn't create
+    that problem; it multiplied the speed it happens at. And the old answer — process as
+    brakes — never worked either: discipline that slows builders down gets routed around.</p>
+    <p class="lede-sm">The right answer isn't slowing anything down. It's speeding everything
+    else up to match — the self-correcting practices of a mature engineering org, run by
+    agents at the same speed the code gets written:</p>
+    <ul class="bullets">
+      <li>Reviews that change the process, not just the code</li>
+      <li>Incidents that become guardrails, not just fixes</li>
+      <li>Retros that rewrite the next plan</li>
+    </ul>
+    <p class="lede-sm">Agents do the discipline. You hold the gates.</p>
   </div>
 </section>
 

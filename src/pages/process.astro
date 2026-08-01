@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import LoopHex from '../components/LoopHex.astro';
 
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
@@ -16,6 +17,7 @@ export const meta = {
     <p class="toc-title">On this page</p>
     <a class="head" href="#how">The mental model</a>
     <a class="sub" href="#how-tenets">The tenets</a>
+    <a class="head" href="#ring">The ring</a>
     <a class="head" href="#pipeline">The pipeline</a>
     <a class="sub" href="#pipeline-green">What keeps the line green</a>
     <a class="head" href="#release">Merge order is planned</a>
@@ -57,6 +59,17 @@ export const meta = {
         <p>Worktree → implement → refine → check → submit → review → merge. One bead, one
         branch (<code>wt/bead/issue/&lt;id&gt;</code>), one reviewable change.</p></div>
     </div>
+  </div>
+</section>
+<section id="ring">
+  <div class="wrap">
+    <div class="eyebrow display">The ring</div>
+    <h2 class="display">Six phases, one ring — and one edge nobody closes</h2>
+    <p>A car factory isn't successful because the car left the line — it's successful if the
+    car survives the road. Software is no different: what happens in production is the only
+    signal that says whether the last decision was any good, so it has to come back round to
+    the next one.</p>
+    <LoopHex />
   </div>
 </section>
 <section id="pipeline">
