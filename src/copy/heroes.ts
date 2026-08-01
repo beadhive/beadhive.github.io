@@ -64,7 +64,7 @@ const keepup: Hero = {
 };
 
 /** Factory-subject frame: slop contrast in the title, anti-brakes in the lede. */
-const shipsnot: Hero = {
+const noslop: Hero = {
   eyebrow: 'Beadhive',
   title: 'A factory that ships software, not slop',
   lede:
@@ -86,6 +86,6 @@ const orgbehind: Hero = {
   siteDescription,
 };
 
-const HERO: 'outrun' | 'keepup' | 'shipsnot' | 'orgbehind' = 'shipsnot';
+const HERO: 'outrun' | 'keepup' | 'noslop' | 'orgbehind' = 'noslop';
 
-export const hero: Hero = { outrun, keepup, shipsnot, orgbehind }[HERO];
+export const hero: Hero = { outrun, keepup, noslop, orgbehind }[HERO];
