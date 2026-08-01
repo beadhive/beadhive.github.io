@@ -1,0 +1,105 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Exported so /llms.txt can enumerate this page without a second copy of its
+// title and description. A new page with a `meta` export appears there for free.
+//
+// Register (infra/docs/design/gtm-dual-icp.md): ICP-2-facing — the
+// commitment-ladder argument. Never "abandon your tools"; each rung pays for
+// itself and abandonment is a conclusion the reader reaches.
+export const meta = {
+  order: 7,
+  label: 'The ladder',
+  title: 'Why the data moves in · Beadhive',
+  description:
+    'Agents can\'t plan against data they can\'t query. The commitment ladder: sync the ' +
+    'tracker, move the docs, record the reviews, hook the telemetry — each rung pays off on ' +
+    'its own, and retiring the old tools is a conclusion you reach, not a demand we make.',
+};
+---
+<Layout active="data" title={meta.title} description={meta.description}>
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#principle">The principle</a>
+    <a class="head" href="#rungs">The rungs</a>
+    <a class="head" href="#conclusion">Nothing is abandoned first</a>
+    <a class="head" href="#top">Where the ladder tops out</a>
+  </nav>
+  <div class="pagemain">
+
+<section id="principle">
+  <div class="wrap">
+    <div class="eyebrow display">09 · The ladder</div>
+    <h2 class="display">Agents can't plan against data they can't query</h2>
+    <p class="lede-sm">You've consolidated systems before and regretted some of them. This page
+    is the argument for why this consolidation is different — one rung at a time, each rung
+    paying for itself.</p>
+    <p>Right now your lifecycle is scattered by design: issues in one SaaS, decisions in a docs
+    folder or someone's Drive, review reasoning in PR threads, incident knowledge in dashboards
+    and postmortem docs. A senior engineer holds the connections between them in their head.
+    An agent can't — and neither can the next engineer.</p>
+    <p>Files are readable but not <em>queryable</em>. An agent can open your design doc; it
+    cannot ask what's blocked by it, what depends on it, or whether the incident from March
+    already invalidated it. Planning against unqueryable data is improvisation with extra
+    steps — which is exactly the failure you've watched AI coding tools repeat. The fix is not
+    a smarter agent. It's putting the lifecycle where every seat can ask it questions: the
+    work-graph.</p>
+  </div>
+</section>
+
+<section id="rungs">
+  <div class="wrap">
+    <div class="eyebrow display">One at a time</div>
+    <h2 class="display">The rungs — each pays for itself</h2>
+    <div class="cardgrid">
+      <div class="card"><h4><span class="hexdot">⬢</span>1 · Sync the issue tracker</h4>
+        <p>Bi-directional sync; beads becomes the working copy, your tracker keeps running.
+        Immediate payoff: "what's next" is <em>computed</em> from real dependency edges,
+        dispatch is ordered, and the plan survives any agent losing its context.</p></div>
+      <div class="card"><h4><span class="hexdot">⬢</span>2 · Move the design docs in</h4>
+        <p>Backfill proposes your ADRs, specs and git history as beads — reconciled, never
+        blind-imported. Immediate payoff: planning cites recorded decisions instead of
+        re-litigating them, and a decision has an address other work can depend on.</p></div>
+      <div class="card"><h4><span class="hexdot">⬢</span>3 · Record reviews in the graph</h4>
+        <p>Review verdicts become gates — records, not vibes in a chat thread — signed by
+        whoever held the seat. Immediate payoff: a bounce targets the process that produced
+        the defect, not just the diff, so the correction sticks.</p></div>
+      <div class="card"><h4><span class="hexdot">⬢</span>4 · Hook up the telemetry</h4>
+        <p>Production signal joins the same graph the planner reads. Immediate payoff: an
+        incident doesn't end at mitigation — it becomes a guardrail in the next plan, which is
+        the loop everything else on this site exists to close.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="conclusion">
+  <div class="wrap">
+    <div class="eyebrow display">No leap required</div>
+    <h2 class="display">Nothing is abandoned first</h2>
+    <p>Rung one is a sync, not a migration. Your tracker, your docs, your dashboards all keep
+    working; beads is simply the copy the agents plan against. What happens next is the same
+    thing that happens to any mirrored system: one copy is where the decisions get made and
+    the other goes quietly stale. When you retire the old tool — if you do — it's because
+    nobody had opened it in a month, not because a landing page told you to.</p>
+  </div>
+</section>
+
+<section id="top">
+  <div class="wrap">
+    <div class="eyebrow display">The view from above</div>
+    <h2 class="display">Where the ladder tops out</h2>
+    <p>With the whole lifecycle in one queryable graph, the seats can run without you in the
+    loop of every step: planners file gated plans, developers work headless in their own
+    worktrees, reviewers and wardens hold their gates, and production reports back into the
+    next cycle. Your seat rises to where a CTO's should be — reading the fleet at a glance,
+    approving at the gates that matter, steering by what the graph says instead of by reading
+    everything yourself.</p>
+    <p><a class="deeplink" href="/roles/">The seats and who holds what</a><br/>
+    <a class="deeplink" href="/fleet/">The fleet view — every hive from one seat</a></p>
+  </div>
+</section>
+
+  </div>
+</div>
+</Layout>

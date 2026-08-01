@@ -21,7 +21,7 @@ export const meta = {
     <h1 class="display">{hero.title}</h1>
     <p class="lede">{hero.lede}</p>
     <div class="herobar">
-      <a class="btn btn-primary" href="#try">Ship something real</a>
+      <a class="btn btn-primary" href="/start/">Ship something real</a>
       <a class="btn btn-ghost" href="/process/">See how the factory works</a>
     </div>
   </div>
@@ -174,38 +174,12 @@ export const meta = {
 <span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
     </div>
 
-    <h3 style="margin-top:1.8rem">Bring the planning you already have</h3>
-    <p>Most repos are already full of it: ADRs, design notes, a <code>.planning/</code>
-    directory, a spec folder some other markdown framework generated. That is good information
-    in the wrong storage format. A file tree is a poor search index — an agent can read it, but
-    it can't ask what's blocked, what this depends on, or what's ready.</p>
-    <p><b>Backfill</b> reads your git history and those documents and proposes them as beads,
-    reconciling against anything already tracked so nothing is duplicated. It never
-    blind-imports: every proposal stops for you to confirm, reclassify, or throw away.</p>
-    <div class="term">
-<pre><code><span class="p">$</span> bh hive onboard --claude   <span class="c"># or --opencode</span>
-<span class="p">$</span> claude
-<span class="p">&gt;</span> /bh:backfill               <span class="c"># propose history + docs as beads</span></code></pre>
-    </div>
-
-    <h3 style="margin-top:1.8rem">Take as much of the ring as you want</h3>
-    <p>Nobody adopts a lifecycle in one go. Plenty of reasonable places to stop:</p>
-    <ul class="bullets">
-      <li>Start at <b>idea → plan → build</b> alone, if planning is where the pain is, and keep
-      reviewing, releasing and operating exactly as you do today</li>
-      <li>Add review and merge when the volume of agent output makes doing it by hand the
-      bottleneck</li>
-      <li>Close the rest when — and only when — your own evidence says it's worth it</li>
-    </ul>
-    <p>Every seat you haven't handed over is simply a seat a person still holds. That is the
-    normal state, not a degraded one.</p>
-    <div class="term">
-<pre><code><span class="p">$</span> bh role planner            <span class="c"># turn an idea into a gated plan</span>
-<span class="p">$</span> bh role dispatcher         <span class="c"># deliver it, bead by bead</span></code></pre>
-    </div>
+    <p>From there, the agents take it: a planner turns your idea into a gated plan, a
+    dispatcher delivers it bead by bead, and every gate defaults to you. The start guide walks
+    the whole first loop — including bringing in the planning your repo already has.</p>
     <div class="herobar">
-      <a class="btn btn-primary" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Full install guide</a>
-      <a class="btn btn-ghost" href="/roles/#harnesses">Harness support</a>
+      <a class="btn btn-primary" href="/start/">The full start guide</a>
+      <a class="btn btn-ghost" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Install reference</a>
     </div>
   </div>
 </section>
@@ -215,6 +189,9 @@ export const meta = {
   <div class="wrap">
     <div class="eyebrow display">Go deeper</div>
     <h2 class="display">The field guide</h2>
+    <p class="lede-sm">For the reader who has run these processes at scale and doubts agents
+    can: this is how they're encoded. Every claim on this page has its machinery documented
+    here — and the source is one link further.</p>
     <div class="cardgrid reveal-stagger">
       <a class="card teaser" href="/beads/">
         <h3><span class="hexdot">⬢</span>The substrate</h3>
@@ -235,6 +212,12 @@ export const meta = {
         <h3><span class="hexdot">⬢</span>Scale</h3>
         <p>A fleet of hives, one Head Office, and what's actionable anywhere.</p>
         <span class="cardcta display">Read Fleet →</span>
+      </a>
+      <a class="card teaser" href="/data/">
+        <h3><span class="hexdot">⬢</span>The ladder</h3>
+        <p>Why the tracker, the docs, the reviews and the telemetry move into the graph — one
+        rung at a time, each paying for itself.</p>
+        <span class="cardcta display">Read The ladder →</span>
       </a>
     </div>
   </div>

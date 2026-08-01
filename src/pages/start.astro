@@ -1,0 +1,137 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Exported so /llms.txt can enumerate this page without a second copy of its
+// title and description. A new page with a `meta` export appears there for free.
+//
+// Register (infra/docs/design/gtm-dual-icp.md): this page is ICP-1-voiced end
+// to end — what the agents will do FOR you, never process doctrine. Indict the
+// situation, not the reader; no org-chart vocabulary without an inline gloss.
+export const meta = {
+  order: 2,
+  label: 'Start',
+  title: 'Start · Beadhive',
+  description:
+    'From an idea to something real: install in five minutes, let the agents run the ' +
+    'engineering process, and hold only the decisions that matter. No engineering-org ' +
+    'experience required.',
+};
+---
+<Layout active="start" title={meta.title} description={meta.description}>
+
+<section id="start">
+  <div class="wrap">
+    <div class="eyebrow display">Start here</div>
+    <h2 class="display">You bring the idea. The factory brings the discipline.</h2>
+    <p class="lede-sm">You don't need to know what an architecture decision record is, why
+    review gates exist, or how mature engineering teams learn from incidents. The agents run
+    that process for you — and explain why each piece matters as it happens. Your job is the
+    part nobody can do for you: deciding what to build, and approving what ships.</p>
+  </div>
+</section>
+
+<div class="band">
+<section id="install">
+  <div class="wrap">
+    <div class="eyebrow display">Five minutes</div>
+    <h2 class="display">A running factory, against the repo you already have</h2>
+    <p class="lede-sm">No server, no signup, no hosted dependency — and nothing written into
+    your repo until you ask for it.</p>
+    <div class="term reveal" style="margin-top:18px">
+      <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
+<pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
+<span class="p">$</span> bh config init
+<span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
+<span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
+    </div>
+  </div>
+</section>
+</div>
+
+<section id="plan">
+  <div class="wrap">
+    <div class="eyebrow display">First loop</div>
+    <h2 class="display">Turn the idea into a plan — by answering questions</h2>
+    <p>Tell the planner what you want to build. It interviews you, researches what already
+    exists, writes the decisions down, and breaks the work into small, dependency-ordered
+    pieces — <b>beads</b> — each one sized so an agent can finish it and you can judge it.</p>
+    <div class="term">
+<pre><code><span class="p">$</span> bh role planner            <span class="c"># an idea in, a gated plan out</span></code></pre>
+    </div>
+    <p>It will look like a lot of writing-things-down. That's the point: three weeks from now,
+    neither you nor the agents have to remember <em>why</em> — it's on record, and every later
+    step can cite it instead of re-deciding it.</p>
+  </div>
+</section>
+
+<section id="build">
+  <div class="wrap">
+    <div class="eyebrow display">Then</div>
+    <h2 class="display">Watch it build — and hold the gates</h2>
+    <p>The dispatcher hands each bead to a developer agent in its own isolated copy of the
+    repo, under its own signed identity. Work comes back as a reviewable change with the
+    checks already run. Nothing merges while a gate is open, and <b>every gate defaults to
+    you</b> — approving is your seat until you decide otherwise.</p>
+    <div class="term">
+<pre><code><span class="p">$</span> bh role dispatcher         <span class="c"># deliver the plan, bead by bead</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<div class="band">
+<section id="bring">
+  <div class="wrap">
+    <div class="eyebrow display">Already started?</div>
+    <h2 class="display">Bring the planning you already have</h2>
+    <p>Most repos are already full of it: ADRs, design notes, a <code>.planning/</code>
+    directory, a spec folder some other markdown framework generated. That is good information
+    in the wrong storage format. A file tree is a poor search index — an agent can read it, but
+    it can't ask what's blocked, what this depends on, or what's ready.</p>
+    <p><b>Backfill</b> reads your git history and those documents and proposes them as beads,
+    reconciling against anything already tracked so nothing is duplicated. It never
+    blind-imports: every proposal stops for you to confirm, reclassify, or throw away.</p>
+    <div class="term">
+<pre><code><span class="p">$</span> bh hive onboard --claude   <span class="c"># or --opencode</span>
+<span class="p">$</span> claude
+<span class="p">&gt;</span> /bh:backfill               <span class="c"># propose history + docs as beads</span></code></pre>
+    </div>
+  </div>
+</section>
+</div>
+
+<section id="pace">
+  <div class="wrap">
+    <div class="eyebrow display">Your pace</div>
+    <h2 class="display">Take as much of the ring as you want</h2>
+    <p>Nobody adopts a lifecycle in one go. Plenty of reasonable places to stop:</p>
+    <ul class="bullets">
+      <li>Start at <b>idea → plan → build</b> alone, if planning is where the pain is, and keep
+      reviewing, releasing and operating exactly as you do today</li>
+      <li>Add review and merge when the volume of agent output makes doing it by hand the
+      bottleneck</li>
+      <li>Close the rest when — and only when — your own evidence says it's worth it</li>
+    </ul>
+    <p>Every seat you haven't handed over is simply a seat a person still holds. That is the
+    normal state, not a degraded one.</p>
+  </div>
+</section>
+
+<div class="band">
+<section id="learn">
+  <div class="wrap">
+    <div class="eyebrow display">The quiet part</div>
+    <h2 class="display">You'll learn the process by watching it work</h2>
+    <p>Every time the factory does something that looks like ceremony — records a decision,
+    refuses a merge, writes up what an incident taught it — it says why. A few loops in, you
+    aren't following a process you don't understand; you're running an engineering org, and
+    you know what each part is for. That knowledge is yours to keep, whatever you build
+    next.</p>
+    <div class="herobar">
+      <a class="btn btn-primary" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Full install guide</a>
+      <a class="btn btn-ghost" href="/process/">See how the factory works</a>
+    </div>
+  </div>
+</section>
+</div>
+
+</Layout>

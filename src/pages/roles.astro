@@ -4,7 +4,7 @@ import Layout from '../layouts/Layout.astro';
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
 export const meta = {
-  order: 4,
+  order: 5,
   label: 'Roles & seats',
   title: 'Roles & seats · Beadhive',
   description: 'One process, two kinds of worker: humans hold the gates, agents do the work — the four planes and the seats that sit in them, separated by blast radius, and the agent harnesses a seat can run under.',
@@ -25,6 +25,8 @@ export const meta = {
   <div class="wrap">
     <div class="eyebrow display">05 · Humans + agents</div>
     <h2 class="display">One process, two kinds of worker</h2>
+    <p class="lede-sm">The org chart you already know — planes, seats, blast radius — except a
+    seat no longer cares whether its worker is a person or an agent.</p>
     <p>The factory doesn't split "human workflows" from "agent workflows" — it defines
     <b>seats</b>, and either kind of worker can sit in one. A seat is a set of functional inputs,
     outputs and permissions, so it can be filled by an agent sub-task, by a main harness loop

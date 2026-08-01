@@ -5,7 +5,7 @@ import LoopHex from '../components/LoopHex.astro';
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
 export const meta = {
-  order: 3,
+  order: 4,
   label: 'How work flows',
   title: 'How work flows · Beadhive',
   description: 'The Beadhive mental model in one breath and the full planning → dispatch → develop → review → merge pipeline, with its spike, bounce, and replan loops.',
@@ -28,6 +28,8 @@ export const meta = {
   <div class="wrap">
     <div class="eyebrow display">03 · How it works</div>
     <h2 class="display">The mental model in one breath</h2>
+    <p class="lede-sm">You've run pipelines like this with humans in every box. The difference
+    to look for: every hand-off is a record, and nothing passes a gate on vibes.</p>
     <p>Every repo is a <b>hive</b> — its own beads database, embedded as Dolt under the repo's
     gitignored <code>.beads/</code>. Issues carry a short, stable <b>prefix</b>
     (<code>acme-api-1</code>) derived from the stable part of identity (org + repo); the parts
