@@ -11,9 +11,11 @@
 // infra/brand/tokens.json — not a paraphrase of it. Editing one without the
 // other puts the page and every shared preview into disagreement, and the card
 // is a rendered PNG, so it needs `node brand/render.mjs` rather than a
-// redeploy. The OG card still carries the OLD hero until this comparison
-// settles — sync tokens.json to the winner BEFORE publish (bh-infra-2sk
-// acceptance).
+// redeploy. The card is synced to the `noslop` variant; if a DIFFERENT variant
+// wins this comparison, re-sync tokens.json + public/og-default.png before
+// publish (bh-infra-2sk acceptance). Banners deliberately differ: they carry
+// the imperative `bannerTagline` ("Ship software, not slop.") per the surface
+// split in infra/docs/design/hero-copy-brainstorm.md.
 //
 // Register rule (gtm-dual-icp.md): the front page is ICP-1 legible — indict
 // the situation ("code outruns the process"), never the reader. No cowboy, no
