@@ -63,6 +63,29 @@ const keepup: Hero = {
   siteDescription,
 };
 
-const HERO: 'outrun' | 'keepup' = 'outrun';
+/** Factory-subject frame: slop contrast in the title, anti-brakes in the lede. */
+const shipsnot: Hero = {
+  eyebrow: 'Beadhive',
+  title: 'A factory that ships software, not slop',
+  lede:
+    'It doesn’t slow your code down — it speeds everything else up to match. Agents run ' +
+    'planning, review, release and operations at the speed the code gets written, and you ' +
+    'hold the gates.',
+  siteTitle: 'Beadhive — a factory that ships software, not slop',
+  siteDescription,
+};
 
-export const hero: Hero = { outrun, keepup }[HERO];
+/** Factory-subject frame: the ICP-1 org-behind-you story in the title. */
+const orgbehind: Hero = {
+  eyebrow: 'Beadhive',
+  title: 'A factory that puts a whole engineering org behind one builder',
+  lede:
+    'Planning, review, release and operations — run by agents at the speed you write code, ' +
+    'with the discipline of a mature engineering org built in. You hold the gates.',
+  siteTitle: 'Beadhive — a factory that puts a whole engineering org behind one builder',
+  siteDescription,
+};
+
+const HERO: 'outrun' | 'keepup' | 'shipsnot' | 'orgbehind' = 'outrun';
+
+export const hero: Hero = { outrun, keepup, shipsnot, orgbehind }[HERO];
