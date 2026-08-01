@@ -57,21 +57,23 @@ export const meta = {
         positioned element per wrapper, or a pseudo-element on .rung). */}
     <div class="cardgrid runggrid">
       <div class="rung"><div class="card"><h4><span class="hexdot">⬢</span>1 · Sync the issue tracker</h4>
-        <p>Bi-directional sync; beads becomes the working copy, your tracker keeps running.
-        Immediate payoff: "what's next" is <em>computed</em> from real dependency edges,
-        dispatch is ordered, and the plan survives any agent losing its context.</p></div></div>
+        <p>Bi-directional sync; beads becomes the working copy, your tracker keeps running.</p>
+        <p><b>Payoff:</b> "what's next" is <em>computed</em> from real dependency edges, and
+        the plan survives any agent losing its context.</p></div></div>
       <div class="rung"><div class="card"><h4><span class="hexdot">⬢</span>2 · Move the design docs in</h4>
         <p>Backfill proposes your ADRs, specs and git history as beads — reconciled, never
-        blind-imported. Immediate payoff: planning cites recorded decisions instead of
-        re-litigating them, and a decision has an address other work can depend on.</p></div></div>
+        blind-imported.</p>
+        <p><b>Payoff:</b> planning cites recorded decisions instead of re-litigating them, and
+        a decision has an address other work can depend on.</p></div></div>
       <div class="rung"><div class="card"><h4><span class="hexdot">⬢</span>3 · Record reviews in the graph</h4>
         <p>Review verdicts become gates — records, not vibes in a chat thread — signed by
-        whoever held the seat. Immediate payoff: a bounce targets the process that produced
-        the defect, not just the diff, so the correction sticks.</p></div></div>
+        whoever held the seat.</p>
+        <p><b>Payoff:</b> a bounce targets the process that produced the defect, not just the
+        diff, so the correction sticks.</p></div></div>
       <div class="rung"><div class="card"><h4><span class="hexdot">⬢</span>4 · Hook up the telemetry</h4>
-        <p>Production signal joins the same graph the planner reads. Immediate payoff: an
-        incident doesn't end at mitigation — it becomes a guardrail in the next plan, which is
-        the loop everything else on this site exists to close.</p></div></div>
+        <p>Production signal joins the same graph the planner reads.</p>
+        <p><b>Payoff:</b> an incident doesn't end at mitigation — it becomes a guardrail in
+        the next plan, the loop everything else on this site exists to close.</p></div></div>
     </div>
   </div>
 </section>
@@ -114,6 +116,8 @@ export const meta = {
   .runggrid { position: relative; }
   .rung { position: relative; }
   .rung > .card { height: 100%; }
+  /* Setup line above, payoff line below — the gap is what makes the split scan. */
+  .rung > .card p + p { margin-top: 9px; }
 
   /* ≥1024px: a true 2×2 with room to breathe — wider cards, a step up in
      type size so four dense paragraphs stop reading as a cramped widget. */
