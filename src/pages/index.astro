@@ -30,20 +30,29 @@ export const meta = {
 <section id="why" class="reveal">
   <div class="wrap">
     <div class="eyebrow display">The problem</div>
-    <h2 class="display">Slop is a process problem, not an AI problem</h2>
-    <p class="lede-sm">Unmaintainable software existed long before agents — it's what happens
-    when nothing a builder ships has to answer to whoever maintains it next. AI didn't create
-    that problem; it multiplied the speed it happens at. And the old answer — process as
-    brakes — never worked either: discipline that slows builders down gets routed around.</p>
-    <p class="lede-sm">The right answer isn't slowing anything down. It's speeding everything
-    else up to match — the self-correcting practices of a mature engineering org, run by
-    agents at the same speed the code gets written:</p>
-    <ul class="bullets">
-      <li>Reviews that change the process, not just the code</li>
-      <li>Incidents that become guardrails, not just fixes</li>
-      <li>Retros that rewrite the next plan</li>
-    </ul>
-    <p class="lede-sm">Agents do the discipline. You hold the gates.</p>
+    <div class="why-grid">
+      <div class="why-copy">
+        <h2 class="display">Slop is a process problem, not an AI problem</h2>
+        <p class="lede-sm">Unmaintainable software existed long before agents — it's what happens
+        when nothing a builder ships has to answer to whoever maintains it next. AI didn't create
+        that problem; it multiplied the speed it happens at. And the old answer — process as
+        brakes — never worked either: discipline that slows builders down gets routed around.</p>
+        <p class="lede-sm">The right answer isn't slowing anything down. It's speeding everything
+        else up to match — the self-correcting practices of a mature engineering org, run by
+        agents at the same speed the code gets written:</p>
+        <ul class="bullets">
+          <li>Reviews that change the process, not just the code</li>
+          <li>Incidents that become guardrails, not just fixes</li>
+          <li>Retros that rewrite the next plan</li>
+        </ul>
+        <p class="lede-sm">Agents do the discipline. You hold the gates.</p>
+      </div>
+      {/* Reserved for the process diagram (follow-up bead). Sized so the row
+          holds its two-column shape while empty; the lone comb cell is the
+          placeholder motif, drawn in CSS so this div stays empty for the
+          diagram to land in. */}
+      <div class="why-art" aria-hidden="true"></div>
+    </div>
   </div>
 </section>
 
@@ -224,3 +233,39 @@ export const meta = {
 </section>
 
 </Layout>
+
+<style>
+  /* Empty art slot: invisible on a stacked layout, a sized right column on a
+     laptop so the argument doesn't sit alone in a half-empty row. */
+  .why-art { display: none; }
+
+  @media (min-width: 1024px) {
+    #why > .wrap { max-width: 72rem; }
+    .why-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 11fr) minmax(0, 9fr);
+      column-gap: 4rem;
+      align-items: stretch;
+      margin-top: 6px;
+    }
+    .why-copy > p:last-child { margin-bottom: 0; }
+    .why-art {
+      display: grid;
+      place-items: center;
+      min-height: 22rem;
+      background: var(--panel);
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+    }
+    /* One faint comb cell — the same empty-cell motif as the 404 art — until
+       the diagram bead fills this slot. */
+    .why-art::before {
+      content: "";
+      width: 9.5rem;
+      height: 11rem;
+      background: var(--honey-wash);
+      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    }
+  }
+</style>

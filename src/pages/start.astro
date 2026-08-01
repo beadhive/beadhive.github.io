@@ -19,10 +19,10 @@ export const meta = {
 ---
 <Layout active="start" title={meta.title} description={meta.description}>
 
-<section id="start">
+<section id="start" class="step">
   <div class="wrap">
     <div class="eyebrow display">Start here</div>
-    <h2 class="display">You bring the idea. The factory brings the discipline.</h2>
+    <h2 class="display">You bring the idea.<br class="herobr" /> The factory brings the discipline.</h2>
     <p class="lede-sm">You don't need to know what an architecture decision record is, why
     review gates exist, or how mature engineering teams learn from incidents. The agents run
     that process for you — and explain why each piece matters as it happens. Your job is the
@@ -31,107 +31,238 @@ export const meta = {
 </section>
 
 <div class="band">
-<section id="install">
+<section id="install" class="step">
   <div class="wrap">
-    <div class="eyebrow display">Five minutes</div>
-    <h2 class="display">A running factory, against the repo you already have</h2>
-    <p class="lede-sm">No server, no signup, no hosted dependency — and nothing written into
-    your repo until you ask for it.</p>
-    <div class="term reveal" style="margin-top:18px">
-      <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
+    <div class="eyebrow display"><span class="stepno">01</span><span>Five minutes</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">A running factory, against the repo you already have</h2>
+        <p class="lede-sm">No server, no signup, no hosted dependency — and nothing written into
+        your repo until you ask for it.</p>
+      </div>
+      <div class="step-side">
+        <div class="term reveal">
+          <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
 <pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
 <span class="p">$</span> bh config init
 <span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
 <span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 </div>
 
-<section id="plan">
+<section id="plan" class="step step--flip">
   <div class="wrap">
-    <div class="eyebrow display">First loop</div>
-    <h2 class="display">Turn the idea into a plan — by answering questions</h2>
-    <p>Tell the planner what you want to build. It interviews you, researches what already
-    exists, writes the decisions down, and breaks the work into small, dependency-ordered
-    pieces — <b>beads</b> — each one sized so an agent can finish it and you can judge it.</p>
-    <div class="term">
+    <div class="eyebrow display"><span class="stepno">02</span><span>First loop</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">Turn the idea into a plan — by answering questions</h2>
+        <p>Tell the planner what you want to build. It interviews you, researches what already
+        exists, writes the decisions down, and breaks the work into small, dependency-ordered
+        pieces — <b>beads</b> — each one sized so an agent can finish it and you can judge it.</p>
+        <p>It will look like a lot of writing-things-down. That's the point: three weeks from now,
+        neither you nor the agents have to remember <em>why</em> — it's on record, and every later
+        step can cite it instead of re-deciding it.</p>
+      </div>
+      <div class="step-side">
+        <div class="term">
 <pre><code><span class="p">$</span> bh role planner            <span class="c"># an idea in, a gated plan out</span></code></pre>
+        </div>
+      </div>
     </div>
-    <p>It will look like a lot of writing-things-down. That's the point: three weeks from now,
-    neither you nor the agents have to remember <em>why</em> — it's on record, and every later
-    step can cite it instead of re-deciding it.</p>
   </div>
 </section>
 
-<section id="build">
+<section id="build" class="step">
   <div class="wrap">
-    <div class="eyebrow display">Then</div>
-    <h2 class="display">Watch it build — and hold the gates</h2>
-    <p>The dispatcher hands each bead to a developer agent in its own isolated copy of the
-    repo, under its own signed identity. Work comes back as a reviewable change with the
-    checks already run. Nothing merges while a gate is open, and <b>every gate defaults to
-    you</b> — approving is your seat until you decide otherwise.</p>
-    <div class="term">
+    <div class="eyebrow display"><span class="stepno">03</span><span>Then</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">Watch it build — and hold the gates</h2>
+        <p>The dispatcher hands each bead to a developer agent in its own isolated copy of the
+        repo, under its own signed identity. Work comes back as a reviewable change with the
+        checks already run. Nothing merges while a gate is open, and <b>every gate defaults to
+        you</b> — approving is your seat until you decide otherwise.</p>
+      </div>
+      <div class="step-side">
+        <div class="term">
 <pre><code><span class="p">$</span> bh role dispatcher         <span class="c"># deliver the plan, bead by bead</span></code></pre>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
 <div class="band">
-<section id="bring">
+<section id="bring" class="step step--flip">
   <div class="wrap">
-    <div class="eyebrow display">Already started?</div>
-    <h2 class="display">Bring the planning you already have</h2>
-    <p>Most repos are already full of it: ADRs, design notes, a <code>.planning/</code>
-    directory, a spec folder some other markdown framework generated. That is good information
-    in the wrong storage format. A file tree is a poor search index — an agent can read it, but
-    it can't ask what's blocked, what this depends on, or what's ready.</p>
-    <p><b>Backfill</b> reads your git history and those documents and proposes them as beads,
-    reconciling against anything already tracked so nothing is duplicated. It never
-    blind-imports: every proposal stops for you to confirm, reclassify, or throw away.</p>
-    <div class="term">
+    <div class="eyebrow display"><span class="stepno">04</span><span>Already started?</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">Bring the planning you already have</h2>
+        <p>Most repos are already full of it: ADRs, design notes, a <code>.planning/</code>
+        directory, a spec folder some other markdown framework generated. That is good information
+        in the wrong storage format. A file tree is a poor search index — an agent can read it, but
+        it can't ask what's blocked, what this depends on, or what's ready.</p>
+        <p><b>Backfill</b> reads your git history and those documents and proposes them as beads,
+        reconciling against anything already tracked so nothing is duplicated. It never
+        blind-imports: every proposal stops for you to confirm, reclassify, or throw away.</p>
+      </div>
+      <div class="step-side">
+        <div class="term">
 <pre><code><span class="p">$</span> bh hive onboard --claude   <span class="c"># or --opencode</span>
 <span class="p">$</span> claude
 <span class="p">&gt;</span> /bh:backfill               <span class="c"># propose history + docs as beads</span></code></pre>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 </div>
 
-<section id="pace">
+<section id="pace" class="step step--top">
   <div class="wrap">
-    <div class="eyebrow display">Your pace</div>
-    <h2 class="display">Take as much of the ring as you want</h2>
-    <p>Nobody adopts a lifecycle in one go. Plenty of reasonable places to stop:</p>
-    <ul class="bullets">
-      <li>Start at <b>idea → plan → build</b> alone, if planning is where the pain is, and keep
-      reviewing, releasing and operating exactly as you do today</li>
-      <li>Add review and merge when the volume of agent output makes doing it by hand the
-      bottleneck</li>
-      <li>Close the rest when — and only when — your own evidence says it's worth it</li>
-    </ul>
-    <p>Every seat you haven't handed over is simply a seat a person still holds. That is the
-    normal state, not a degraded one.</p>
+    <div class="eyebrow display"><span class="stepno">05</span><span>Your pace</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">Take as much of the ring as you want</h2>
+        <p>Nobody adopts a lifecycle in one go. Plenty of reasonable places to stop:</p>
+      </div>
+      <div class="step-side">
+        <div class="sidecard">
+          <ul class="bullets">
+            <li>Start at <b>idea → plan → build</b> alone, if planning is where the pain is, and keep
+            reviewing, releasing and operating exactly as you do today</li>
+            <li>Add review and merge when the volume of agent output makes doing it by hand the
+            bottleneck</li>
+            <li>Close the rest when — and only when — your own evidence says it's worth it</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="step-closer">Every seat you haven't handed over is simply a seat a person still
+    holds. That is the normal state, not a degraded one.</p>
   </div>
 </section>
 
 <div class="band">
-<section id="learn">
+<section id="learn" class="step step--flip">
   <div class="wrap">
-    <div class="eyebrow display">The quiet part</div>
-    <h2 class="display">You'll learn the process by watching it work</h2>
-    <p>Every time the factory does something that looks like ceremony — records a decision,
-    refuses a merge, writes up what an incident taught it — it says why. A few loops in, you
-    aren't following a process you don't understand; you're running an engineering org, and
-    you know what each part is for. That knowledge is yours to keep, whatever you build
-    next.</p>
-    <div class="herobar">
-      <a class="btn btn-primary" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Full install guide</a>
-      <a class="btn btn-ghost" href="/process/">See how the factory works</a>
+    <div class="eyebrow display"><span class="stepno">06</span><span>The quiet part</span></div>
+    <div class="step-grid">
+      <div class="step-text">
+        <h2 class="display">You'll learn the process by watching it work</h2>
+        <p>Every time the factory does something that looks like ceremony — records a decision,
+        refuses a merge, writes up what an incident taught it — it says why. A few loops in, you
+        aren't following a process you don't understand; you're running an engineering org, and
+        you know what each part is for. That knowledge is yours to keep, whatever you build
+        next.</p>
+      </div>
+      <div class="step-side">
+        <div class="sidecard herobar">
+          <a class="btn btn-primary" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Full install guide</a>
+          <a class="btn btn-ghost" href="/process/">See how the factory works</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 </div>
 
 </Layout>
+
+<style>
+  /* ---------- numbered path ----------
+     The step number rides inside the existing eyebrow, so the hairline rule
+     still trails it and the label keeps its small-caps voice. Numbers stay at
+     the page's left edge on every step — the path reads top-to-bottom even
+     while the content below alternates sides. */
+  .stepno {
+    font-size: 1.65rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--honey-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hero h2 used to balance-wrap after "The"; break at the sentence boundary
+     instead. Below 640px the line is too short for the br — let text-wrap:
+     balance handle it. */
+  .herobr { display: none; }
+  @media (min-width: 640px) {
+    .herobr { display: inline; }
+  }
+
+  /* ---------- mobile-first: everything stacks ---------- */
+  .step-side { margin-top: 18px; }
+  .sidecard {
+    background: var(--panel);
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+  /* The bare `.bullets` list has no global styling outside .featrow; give it
+     the same hex-bullet voice here. */
+  .sidecard .bullets {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+    max-width: none;
+  }
+  /* NOT the .featrow grid-li treatment: these li contain <b> children, and a
+     grid li promotes each child to its own grid item, shattering the line. */
+  .sidecard .bullets li {
+    position: relative;
+    padding-left: 1.25rem;
+    font-size: .93rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+    margin-bottom: 12px;
+  }
+  .sidecard .bullets li:last-child { margin-bottom: 0; }
+  .sidecard .bullets li::before {
+    content: "⬢";
+    position: absolute;
+    left: 0;
+    top: .3em;
+    color: var(--honey-strong);
+    font-size: 10px;
+    line-height: 1;
+  }
+  .sidecard.herobar { margin-top: 0; gap: 12px; }
+  .sidecard.herobar .btn { flex: 1 1 auto; justify-content: center; }
+
+  /* ---------- ≥1024px: alternating two-column step rows ---------- */
+  @media (min-width: 1024px) {
+    .step > .wrap { max-width: 74rem; }
+    .step { padding: 52px 0 20px; }
+    .step-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      column-gap: 4.5rem;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .step--flip .step-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+    /* When the side block is taller than the text (the "your pace" card),
+       centering floats the heading into dead space — pin that row to the top. */
+    .step--top .step-grid { align-items: start; }
+    .step--top .step-side { margin-top: 8px; }
+    .step--flip .step-text { grid-column: 2; grid-row: 1; }
+    .step--flip .step-side { grid-column: 1; grid-row: 1; }
+    .step-side { margin-top: 0; }
+    /* Fill the column instead of stopping at the global 34rem cap — the column
+       itself is the width constraint here. */
+    .step-side .term { max-width: none; }
+    .step-text > p:last-child { margin-bottom: 0; }
+    /* Full-width closer under a two-column row (the "your pace" coda). */
+    .step-closer { margin-top: 26px; }
+    .sidecard { padding: 24px 26px; }
+    .sidecard.herobar .btn { flex: 1 1 100%; }
+  }
+</style>
