@@ -52,25 +52,27 @@ export const meta = {
   <div class="wrap">
     <div class="eyebrow display">One at a time</div>
     <h2 class="display">The rungs — each pays for itself</h2>
-    {/* Each rung sits in a positioned .rung wrapper so a follow-up bead can
-        draw the vertical connecting rail between them (an absolutely
-        positioned element per wrapper, or a pseudo-element on .rung). */}
+    {/* The ladder drawn as a ladder: each rung carries a numbered comb-cell
+        badge on its top edge, and a rail threads badge to badge — a straight
+        drop when the cards stack, a stepped descent through the staggered 2×2
+        on a laptop. The rail is pseudo-element chrome on .rung; the badge is
+        real content so the rung numbers survive for screen readers. */}
     <div class="cardgrid runggrid">
-      <div class="rung"><div class="card"><h4><span class="hexdot">⬢</span>1 · Sync the issue tracker</h4>
+      <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>1</span></span> Sync the issue tracker</h4>
         <p>Bi-directional sync; beads becomes the working copy, your tracker keeps running.</p>
         <p><b>Payoff:</b> "what's next" is <em>computed</em> from real dependency edges, and
         the plan survives any agent losing its context.</p></div></div>
-      <div class="rung"><div class="card"><h4><span class="hexdot">⬢</span>2 · Move the design docs in</h4>
+      <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>2</span></span> Move the design docs in</h4>
         <p>Backfill proposes your ADRs, specs and git history as beads — reconciled, never
         blind-imported.</p>
         <p><b>Payoff:</b> planning cites recorded decisions instead of re-litigating them, and
         a decision has an address other work can depend on.</p></div></div>
-      <div class="rung"><div class="card"><h4><span class="hexdot">⬢</span>3 · Record reviews in the graph</h4>
+      <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>3</span></span> Record reviews in the graph</h4>
         <p>Review verdicts become gates — records, not vibes in a chat thread — signed by
         whoever held the seat.</p>
         <p><b>Payoff:</b> a bounce targets the process that produced the defect, not just the
         diff, so the correction sticks.</p></div></div>
-      <div class="rung"><div class="card"><h4><span class="hexdot">⬢</span>4 · Hook up the telemetry</h4>
+      <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>4</span></span> Hook up the telemetry</h4>
         <p>Production signal joins the same graph the planner reads.</p>
         <p><b>Payoff:</b> an incident doesn't end at mitigation — it becomes a guardrail in
         the next plan, the loop everything else on this site exists to close.</p></div></div>
@@ -110,25 +112,74 @@ export const meta = {
 </Layout>
 
 <style>
-  /* Rail anchor: each rung is a positioned wrapper (and the grid itself is
-     positioned) so the connecting rail can be drawn later without touching
-     this markup again. */
-  .runggrid { position: relative; }
+  /* ---------- the ladder rail ----------
+     Below 1024px the rungs stack single-column and the rail is a straight
+     drop: each badge hangs from the card above it. The thread's grammar is
+     "rail passes behind the cards, surfaces in the gaps" — segments emerge
+     from a card edge and dive into the next rung's badge. */
+  .runggrid { position: relative; grid-template-columns: 1fr; row-gap: 30px; }
   .rung { position: relative; }
   .rung > .card { height: 100%; }
   /* Setup line above, payoff line below — the gap is what makes the split scan. */
   .rung > .card p + p { margin-top: 9px; }
 
-  /* ≥1024px: a true 2×2 with room to breathe — wider cards, a step up in
-     type size so four dense paragraphs stop reading as a cramped widget. */
+  /* Numbered comb-cell badge straddling each rung's top edge. Real content,
+     not chrome: the number is what orders the ladder. */
+  .rungno {
+    position: absolute; top: -17px; left: 22px; width: 30px; height: 34px;
+    display: grid; place-items: center;
+  }
+  .rungno svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .rungno polygon { fill: var(--honey-wash); stroke: var(--honey); stroke-width: 2; }
+  .rungno > span {
+    position: relative; line-height: 1;
+    font-family: "Futura", "Avenir Next", system-ui, sans-serif;
+    font-size: 15px; font-weight: 800; color: var(--honey-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* straight drop: previous card's underside → this rung's badge */
+  .rung + .rung::before {
+    content: ""; position: absolute;
+    left: 36px; top: -30px; width: 2px; height: 13px;
+    background: var(--mark-line); opacity: .4;
+  }
+
+  /* ≥1024px: a true 2×2 with room to breathe — and the right column staggered
+     down, so 1→2→3→4 also reads top-to-bottom by eye. The rail becomes a
+     stepped descent, drawn with border elbows in the grid gaps. */
   @media (min-width: 1024px) {
     #rungs > .wrap { max-width: 68rem; }
     .runggrid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 1.5rem 2rem;
+      gap: 2rem 2.5rem;
     }
+    .rung:nth-child(even) { margin-top: 2.75rem; }
     .rung > .card { padding: 26px 30px; }
     .rung > .card h4 { font-size: 17px; margin-bottom: 10px; }
     .rung > .card p { font-size: 15px; line-height: 1.62; }
+    .rungno { left: 26px; }
+
+    /* 1→2 and 3→4: out of the left card's right edge, elbow down into the
+       staggered right card's badge. (`.rung + .rung` repeated here so these
+       outrank the base stub rule once Astro's scoping attributes are added.) */
+    .rung + .rung:nth-child(even)::before {
+      left: -2.5rem; top: -38px;
+      width: calc(2.5rem + 38px); height: 21px;
+      background: none;
+      border-top: 2px solid var(--mark-line);
+      border-right: 2px solid var(--mark-line);
+      border-top-right-radius: 12px;
+    }
+    /* 2→3: down from under the right card, back across the row gap, into the
+       left card's badge from the side. */
+    .rung + .rung:nth-child(3)::before {
+      left: 56px; top: -32px;
+      width: calc(100% + 2.5rem - 19px); height: 18px;
+      background: none;
+      border-right: 2px solid var(--mark-line);
+      border-bottom: 2px solid var(--mark-line);
+      border-bottom-right-radius: 12px;
+    }
   }
 </style>

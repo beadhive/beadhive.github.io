@@ -11,6 +11,27 @@ export const meta = {
   title: hero.siteTitle,
   description: hero.siteDescription,
 };
+
+// --- matched-lanes diagram (#why) ---------------------------------------
+// Two conveyor lanes, identical pitch. The sameness IS the argument: process
+// keeps pace with code instead of braking it. Honey "beat" chevrons sit at the
+// same x in both lanes, tied by dashed verticals — a shared metronome.
+const LANE_X = 48, LANE_W = 404, LANE_H = 44;
+const LANES = [
+  { label: 'code',    y: 100 },
+  { label: 'process', y: 216 },
+];
+const CHEV_XS = Array.from({ length: 10 }, (_, i) => 64 + i * 40);
+const BEATS = [184, 384];            // honey beat chevrons — same x in both lanes
+const TIES = BEATS.map((x) => x + 7); // dashed tempo ties between the lanes
+// process-lane phases: zones the flow passes through, not stops along it —
+// so the boundaries are ruler ticks under the lane, never walls across it.
+const PHASES_LANE = ['planning', 'review', 'release', 'ops'];
+const SEG = LANE_W / PHASES_LANE.length;
+const chev = (x: number, laneY: number) => {
+  const cy = laneY + LANE_H / 2;
+  return `M ${x} ${cy - 12} L ${x + 14} ${cy} L ${x} ${cy + 12}`;
+};
 ---
 <Layout active="home">
 
@@ -45,11 +66,52 @@ export const meta = {
         </ul>
         <p class="lede-sm">Agents do the discipline. You hold the gates.</p>
       </div>
-      {/* Reserved for the process diagram (follow-up bead). Sized so the row
-          holds its two-column shape while empty; the lone comb cell is the
-          placeholder motif, drawn in CSS so this div stays empty for the
-          diagram to land in. */}
-      <div class="why-art" aria-hidden="true"></div>
+      {/* The matched-lanes diagram: two conveyor lanes at identical pitch.
+          Process isn't a brake on code — it's a second lane running at the
+          same cadence. Geometry lives in the frontmatter above. */}
+      <div class="why-art" role="img"
+           aria-label="Diagram: two conveyor lanes moving at the same speed — a code lane, and a process lane passing through planning, review, release and ops. Matching tempo marks tie the lanes together: process keeps pace with code instead of braking it.">
+        <svg viewBox="24 64 452 240" aria-hidden="true">
+          {/* the two tracks */}
+          {LANES.map((lane) => (
+            <>
+              <text class="wa-lane" x={LANE_X} y={lane.y - 12}>{lane.label}</text>
+              <rect x={LANE_X} y={lane.y} width={LANE_W} height={LANE_H} rx="22"
+                    fill="var(--honey-wash)" opacity=".45"/>
+              <rect x={LANE_X} y={lane.y} width={LANE_W} height={LANE_H} rx="22"
+                    fill="none" stroke="var(--mark-line)" stroke-width="2" opacity=".5"/>
+              {CHEV_XS.map((x) => (
+                <path d={chev(x, lane.y)} fill="none"
+                      stroke={BEATS.includes(x) ? 'var(--honey)' : 'var(--mark-line)'}
+                      stroke-width={BEATS.includes(x) ? 3 : 2.5}
+                      opacity={BEATS.includes(x) ? 1 : 0.4}
+                      stroke-linecap="round" stroke-linejoin="round"/>
+              ))}
+            </>
+          ))}
+
+          {/* the tempo ties: same beat, both lanes */}
+          {TIES.map((x) => (
+            <line x1={x} y1={LANES[0].y + LANE_H + 4} x2={x} y2={LANES[1].y - 4}
+                  stroke="var(--honey)" stroke-width="2" stroke-dasharray="2 6"
+                  stroke-linecap="round" opacity=".9"/>
+          ))}
+          <text class="wa-pace" x={(TIES[0] + TIES[1]) / 2}
+                y={(LANES[0].y + LANE_H + LANES[1].y) / 2 + 4}
+                text-anchor="middle">same cadence</text>
+
+          {/* phase ruler under the process lane — zones, not walls */}
+          {PHASES_LANE.slice(1).map((_, i) => (
+            <line x1={LANE_X + SEG * (i + 1)} y1={LANES[1].y + LANE_H}
+                  x2={LANE_X + SEG * (i + 1)} y2={LANES[1].y + LANE_H + 8}
+                  stroke="var(--mark-line)" stroke-width="1.5" opacity=".4"/>
+          ))}
+          {PHASES_LANE.map((p, i) => (
+            <text class="wa-phase" x={LANE_X + SEG * i + SEG / 2}
+                  y={LANES[1].y + LANE_H + 26} text-anchor="middle">{p}</text>
+          ))}
+        </svg>
+      </div>
     </div>
   </div>
 </section>
@@ -233,9 +295,17 @@ export const meta = {
 </Layout>
 
 <style>
-  /* Empty art slot: invisible on a stacked layout, a sized right column on a
-     laptop so the argument doesn't sit alone in a half-empty row. */
+  /* Art slot: invisible on a stacked layout (the copy carries the argument
+     there), a sized right column on a laptop. */
   .why-art { display: none; }
+
+  .why-art text {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-weight: 600;
+  }
+  .wa-lane  { fill: var(--ink-3); font-size: 13px; }
+  .wa-phase { fill: var(--ink-3); font-size: 12px; }
+  .wa-pace  { fill: var(--honey-strong); font-size: 12px; }
 
   @media (min-width: 1024px) {
     #why > .wrap { max-width: 72rem; }
@@ -256,14 +326,6 @@ export const meta = {
       border-radius: 16px;
       box-shadow: var(--shadow);
     }
-    /* One faint comb cell — the same empty-cell motif as the 404 art — until
-       the diagram bead fills this slot. */
-    .why-art::before {
-      content: "";
-      width: 9.5rem;
-      height: 11rem;
-      background: var(--honey-wash);
-      clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-    }
+    .why-art svg { display: block; width: 94%; max-width: 30rem; height: auto; }
   }
 </style>
