@@ -86,6 +86,6 @@ const orgbehind: Hero = {
   siteDescription,
 };
 
-const HERO: 'outrun' | 'keepup' | 'shipsnot' | 'orgbehind' = 'outrun';
+const HERO: 'outrun' | 'keepup' | 'shipsnot' | 'orgbehind' = 'shipsnot';
 
 export const hero: Hero = { outrun, keepup, shipsnot, orgbehind }[HERO];
