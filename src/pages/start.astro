@@ -7,6 +7,11 @@ import Layout from '../layouts/Layout.astro';
 // Register (infra/docs/design/gtm-dual-icp.md): this page is ICP-1-voiced end
 // to end — what the agents will do FOR you, never process doctrine. Indict the
 // situation, not the reader; no org-chart vocabulary without an inline gloss.
+//
+// This page is where the site's COLLAPSE-THE-SECONDARY-AUDIENCE pattern is
+// first applied ("Manual install", below). The pattern itself, and what it is
+// and is not for, is written down with the rest of the copy register in
+// src/copy/heroes.ts — read it before collapsing anything on a new surface.
 export const meta = {
   order: 2,
   label: 'Start',
@@ -122,6 +127,42 @@ const [npX, npY] = at(240, R + 28);
           <a class="pastelink" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md"
              >https://github.com/beadhive/beadhive/blob/main/INSTALL.md</a>
         </div>
+        {/* THE ONLY COMMAND BLOCK ON THIS SITE, AND IT IS A COPY. SOURCE OF
+            TRUTH: beadhive/beadhive INSTALL.md — its `install:` frontmatter
+            owns `methods[0].command` (the two managed-path lines), and its
+            "Managed path (recommended)" prose owns the nix installer above them
+            and the `bh --version` check below. Changing what this site tells
+            people to run means changing INSTALL.md; this block only follows it.
+
+            This epic exists because three surfaces each kept their own copy and
+            two rotted through a full minor release — INSTALL.md moved to the
+            managed path at v0.8.0 and neither the README nor this page followed
+            for three releases. Adding a fourth copy anywhere restarts that clock.
+
+            "ONE COMMAND BLOCK" MEANS ONE INSTALL BLOCK — stated so the next
+            reader does not have to guess. The .term blocks further down this
+            page (`bh role planner`, `bh role dispatcher`, `/bh:backfill`) stay:
+            they illustrate what a seat is called, they have no source of truth
+            in another repo, and there is therefore nothing for them to drift
+            AGAINST. The rule is about copies of an install route, which is the
+            only thing that rotted. Verified by grep across src/ and dist/ —
+            `uv tool install|nix profile|pipx|pip install|brew install|docker
+            run|install.determinate` matches this block and nothing else on the
+            site; the homepage's copy was removed with this change and carries a
+            comment saying why.
+
+            WHAT GUARDS THE DEEP LINK, because it is not here and cannot be:
+            GitHub derives heading anchors from heading TEXT, so renaming
+            README.md's `## Install` would 404 the link below to the top of the
+            file with no error this repo's CI could ever see. The guard lives on
+            the side that owns the heading —
+            beadhive/beadhive tests/test_readme_install_drift.py, which asserts
+            that anchor still exists PRECISELY BECAUSE this page deep-links it.
+            Do not reimplement that check here: nothing in this repo can read
+            that one, and a second, worse copy of the guard is the same disease
+            as a second copy of the commands. Same shape as astro.config.mjs,
+            where the site value names tofu/porkbun_dns.tf as where the domain
+            is actually configured. */}
         <details class="disclose">
           <summary>Manual install</summary>
           <div class="disclose-body">

@@ -20,6 +20,37 @@
 // Register rule (gtm-dual-icp.md): the front page is ICP-1 legible — indict
 // the situation ("code outruns the process"), never the reader. No cowboy, no
 // "enterprise".
+//
+// ---------------------------------------------------------------------------
+// HOUSE PATTERN: COLLAPSE THE SECONDARY AUDIENCE, DON'T DELETE IT.
+//
+// Settled 2026-08-07 (bh-infra-9ne). When a surface carries content that is
+// REAL but is not what most readers came for, put it behind a closed-by-default
+// disclosure rather than cutting it or leading with it. Two surfaces now do
+// this, for the same reason:
+//
+//   * beadhive's README collapses "Develop" — true, and most readers are not
+//     there to build the tool.
+//   * /start collapses "Manual install" — true, and most readers are better
+//     served by pasting one link at an agent than by a nix installer one-liner.
+//
+// What it says is "this is real, it is just not what most readers came for",
+// and the reader who IS there for it is one click away rather than a search
+// away. It is NOT a way to hide a weak answer: if the collapsed content is the
+// honest answer for a real audience, collapse it; if it is embarrassing, fix it.
+//
+// Two rules that come with the pattern, learned the same day:
+//   1. The disclosure's LEAD is the most expensive step, not the shortest. The
+//      nix prerequisite goes first inside "Manual install" precisely because it
+//      is the one that needs sudo — ordering it last would make the block look
+//      cheaper than the work actually is.
+//   2. Collapsing is not a licence to duplicate. What is inside a disclosure is
+//      still a copy of something, and still names its source — see the comment
+//      over start.astro's command block, which is the site's only one.
+//
+// The chrome is `.disclose` in src/styles/global.css, site-wide on purpose, so
+// the next surface follows this instead of reinventing a disclosure.
+// ---------------------------------------------------------------------------
 
 export interface Hero {
   /** Small caps line above the headline. */
