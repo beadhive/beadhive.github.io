@@ -110,13 +110,35 @@ const [npX, npY] = at(240, R + 28);
         your repo until you ask for it.</p>
       </div>
       <div class="step-side">
-        <div class="term reveal">
-          <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
-<pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
-<span class="p">$</span> bh config init
-<span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
-<span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
+        {/* THE CTA IS THE MESSAGE, and it is the whole default surface. The brief
+            here is "explain how easy setup is", and the easiest TRUE statement
+            about installing this is not a shell command at all — it is that you
+            paste one URL at an agent and answer questions. A nix installer
+            one-liner does not read as easy however it is framed, so it lives one
+            click away rather than in the spotlight. Do not promote it back up. */}
+        <div class="pastecard reveal">
+          <p class="paste-lede">Paste one link at your agent. It asks before every command and
+          tells you what each one does.</p>
+          <a class="pastelink" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md"
+             >https://github.com/beadhive/beadhive/blob/main/INSTALL.md</a>
         </div>
+        <details class="disclose">
+          <summary>Manual install</summary>
+          <div class="disclose-body">
+            <div class="term">
+              <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
+<pre><code><span class="c"># 1. nix, once — needs sudo; it installs a system daemon</span>
+<span class="p">$</span> curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+<span class="c"># 2. the toolchain, then bh itself</span>
+<span class="p">$</span> nix profile add github:beadhive/beadhive/latest#default
+<span class="p">$</span> uv tool install --force 'beadhive[otel]'
+<span class="p">$</span> bh --version    <span class="c"># must print the released version</span></code></pre>
+            </div>
+            <a class="deeplink" href="https://github.com/beadhive/beadhive/blob/main/README.md#install"
+               >Other routes, platform limits and what each costs</a>
+          </div>
+        </details>
       </div>
     </div>
   </div>

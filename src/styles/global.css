@@ -549,6 +549,68 @@
   .term .p { color: var(--honey-strong); }
   .term .c { color: var(--ink-3); }
 
+  /* ---------- paste-a-link CTA ----------
+     The install call to action, site-wide. It lives HERE rather than scoped to
+     one page because two surfaces show it (/ and /start) and the whole point of
+     the epic that introduced it (bh-infra-9ne) is that the site stopped keeping
+     per-page copies of install content. A third surface should reuse this, not
+     restyle it.
+
+     The URL is rendered in full, in the terminal's own typeface, because the
+     reader's job is to COPY it into an agent — not only to click it. Hence
+     `overflow-wrap: anywhere`: it must wrap inside a narrow column rather than
+     scroll out of reach. */
+  .pastecard {
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 20px 22px; box-shadow: var(--shadow);
+    display: grid; gap: 12px;
+  }
+  .paste-lede { margin: 0; font-size: 1.02rem; line-height: 1.55; color: var(--ink); }
+  .pastelink {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 12.5px; line-height: 1.5; color: var(--honey-strong);
+    background: var(--code-bg); border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 11px 13px; overflow-wrap: anywhere; text-decoration: none;
+  }
+  .pastelink:hover {
+    border-color: var(--honey);
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+
+  /* ---------- collapsed secondary-audience disclosure ----------
+     Content that is real but is not what most readers came for is COLLAPSED,
+     never dropped. Currently: /start's "Manual install".
+
+     Native <details>, deliberately — it is keyboard-operable, screen-reader
+     announced and find-in-page expandable with no script, which a div-plus-
+     click reimplementation would each have to earn back. Only the UA marker is
+     replaced (same idiom as Nav.astro's .navmenu), so the widget reads as part
+     of the page; the global :focus-visible rule already covers `summary`. */
+  .disclose {
+    margin-top: 14px;
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: 10px;
+  }
+  .disclose > summary {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; list-style: none; cursor: pointer;
+    font-family: "Futura", "Avenir Next", system-ui, sans-serif;
+    font-weight: 700; font-size: 14px; color: var(--ink-2);
+  }
+  .disclose > summary::-webkit-details-marker { display: none; }
+  .disclose > summary::before {
+    content: ""; flex: none; width: 6px; height: 6px; margin-left: 3px;
+    border-right: 2px solid var(--honey-strong); border-bottom: 2px solid var(--honey-strong);
+    transform: rotate(-45deg);
+  }
+  .disclose[open] > summary::before { transform: rotate(45deg) translate(-2px, -2px); }
+  .disclose > summary:hover { color: var(--ink); }
+  .disclose[open] > summary { border-bottom: 1px solid var(--hairline); }
+  .disclose-body { padding: 14px 16px 16px; }
+  .disclose-body .term { max-width: none; margin-bottom: 14px; }
+  @media (prefers-reduced-motion: no-preference) {
+    .disclose > summary::before { transition: transform .15s ease; }
+  }
+
   /* ---------- stat strip ---------- */
   .stats {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
