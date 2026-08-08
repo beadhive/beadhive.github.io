@@ -235,10 +235,93 @@ const [npX, npY] = at(240, R + 28);
   </div>
 </section>
 
+{/* "Your pace" above answers HOW MUCH of the loop you hand over. This answers
+    HOW FAR it reaches — the question the site did not address at all, and the
+    one a reader who has got rung 1 working asks next.
+
+    PARAPHRASED FROM docs/ADOPTION.md IN THIS PAGE'S OWN VOICE — never copied.
+    Same four, same order, so a reader who follows a link lands on something
+    that matches what they just read. But this page's register (see the header
+    comment) is outcomes, not configurations: the mechanism behind rung 4 is
+    exactly the doctrine vocabulary the register forbids, so it is one honest
+    sentence and a link. If you are tempted to name the machinery here, that is
+    the signal to link harder, not to explain.
+
+    THE COSTS ARE NOT OPTIONAL. "Nothing to sign up for" is only credible next
+    to "nothing is backed up". The measured figures and the platform limits stay
+    in the docs on purpose — this page says what it costs you, not what it costs
+    in gigabytes.
+
+    Each rung links to docs/ADOPTION.md with NO #anchor. Only README.md#install
+    is drift-gated from the other side (beadhive's tests/test_readme_install_drift.py);
+    an anchor into this document would be an unguarded cross-repo link that
+    404s to the top of the page the day someone rewords a heading. */}
+<section id="reach" class="step">
+  <div class="wrap">
+    <div class="eyebrow display"><span class="stepno">06</span><span>How far it goes</span></div>
+    <h2 class="display">It doesn't stop at your laptop</h2>
+    <p class="lede-sm">Four places people settle, and what each one really costs. It isn't a
+    staircase — the third is about what's installed rather than how far you've gone, and only
+    the fourth needs another rung under it first.</p>
+    <ol class="runglist">
+      <li class="rungrow">
+        <span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>1</span></span>
+        <div class="rungbody">
+          <h3>One repo, on the laptop you already have</h3>
+          <p>The whole loop, idea to shipped, against one project. Nothing to run, nothing to
+          sign up for, and nothing held back for a later rung.</p>
+          <p class="rungcost"><b>What it costs:</b> this machine is the only copy. Nothing is
+          backed up anywhere, and nothing else can join in yet.</p>
+          <a class="deeplink" href="https://github.com/beadhive/beadhive/blob/main/docs/ADOPTION.md">Starting here</a>
+        </div>
+      </li>
+      <li class="rungrow">
+        <span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>2</span></span>
+        <div class="rungbody">
+          <h3>Backed up — and more than one project</h3>
+          <p>Give the factory somewhere of its own to push to and what it knows outlives the
+          laptop. That's also where a second and third repo start paying off: one list of
+          what's actionable, across all of them.</p>
+          <p class="rungcost"><b>What it costs:</b> one private repo to hold it, and the push is
+          yours to make — it doesn't happen on its own.</p>
+          <a class="deeplink" href="https://github.com/beadhive/beadhive/blob/main/docs/ADOPTION.md">Wiring the backup</a>
+        </div>
+      </li>
+      <li class="rungrow">
+        <span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>3</span></span>
+        <div class="rungbody">
+          <h3>Every tool pinned, so next month behaves like today</h3>
+          <p><code>bh</code> doesn't work alone — it drives four other programs. This is where
+          they get installed together and held at versions that match, instead of being whatever
+          each machine happened to have. Take it in any order — before rung 2, after rung 4, or
+          never.</p>
+          <p class="rungcost"><b>What it costs:</b> a one-time install that asks for an
+          administrator password, and a wait while it downloads. Not every machine can take it.</p>
+          <a class="deeplink" href="https://github.com/beadhive/beadhive/blob/main/docs/ADOPTION.md">What gets pinned, and where it works</a>
+        </div>
+      </li>
+      <li class="rungrow">
+        <span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>4</span></span>
+        <div class="rungbody">
+          <h3>A machine that keeps working while you sleep</h3>
+          <p>An always-on machine does the running; your laptop goes back to being where you
+          decide things. You can still hand it work from anywhere, and read what it did.</p>
+          <p class="rungcost"><b>What it costs:</b> rung 2 first — there's no way around that
+          one — and a second machine to keep running. This is the newest ground here, and it's
+          still settling.</p>
+          <a class="deeplink" href="https://github.com/beadhive/beadhive/blob/main/docs/ADOPTION.md">What a second machine involves</a>
+        </div>
+      </li>
+    </ol>
+    <p class="step-closer">Most people never leave the first rung, and that is a finished
+    posture rather than a stalled one. The ceiling is here so you can see it, not so you climb it.</p>
+  </div>
+</section>
+
 <div class="band">
 <section id="learn" class="step step--flip">
   <div class="wrap">
-    <div class="eyebrow display"><span class="stepno">06</span><span>The quiet part</span></div>
+    <div class="eyebrow display"><span class="stepno">07</span><span>The quiet part</span></div>
     <div class="step-grid">
       <div class="step-text">
         <h2 class="display">You'll learn the process by watching it work</h2>
@@ -351,6 +434,34 @@ const [npX, npY] = at(240, R + 28);
   .sidecard.herobar { margin-top: 0; gap: 12px; }
   .sidecard.herobar .btn { flex: 1 1 auto; justify-content: center; }
 
+  /* ---------- how far it goes: the four rungs ----------
+     An <ol> because the ORDER is load-bearing — it matches docs/ADOPTION.md, so
+     a reader who follows a link lands where they expect. The number is real
+     content in a comb cell rather than a list marker, so it survives
+     `list-style: none` for a screen reader (same treatment as /data's ladder).
+     Two columns at ≥1024px: four single-column rows push rung 4 off the screen
+     entirely, and the ceiling is the whole point of the section. */
+  .runglist {
+    list-style: none; margin: 26px 0 0; padding: 0;
+    display: grid; gap: 22px;
+  }
+  .rungrow {
+    display: grid; grid-template-columns: 2.1rem minmax(0, 1fr);
+    gap: 1rem; align-items: start;
+  }
+  .rungno { position: relative; display: block; width: 2.1rem; }
+  .rungno svg { display: block; width: 100%; height: auto; }
+  .rungno svg polygon { fill: var(--panel); stroke: var(--honey-strong); stroke-width: 2; }
+  .rungno > span {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-family: "Futura", "Avenir Next", system-ui, sans-serif;
+    font-weight: 800; font-size: 13px; color: var(--honey-strong);
+    font-variant-numeric: tabular-nums;
+  }
+  .rungbody h3 { margin: 0 0 6px; font-size: 1.05rem; font-weight: 700; letter-spacing: -.01em; }
+  .rungbody p { margin: 0 0 9px; font-size: .95rem; line-height: 1.6; color: var(--ink-2); max-width: 58ch; }
+  .rungbody .rungcost b { color: var(--ink); }
+
   /* ---------- ≥1024px: alternating two-column step rows ---------- */
   @media (min-width: 1024px) {
     .step > .wrap { max-width: 74rem; }
@@ -376,6 +487,7 @@ const [npX, npY] = at(240, R + 28);
     .step-text > p:last-child { margin-bottom: 0; }
     /* Full-width closer under a two-column row (the "your pace" coda). */
     .step-closer { margin-top: 26px; }
+    .runglist { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 3rem; row-gap: 26px; }
     .sidecard { padding: 24px 26px; }
     .sidecard.herobar .btn { flex: 1 1 100%; }
   }
