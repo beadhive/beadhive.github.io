@@ -6,6 +6,19 @@ interface Props {
 }
 const { active } = Astro.props;
 
+// PAGES ONLY — one entry per route, and the label is this bar's own short form
+// of the page (compare each page's longer `meta.label`, which is what /llms.txt
+// lists). A section of a page never earns a row here: the bar has seven items,
+// `active` is keyed per route, and an anchor entry would light up nothing. The
+// machine-facing index has the same shape for the same reason — a section
+// reaches it through its page's `meta.description`. See src/pages/llms.txt.ts.
+//
+// `/data` WAS LABELLED "Ladder" (bh-infra-0d3, when it was the only one). It
+// isn't any more: /start now carries the adoption ladder — four rungs, one repo
+// on a laptop up to a machine that keeps running while you sleep — so a bare
+// "Ladder" in the nav had stopped naming one thing. This bar says what the page
+// is ABOUT and lets the two pages keep their own ladders; /data's own eyebrow,
+// h2 and `meta` are untouched.
 const links = [
   { href: '/', label: 'Home', key: 'home' },
   { href: '/start/', label: 'Start', key: 'start' },
@@ -13,7 +26,7 @@ const links = [
   { href: '/process/', label: 'Process', key: 'process' },
   { href: '/roles/', label: 'Roles', key: 'roles' },
   { href: '/fleet/', label: 'Fleet', key: 'fleet' },
-  { href: '/data/', label: 'Ladder', key: 'data' },
+  { href: '/data/', label: 'Data', key: 'data' },
 ];
 ---
 <nav class="topnav">
