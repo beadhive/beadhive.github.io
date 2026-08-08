@@ -235,12 +235,18 @@ const chev = (x: number, laneY: number) => {
     <h2 class="display">Start automating one step at a time</h2>
     <p class="lede-sm">Point it at a real repo. A hive writes nothing into yours until you ask
     it to, and you don't have to run the whole ring to get something out of it.</p>
-    <div class="term reveal" style="margin-top:18px">
-      <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
-<pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
-<span class="p">$</span> bh config init
-<span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
-<span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
+    {/* NO COMMAND BLOCK HERE — deliberate, and please leave it that way.
+        This carried its own copy of the install commands and rotted for three
+        releases while INSTALL.md said something else (bh-infra-9ne). The site
+        now holds exactly ONE command block, collapsed under "Manual install" on
+        /start, which names INSTALL.md as its source. A second copy on the
+        busiest page is how that drift started; the CTA below is the same one
+        /start leads with, and the commands are one click further. */}
+    <div class="pastecard reveal" style="margin-top:18px">
+      <p class="paste-lede">Paste one link at your agent. It asks before every command and
+      tells you what each one does.</p>
+      <a class="pastelink" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md"
+         >https://github.com/beadhive/beadhive/blob/main/INSTALL.md</a>
     </div>
 
     <p>From there, the agents take it: a planner turns your idea into a gated plan, a
@@ -248,7 +254,9 @@ const chev = (x: number, laneY: number) => {
     the whole first loop — including bringing in the planning your repo already has.</p>
     <div class="herobar">
       <a class="btn btn-primary" href="/start/">The full start guide</a>
-      <a class="btn btn-ghost" href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">Install reference</a>
+      {/* The old "Install reference" button pointed at the same INSTALL.md the
+          CTA above now links, three lines apart. One link, one place. */}
+      <a class="btn btn-ghost" href="https://github.com/beadhive/beadhive/blob/main/README.md#install">Other install routes</a>
     </div>
   </div>
 </section>
