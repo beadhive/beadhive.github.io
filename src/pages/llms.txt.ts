@@ -6,7 +6,28 @@
 // in the build would notice. Instead this globs the real page modules and reads
 // the `meta` each one exports, so a new page appears here for free and a page
 // WITHOUT meta is reported at build time rather than quietly omitted.
+//
+// WHAT THAT DESIGN DOES *NOT* DO, established empirically for bh-infra-9ne.6:
+// it indexes PAGES, from `meta`. It never walks a page body. So no section of a
+// page reaches this file on its own — not a collapsed one, not an open one. The
+// collapsed "Manual install" disclosure on /start is a red herring in that
+// sense: `<details>` ships its contents in the static HTML whether or not it is
+// open (verified in dist/start/index.html), so an agent that FETCHES the page
+// finds the commands; an agent that reads only this index found nothing to
+// install with, and that was already true before anything was collapsed.
+//
+// The fix is here rather than on the page. The two audiences want opposite
+// defaults — a reader gets a paste-a-link CTA with the commands one click away,
+// an agent gets the commands spelled out — so `## Install` below renders the
+// route from src/copy/install.ts instead of the page un-collapsing itself. Same
+// module the page renders: one edit moves both surfaces.
+//
+// A page's `meta.description` is therefore the ONLY channel by which its
+// sections are represented here. That is why /start's description names both
+// halves of the page (getting set up, and how far it reaches) — see the comment
+// over its `meta` export before shortening it.
 import type { APIRoute } from 'astro';
+import { installPlainText, installMoreHref } from '../copy/install';
 
 interface PageMeta {
   order: number;
@@ -47,6 +68,12 @@ const pages = Object.entries(modules)
   })
   .sort((a, b) => a.meta.order - b.meta.order);
 
+// Docs an agent should be able to reach without rendering a page. ADOPTION.md
+// is here because /start's "How far it goes" links it four times and paraphrases
+// it deliberately — the rungs are stated there as OUTCOMES, and the mechanism
+// behind the last one is doctrine this site does not carry. Link, don't restate:
+// a copy of the ladder in this file would be the same drift the site just spent
+// an epic removing, and would smuggle in vocabulary the register forbids.
 const REFERENCE = [
   ['Process, seats and the bead lifecycle', 'docs/AGF.md'],
   ['Every bh work verb', 'docs/WORK.md'],
@@ -55,6 +82,7 @@ const REFERENCE = [
   ['Labels, the registry and validation', 'docs/LABELS.md'],
   ['The command surface', 'docs/CLI.md'],
   ['Configuration reference', 'docs/CONFIGURATION.md'],
+  ['How far it goes: the four rungs people settle on, and what each costs', 'docs/ADOPTION.md'],
 ] as const;
 
 export const GET: APIRoute = () => {
@@ -85,7 +113,19 @@ export const GET: APIRoute = () => {
     '',
     '## Install',
     '',
-    '- [INSTALL.md](https://github.com/beadhive/beadhive/blob/main/INSTALL.md): fresh machine to a working `bh`',
+    'The recommended route is to read INSTALL.md and walk the human through it, asking',
+    'before each command and saying what it does — that is the path beadhive.ai leads with.',
+    'The commands are rendered here so that reading this index is enough to know what an',
+    'install actually runs. They are the managed path and the only route this site carries; on',
+    "/start they sit inside a collapsed \"Manual install\" disclosure, which is a reading",
+    'default and not a redaction — the page ships them either way.',
+    '',
+    '```sh',
+    installPlainText(),
+    '```',
+    '',
+    '- [INSTALL.md](https://github.com/beadhive/beadhive/blob/main/INSTALL.md): fresh machine to a working `bh` — the source of truth for the commands above',
+    `- [README.md#install](${installMoreHref}): every other route, the platform limits, and what each one costs`,
     '- [docs/ONBOARDING.md](https://github.com/beadhive/beadhive/blob/main/docs/ONBOARDING.md): end-to-end, to a configured workspace with registered hives',
     '',
     '## Optional',

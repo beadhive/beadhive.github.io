@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { installTerminalHtml, installMoreHref, installMoreLabel } from '../copy/install';
 
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
@@ -12,14 +13,26 @@ import Layout from '../layouts/Layout.astro';
 // first applied ("Manual install", below). The pattern itself, and what it is
 // and is not for, is written down with the rest of the copy register in
 // src/copy/heroes.ts — read it before collapsing anything on a new surface.
+//
+// THE DESCRIPTION IS THE ONLY WAY A SECTION OF THIS PAGE REACHES /llms.txt.
+// That file indexes PAGES — it reads the `meta` below, never the body — so the
+// step 06 ladder ("How far it goes") is represented to agents by this sentence
+// or not at all. It is also why the description had to change with bh-infra-9ne:
+// it promised "install in five minutes" and a command block that step 01 no
+// longer leads with, and said nothing about reach. Both halves of the page now
+// answer here in the order the page answers them: how you get set up, then how
+// far the same setup goes. Rung 4 stays an OUTCOME ("keeps working while you
+// sleep") — the mechanism behind it is doctrine and is forbidden on this page,
+// in this description, and in /llms.txt alike.
 export const meta = {
   order: 2,
   label: 'Start',
   title: 'Start · Beadhive',
   description:
-    'From an idea to something real: install in five minutes, let the agents run the ' +
-    'engineering process, and hold only the decisions that matter. No engineering-org ' +
-    'experience required.',
+    'From an idea to something real: paste one link at your agent and it sets Beadhive up ' +
+    'for you, the agents run the engineering process, and you hold only the decisions that ' +
+    'matter — plus how far it reaches, from one laptop to a machine that keeps working ' +
+    'while you sleep. No engineering-org experience required.',
 };
 
 // --- first-loop mini-ring -------------------------------------------------
@@ -134,6 +147,15 @@ const [npX, npY] = at(240, R + 28);
             and the `bh --version` check below. Changing what this site tells
             people to run means changing INSTALL.md; this block only follows it.
 
+            THE COMMANDS THEMSELVES NOW LIVE IN src/copy/install.ts, because
+            /llms.txt has to carry them too (bh-infra-9ne.6): that file is the
+            index agents read, it is generated from page `meta` and never from
+            page bodies, so nothing inside this disclosure reached it. Two
+            audiences want opposite defaults — collapsed for a reader, spelled
+            out for an agent — and the way to serve both without a second copy
+            is one data module rendered twice. This element renders it; do not
+            re-inline the commands here.
+
             This epic exists because three surfaces each kept their own copy and
             two rotted through a full minor release — INSTALL.md moved to the
             managed path at v0.8.0 and neither the README nor this page followed
@@ -147,9 +169,11 @@ const [npX, npY] = at(240, R + 28);
             AGAINST. The rule is about copies of an install route, which is the
             only thing that rotted. Verified by grep across src/ and dist/ —
             `uv tool install|nix profile|pipx|pip install|brew install|docker
-            run|install.determinate` matches this block and nothing else on the
-            site; the homepage's copy was removed with this change and carries a
-            comment saying why.
+            run|install.determinate` matches ONE file under src/ (copy/install.ts)
+            and two built artifacts (this page and /llms.txt, both rendered from
+            it); the homepage's copy was removed with this change and carries a
+            comment saying why. Two rendered surfaces are not two copies — one
+            edit still moves both. Two source literals would be.
 
             WHAT GUARDS THE DEEP LINK, because it is not here and cannot be:
             GitHub derives heading anchors from heading TEXT, so renaming
@@ -168,16 +192,17 @@ const [npX, npY] = at(240, R + 28);
           <div class="disclose-body">
             <div class="term">
               <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
-<pre><code><span class="c"># 1. nix, once — needs sudo; it installs a system daemon</span>
-<span class="p">$</span> curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
-
-<span class="c"># 2. the toolchain, then bh itself</span>
-<span class="p">$</span> nix profile add github:beadhive/beadhive/latest#default
-<span class="p">$</span> uv tool install --force 'beadhive[otel]'
-<span class="p">$</span> bh --version    <span class="c"># must print the released version</span></code></pre>
+              {/* set:html, not a template loop: this is a <pre>, so every
+                  newline and the gap before `# must print…` is content, and
+                  the renderer emits those bytes exactly. It also leaves the
+                  apostrophes in 'beadhive[otel]' as apostrophes — an expression
+                  would escape them, and an agent grepping the served HTML for
+                  the command it was told to run would miss it. The `.p` / `.c`
+                  spans it emits are coloured by global.css, so they need no
+                  scoped-style attribute. */}
+              <pre><code set:html={installTerminalHtml()} /></pre>
             </div>
-            <a class="deeplink" href="https://github.com/beadhive/beadhive/blob/main/README.md#install"
-               >Other routes, platform limits and what each costs</a>
+            <a class="deeplink" href={installMoreHref}>{installMoreLabel}</a>
           </div>
         </details>
       </div>
