@@ -12,7 +12,7 @@
 // To publish: set REVIEW_MODE = false, then delete the losing variants and the
 // data-attribute CSS that carried them (grep for the flag name). Do not ship
 // the switchboard switched off — that is how retired copy survives sweeps.
-export const REVIEW_MODE = true;
+export const REVIEW_MODE = false;
 
 export interface ReviewFlag {
   /** data-attribute on <html>, e.g. `hero` → data-hero */
