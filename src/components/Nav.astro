@@ -6,10 +6,9 @@ interface Props {
 }
 const { active } = Astro.props;
 
-// `guide: true` marks the field-guide chapters. The flat nav ignores the flag;
-// the grouped nav (review switch `nav=grouped`) draws a divider + kicker
-// before them so Start (ICP-1) and the field guide (ICP-2) read as the two
-// forks gtm-dual-icp.md asks the first screen to offer.
+// One entry per page; section anchors belong to each page's own TOC.
+// `guide: true` groups the field-guide chapters after Home and Start.
+// Data names /data separately from the adoption ladder on /start.
 const links = [
   { href: '/', label: 'Home', key: 'home' },
   { href: '/start/', label: 'Start', key: 'start' },
@@ -19,7 +18,7 @@ const links = [
   { href: '/roles/', label: 'Roles', key: 'roles', guide: true },
   { href: '/fleet/', label: 'Fleet', key: 'fleet', guide: true },
   { href: '/frame-model/', label: 'Frames', key: 'frame-model', guide: true },
-  { href: '/data/', label: 'Ladder', key: 'data', guide: true },
+  { href: '/data/', label: 'Data', key: 'data', guide: true },
 ];
 const firstGuide = links.findIndex((l) => l.guide);
 ---
