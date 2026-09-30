@@ -69,8 +69,8 @@ export const meta = {
 
 <section id="how">
   <div class="wrap">
-    <div class="eyebrow display">03 · How it works</div>
-    <h2 class="display">The mental model in one breath</h2>
+    <div class="eyebrow display"><span class="chap">02</span> How work flows</div>
+    <h1 class="display doc-title">The mental model in one breath</h1>
     <p class="lede-sm">You've run pipelines like this with humans in every box. The difference
     to look for: every hand-off is a record, and nothing passes a gate on vibes.</p>
     <p>Every repo is a <b>hive</b> — its own beads database, served by <code>bd</code>'s shared
@@ -90,15 +90,15 @@ export const meta = {
     <h3 class="display" id="how-tenets">The tenets</h3>
     <div class="cardgrid">
       <div class="card"><h4><span class="hexdot">⬢</span>Planes, kept separate</h4>
-        <p><b>Control</b> governs the factory. <b>Planning</b> turns ideas into molecules.
-        <b>Development</b> — the CLI still calls it <em>Integration</em> — executes them.
-        <b>Release</b> proves a version and publishes it. Each plane has its own verbs and seats;
+        <p><b>Control</b> governs the factory. <b>Planning</b> turns ideas into
+        molecules. <b>Development</b> — the CLI still calls it <em>Integration</em> — executes
+        them. <b>Release</b> proves a version and publishes it. Each plane has its own verbs and seats;
         they hand off sequentially and never step into each other's role. <b>Assurance</b> is
         the one exception — a cross-cutting gate layer, not a sequential plane.</p></div>
       <div class="card"><h4><span class="hexdot">⬢</span>Merging is not releasing</h4>
         <p>Development is high-frequency and dirty: each bead gets its own worktree and lands on
-        an <b>always-green</b> line. Release is a separate, deliberate, gated act — and since
-        0.20.1 an implemented one: preflight, bump, attest, await, push.</p></div>
+        an <b>always-green</b> line. Release is a separate, deliberate, gated act — preflight,
+        bump, attest, await, push — <a href="#release-bump">described below</a>.</p></div>
       <div class="card"><h4><span class="hexdot">⬢</span>Lossless history</h4>
         <p>Agents do the merging, so history is audited: merge <code>--no-ff</code> at the
         boundary, <b>never squash there</b>. Workers squash only their own local checkpoints
@@ -148,7 +148,7 @@ export const meta = {
 <section id="pipeline">
   <div class="breakout">
     <div class="wrap" style="padding:0">
-      <div class="eyebrow display">04 · The pipeline</div>
+      <div class="eyebrow display">The pipeline</div>
       <h2 class="display">Inside two planes: planning → dispatch → develop → review → merge</h2>
       <p>The full state machine, with its three feedback loops: the <b>spike loop</b> (settle
       feasibility before implementation beads exist), the <b>bounce loop</b>
@@ -373,9 +373,8 @@ export const meta = {
       <div class="note"><b>Where the ideas come from.</b> <span class="status direction">direction</span>
       The pipeline starts at <em>ideate</em>, which quietly assumes someone showed up with an
       idea — capping the whole factory at one person's imagination on a given afternoon. What
-      ships upstream of planning today is intake: <code>bh report</code>, human triage, and
-      <code>bh plan adopt</code>. The ideation plane is meant to add a loop that doesn't wait for
-      someone to show up: read the repo's own vision and strategy documents, derive candidate
+      ships upstream of planning today is <a href="/fleet/#hq-intake">intake and triage</a>.
+      The ideation plane is meant to add a loop that doesn't wait for someone to show up: read the repo's own vision and strategy documents, derive candidate
       topics from how those documents are actually structured rather than from a generic
       checklist, then generate against each topic in parallel — deliberately blind to the
       others, so the batch stays divergent instead of converging on the same three obvious
@@ -388,7 +387,7 @@ export const meta = {
 
 <section id="release">
   <div class="wrap">
-    <div class="eyebrow display">05 · Merge order</div>
+    <div class="eyebrow display">Merge order</div>
     <h2 class="display">Merge order is planned, not first-come-first-served</h2>
     <p>Landing approved beads in whatever order they clear review is fine until a molecule mixes
     <em>kinds</em> of change — a hotfix for the released version, additive features that should
@@ -415,7 +414,7 @@ export const meta = {
     <code>release-hold:</code> gate that blocks its merge until a releaser resolves it — and only
     a releaser can.</p>
 
-    <h3 class="display" id="release-bump">Cutting the version: the guarded bump <span class="status shipped">shipped in 0.20.1</span></h3>
+    <h3 class="display" id="release-bump">Cutting the version: the guarded bump <span class="status shipped">shipped</span></h3>
     <p>Ordering decides what lands; the bump decides what ships. The rule that makes it safe:
     the release gate runs against the <em>exact tree the bump creates</em>, not the tree that was
     green before it.</p>

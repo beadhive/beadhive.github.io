@@ -66,20 +66,20 @@ const references = [
 <Layout active="planes" title={meta.title} description={meta.description}>
 <div class="system-map">
   <header class="map-hero">
-    <p class="eyebrow display">Factory map <span class="eyebrow-rule"></span> local content preview</p>
     <div class="hero-grid">
       <div>
-        <h1 class="display">One idea.<br /><span>Four working planes.</span></h1>
-        <p class="hero-copy">A source-backed map of Beadhive <code>0.20.1</code>: where work begins,
-          how it earns its way to main, and what has to be true before a release leaves the hive.</p>
+        <div class="eyebrow display"><span class="chap">03</span> Planes</div>
+        <h1 class="display doc-title">One idea. Four working planes.</h1>
+        <p class="doc-lede">A source-backed map of the work lifecycle: where work begins, how it
+          earns its way to main, and what has to be true before a release leaves the hive.</p>
         <div class="status-legend" aria-label="Status legend">
-          <span><i class="status-dot shipped"></i> In 0.20.1</span>
-          <span><i class="status-dot direction"></i> Direction / naming proposal</span>
-          <span><i class="status-dot proposed"></i> Design proposal</span>
+          <span class="status shipped">shipped</span>
+          <span class="status direction">direction / naming</span>
+          <span class="status proposed">design proposal</span>
         </div>
       </div>
       <aside class="map-console" aria-label="Lifecycle overview">
-        <div class="console-head"><span>BEADHIVE / WORKFLOW</span><span>0.20.1</span></div>
+        <div class="console-head"><span>BEADHIVE / WORKFLOW</span><span>LIFECYCLE</span></div>
         <ol class="plane-spine">
           <li class="spine-concept"><span class="spine-mark">I</span><span><b>Ideation</b><small>intake exists · plane is future</small></span><em>01</em></li>
           <li><span class="spine-mark">P</span><span><b>Planning</b><small>idea → approved molecule</small></span><em>02</em></li>
@@ -88,11 +88,6 @@ const references = [
         </ol>
         <div class="console-foot"><span>ASSURANCE</span><b>cross-cutting gates</b><span class="live-indicator">●</span></div>
       </aside>
-    </div>
-    <div class="hero-readout">
-      <span><small>LOCAL CLI</small><b>bh 0.20.1</b></span>
-      <span><small>DEFAULT UI PALETTE</small><b>Mission Control</b></span>
-      <span><small>MERGE ≠ RELEASE</small><b>Two separate gates</b></span>
     </div>
   </header>
 
@@ -103,7 +98,8 @@ const references = [
         <div><p class="kicker">IDEATION PLANE</p><h2 id="ideation-title" class="display">Turn signals into a useful question.</h2></div>
         <span class="tag direction-tag">Future plane · intake ships today</span>
       </div>
-      <p class="section-intro">Beadhive 0.20.1 has report intake and planner adoption, while a distinct
+      <p class="section-intro">Beadhive has report intake and planner adoption — the
+        <a href="/fleet/#hq-intake">triage verbs</a> live on the Fleet page — while a distinct
         ideation plane is still a future concept. This transition shows the current entry points
         without claiming that candidate discovery is automated.</p>
       <ol class="state-flow flow-4" aria-label="Current intake path and proposed ideation handoff">
@@ -217,11 +213,9 @@ const references = [
           </li>
         ))}
       </ol>
-      <div class="release-detail">
-        <div><b>Read-only companion</b><code>bh release order</code><small>Strategy-preferred sequence for gated-ready work; advisory, not a version cut.</small></div>
-        <div><b>On a failed push</b><code>bh release recover</code><small>Measures the actual remote tag before choosing recovery. A network error means decide nothing.</small></div>
-        <div class="point-of-no-return"><b>Publication boundary</b><span>Before the tag reaches remote, recovery can undo locally. After publication, roll forward.</span></div>
-      </div>
+      <p class="rule-note"><span class="rule-glyph">⬢</span> The tag reaching the remote is the point of no return: before it,
+        recovery undoes locally; after it, roll forward. The commands, merge ordering and
+        recovery are on <a href="/process/#release">the Process page</a>.</p>
     </div>
   </section>
 
@@ -230,7 +224,7 @@ const references = [
     <div class="section-content">
       <div class="section-heading">
         <div><p class="kicker">VALIDATION + ATTESTATION</p><h2 id="attestation-title" class="display">Reuse proof only when its inputs still match.</h2></div>
-        <span class="tag shipped-tag">0.20.1 capability</span>
+        <span class="tag shipped-tag">shipped</span>
       </div>
       <p class="section-intro">Two reuse paths share a safety rule: proof is narrow, recent, and tied to what actually ran.
         A reused key is not a claim that every key—or the new tree as a whole—is green.</p>
@@ -274,7 +268,7 @@ const references = [
       <article class="broker-proposal">
         <div class="broker-stamp"><span>DESIGN</span><b>PROPOSAL</b><small>2026-09-26</small></div>
         <div class="broker-copy">
-          <p class="micro-label">VALIDATION BROKER · NOT SHIPPED IN 0.20.1</p>
+          <p class="micro-label">VALIDATION BROKER · NOT SHIPPED</p>
           <h3>Make slots understand the work they admit.</h3>
           <p>The current host-slot semaphore grants equal permits. The proposal replaces independent limits
             with a host-wide queue: each opaque key command declares CPU, memory, and named-pool needs;
@@ -314,8 +308,7 @@ const references = [
     <div class="section-content source-content">
       <div><p class="kicker">SOURCE NOTES</p><h2 id="sources-title" class="display">Follow the implementation.</h2></div>
       <ul>{references.map((reference) => <li><a href={reference.href}>{reference.label}<span aria-hidden="true">↗</span></a></li>)}</ul>
-      <p class="source-foot">Palette: the site's dark theme is the Beadhive UI's default <code>Mission Control</code>;
-        light mode keeps the brand's cream ground.</p>
+
     </div>
   </section>
 </div>
@@ -330,15 +323,14 @@ const references = [
   }
   .system-map * { box-sizing: border-box; }
   .system-map a { color: var(--honey-strong); }
-  .map-hero { padding: 22px 0 56px; }
+  .map-hero { padding: 10px 0 40px; }
   .map-hero .eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 27px; color: var(--honey-strong); font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
   .eyebrow-rule { height: 1px; width: 68px; background: var(--honey); opacity: .58; }
   .hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(310px, .75fr); align-items: center; gap: clamp(36px, 8vw, 130px); }
-  .map-hero h1 { margin: 0 0 24px; max-width: 13ch; font-size: clamp(2.8rem, 6vw, 5.7rem); line-height: .98; letter-spacing: -.055em; }
-  .map-hero h1 span { color: var(--honey-strong); }
+  .map-hero .eyebrow { margin-bottom: 0; }
   .hero-copy { max-width: 61ch; margin: 0; color: var(--ink-2); font-size: clamp(1rem, 1.4vw, 1.23rem); }
   .hero-copy code { color: var(--ink); background: var(--panel-2); }
-  .status-legend { display: flex; flex-wrap: wrap; gap: 9px 20px; margin-top: 31px; color: var(--ink-2); font-size: .76rem; }
+  .status-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
   .status-legend span { display: inline-flex; align-items: center; gap: 8px; }
   .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px color-mix(in srgb, var(--green) 45%, transparent); }
   .status-dot.direction { background: var(--honey); box-shadow: none; }
@@ -369,7 +361,7 @@ const references = [
   .section-content { min-width: 0; }
   .section-heading { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-bottom: 15px; }
   .kicker { margin: 0 0 10px; color: var(--honey-strong); font: 600 .66rem/1.4 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .12em; }
-  .section-heading h2, .source-content h2 { margin: 0; font-size: clamp(1.75rem, 3.5vw, 3rem); line-height: 1.08; letter-spacing: -.035em; text-wrap: balance; }
+  .section-heading h2, .source-content h2 { margin: 0; }
   .tag { display: inline-flex; align-items: center; flex: none; min-height: 27px; padding: 5px 9px; border: 1px solid var(--hairline); border-radius: 4px; color: var(--ink-2); font: 600 .59rem/1.2 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .045em; text-transform: uppercase; }
   .shipped-tag { border-color: color-mix(in srgb, var(--green) 35%, transparent); color: var(--green); }
   .direction-tag { border-color: color-mix(in srgb, var(--honey) 38%, transparent); color: var(--honey-strong); }
@@ -481,7 +473,7 @@ const references = [
   .source-section { padding-bottom: 30px; }
   .source-marker > span { border-color: var(--honey); }
   .source-content { display: grid; grid-template-columns: .8fr 1.2fr; gap: 20px 45px; }
-  .source-content h2 { max-width: 12ch; font-size: clamp(1.65rem, 3vw, 2.3rem); }
+  .source-content h2 { max-width: 12ch; }
   .source-content > ul { display: grid; grid-template-columns: 1fr 1fr; gap: 0 25px; list-style: none; margin: 0; padding: 0; }
   .source-content li { border-bottom: 1px solid var(--hairline); }
   .source-content li a { display: flex; justify-content: space-between; gap: 15px; padding: 9px 0; font-size: .71rem; text-decoration: none; }
@@ -504,14 +496,12 @@ const references = [
     .system-map { width: min(100% - 34px, var(--map-max)); padding-top: 24px; }
     .map-hero { padding: 15px 0 38px; }
     .map-hero .eyebrow { font-size: .59rem; letter-spacing: .1em; }
-    .map-hero h1 { font-size: clamp(2.55rem, 13vw, 4.3rem); }
     .status-legend { gap: 9px 13px; font-size: .67rem; }
     .hero-readout { display: grid; grid-template-columns: 1fr 1fr; margin-top: 38px; }
     .hero-readout span { padding: 13px 8px 13px 0; }
     .hero-readout span:last-child { grid-column: 1 / -1; border-top: 1px solid var(--hairline); }
     .hero-readout b { font-size: .78rem; }
     .section-heading { display: grid; }
-    .section-heading h2 { font-size: 1.9rem; }
     .tag { width: fit-content; }
     .flow-4, .flow-5, .proof-pipeline .flow-5 { grid-template-columns: 1fr; gap: 10px; }
     .state-node { min-height: 82px; padding: 13px 14px; }

@@ -24,8 +24,8 @@ export const meta = {
 
 <section id="humans">
   <div class="wrap">
-    <div class="eyebrow display">05 · Humans + agents</div>
-    <h2 class="display">One process, two kinds of worker</h2>
+    <div class="eyebrow display"><span class="chap">04</span> Roles &amp; seats</div>
+    <h1 class="display doc-title">One process, two kinds of worker</h1>
     <p class="lede-sm">The org chart you already know — planes, seats, blast radius — except a
     seat no longer cares whether its worker is a person or an agent.</p>
     <p>The factory doesn't split "human workflows" from "agent workflows" — it defines
@@ -56,7 +56,7 @@ export const meta = {
 </section>
 <section id="seats">
   <div class="wrap">
-    <div class="eyebrow display">06 · Roles &amp; seats</div>
+    <div class="eyebrow display">The seats</div>
     <h2 class="display">The planes, one orchestration spine</h2>
     <p>Seats are separated by <b>blast radius</b>: the seat that routes work holds no secrets,
     the seat that holds secrets makes no decisions, the seat that observes writes nothing. A
@@ -179,25 +179,17 @@ export const meta = {
     <p>A <b>seat</b> answers "what may this session do right now?" and is stamped per action. A
     <b>host role</b> answers "may this machine own execution for a hive?" and governs a lease.
     They are different layers and the vocabulary is kept apart on purpose:</p>
-    <div class="cardgrid">
-      <div class="card"><h3><span class="hexdot">⬢</span>executor</h3>
-        <p>Long-lived host. Holds a hive's <em>one</em> primary lease and runs its dispatcher
-        loops.</p></div>
-      <div class="card"><h3><span class="hexdot">⬢</span>transient</h3>
-        <p>Task- or CI-shaped host. Takes a lease for the job and releases it on exit.</p></div>
-      <div class="card"><h3><span class="hexdot">⬢</span>viewer</h3>
-        <p>Reads and files. Never claims, submits or merges — by definition, not by
-        configuration.</p></div>
-    </div>
-    <p>A session on an executor may hold several seats over a day; the executor still holds
-    exactly one lease per hive. How hosts are provisioned, leased and (proposed) enrolled as
-    Frames is on the <a href="/frame-model/">Frames page</a>.</p>
+    <p>There are three host roles — <code>executor</code>, <code>transient</code>,
+    <code>viewer</code> — and a hive has one primary host at a time. A session on an executor
+    may hold several seats over a day; the executor still holds exactly one lease. The roles,
+    the lease, the dispatcher loops and the proposed Frame enrollment are all on the
+    <a href="/frame-model/">Frames page</a>.</p>
   </div>
 </section>
 
 <section id="harnesses">
   <div class="wrap">
-    <div class="eyebrow display">07 · Harnesses</div>
+    <div class="eyebrow display">Harnesses</div>
     <h2 class="display">Which harness a seat runs under</h2>
     <p>A seat is defined by what it takes in, what it puts out, and what it is allowed to touch —
     not by the agent CLI executing it. So the harness is <b>configuration</b>. Any seat launches

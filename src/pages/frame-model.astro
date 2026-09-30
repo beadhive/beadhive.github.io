@@ -56,16 +56,15 @@ const sources = [
 <Layout active="frame-model" title={meta.title} description={meta.description}>
 <div class="frame-map">
   <header class="frame-hero">
-    <p class="frame-eyebrow">Factory map <span></span> roles · runtimes · deployment</p>
     <div class="frame-hero-grid">
       <div>
-        <p class="frame-kicker">BEADHIVE 0.20.1 / CURRENT + PROPOSED</p>
-        <h1 class="display">One hive of work.<br /><em>Many ways to host it.</em></h1>
-        <p class="frame-lede">Separate the identity that owns a machine from the seat that performs an action. Then scale compute around hives, with the current lease rules kept visible.</p>
+        <div class="eyebrow display"><span class="chap">06</span> Frames</div>
+        <h1 class="display doc-title">One hive of work. Many ways to host it.</h1>
+        <p class="doc-lede">Separate the identity that owns a machine from the seat that performs an action. Then scale compute around hives, with the current lease rules kept visible.</p>
         <div class="frame-legend">
-          <span><i class="dot shipped"></i> In 0.20.1</span>
-          <span><i class="dot direction"></i> Current seam / intended shape</span>
-          <span><i class="dot proposed"></i> Provisioning draft</span>
+          <span class="status shipped">shipped</span>
+          <span class="status direction">current seam / intended shape</span>
+          <span class="status proposed">provisioning draft</span>
         </div>
       </div>
       <aside class="frame-readout">
@@ -79,7 +78,6 @@ const sources = [
       <span><small>HOST LEASE</small><b>One primary per hive</b></span>
       <span><small>LOCAL DISPATCH</small><b>Implemented</b></span>
       <span><small>FLEET SCHEDULER</small><b>Not shipped</b></span>
-      <span><small>LOCAL TOOLCHAIN</small><b>bd 1.3.0 · Dolt 2.3.5</b></span>
     </div>
   </header>
 
@@ -90,7 +88,7 @@ const sources = [
     </div>
     <div class="identity-grid">
       <article class="info-panel">
-        <div class="panel-label"><span>HOST ROLE</span><small>v0.20.1</small></div>
+        <div class="panel-label"><span>HOST ROLE</span><small>CURRENT</small></div>
         <h3>Who may own execution?</h3>
         <div class="role-list">
           {hostRoles.map((item) => <div class="role-row"><b>{item.role}</b><span>{item.purpose}</span><i class="status-chip current">current</i></div>)}
@@ -212,18 +210,13 @@ const sources = [
 
 <style>
   .frame-map { max-width: 1240px; margin: 0 auto; padding: 0 32px 96px; color: var(--ink); }
-  .frame-hero { padding: 46px 0 26px; border-bottom: 1px solid var(--hairline); }
+  .frame-hero { padding: 26px 0 26px; border-bottom: 1px solid var(--hairline); }
   .frame-eyebrow, .frame-kicker { color: var(--honey-strong); font: 700 .68rem/1.3 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
   .frame-eyebrow { display: flex; align-items: center; gap: 12px; margin: 0 0 30px; }
   .frame-eyebrow span { width: 48px; border-top: 1px solid var(--mark-line); }
   .frame-hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(250px, .72fr); gap: 44px; align-items: center; }
   .frame-kicker { margin: 0 0 12px; }
-  .frame-hero h1 { max-width: 780px; margin: 0; font-size: clamp(2.8rem, 7vw, 5.9rem); line-height: .98; letter-spacing: -.065em; }
-  .frame-hero h1 em { color: var(--honey-strong); font-style: normal; }
-  .frame-lede { max-width: 650px; margin: 22px 0 0; color: var(--ink-2); font-size: 1.08rem; line-height: 1.65; }
-  .frame-legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 24px; color: var(--ink-3); font-size: .77rem; }
-  .dot { display: inline-block; width: 8px; height: 8px; margin-right: 7px; border-radius: 50%; background: var(--green); }
-  .dot.direction { background: var(--honey); }.dot.proposed { background: var(--ink-3); }
+  .frame-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
   .frame-readout, .info-panel, .topology-card, .two-notes article { border: 1px solid var(--hairline); background: var(--panel); }
   .frame-readout { padding: 22px; border-top: 2px solid var(--honey); }
   .readout-title, .panel-label, .loop-title, .topology-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
@@ -233,13 +226,13 @@ const sources = [
   .frame-readout p { color: var(--ink-2); font-size: .84rem; line-height: 1.55; }
   .frame-readout a, .frame-sources a { color: var(--honey-strong); text-decoration-color: var(--mark-line); text-underline-offset: 4px; }
   .frame-readout a { font-size: .78rem; }
-  .frame-stats { display: grid; grid-template-columns: repeat(4,1fr); margin-top: 27px; border: 1px solid var(--hairline); background: var(--panel); }
+  .frame-stats { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 27px; border: 1px solid var(--hairline); background: var(--panel); }
   .frame-stats span { padding: 15px 17px; border-right: 1px solid var(--hairline); }.frame-stats span:last-child { border: 0; }
   .frame-stats small, .loop-facts small { display: block; color: var(--ink-3); font: 600 .58rem "JetBrains Mono", ui-monospace, monospace; letter-spacing: .1em; }
   .frame-stats b { display: block; margin-top: 7px; font-size: .85rem; }
   .frame-section { padding: 75px 0 0; }
   .frame-section-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 24px; }
-  .frame-section-head h2, .frame-sources h2 { margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -.045em; }
+  .frame-section-head h2, .frame-sources h2 { margin: 0; }
   .frame-section-head > p { max-width: 400px; margin: 0 0 5px; color: var(--ink-2); line-height: 1.55; font-size: .91rem; }
   .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .info-panel { padding: 22px; }
@@ -310,12 +303,12 @@ const sources = [
   .frame-sources { display: grid; grid-template-columns: 1fr .8fr; gap: 30px; margin-top: 82px; padding: 27px 0 0; border-top: 1px solid var(--hairline); }.frame-sources h2 { font-size: 1.8rem; }.frame-sources p { max-width: 680px; color: var(--ink-2); font-size: .77rem; line-height: 1.65; }.frame-sources ul { margin: 0; padding: 0; list-style: none; }.frame-sources li { padding: 10px 0; border-bottom: 1px solid var(--hairline); font-size: .77rem; }
   @media (max-width: 850px) {
     .frame-hero-grid, .identity-grid, .install-grid, .frame-sources { grid-template-columns: 1fr; }
-    .frame-stats { grid-template-columns: 1fr 1fr; }.frame-stats span:nth-child(2) { border-right: 0; }.frame-stats span:nth-child(-n+2) { border-bottom: 1px solid var(--hairline); }
+    .frame-stats { grid-template-columns: 1fr; }.frame-stats span { border-right: 0; border-bottom: 1px solid var(--hairline); }.frame-stats span:last-child { border-bottom: 0; }
     .runtime-row { grid-template-columns: 1fr 1fr; }.runtime-label { grid-column: 1/-1; }
     .frame-cluster { grid-template-columns: 1fr; }.cluster-lines { height: 30px; flex-direction: row; }.cluster-lines i { width: 28%; transform: rotate(90deg); }
   }
   @media (max-width: 560px) {
-    .frame-map { padding: 0 18px 64px; }.frame-hero { padding-top: 32px; }.frame-hero-grid { gap: 26px; }.frame-hero h1 { font-size: clamp(2.5rem, 14vw, 4rem); }
+    .frame-map { padding: 0 18px 64px; }.frame-hero { padding-top: 32px; }.frame-hero-grid { gap: 26px; }
     .frame-section { padding-top: 55px; }.frame-section-head { display: block; }.frame-section-head > p { margin-top: 13px; }
     .frame-stats span { padding: 12px; }.frame-stats b { font-size: .72rem; }.role-row { grid-template-columns: 78px 1fr; padding: 8px 0; }.role-row .status-chip { grid-column: 2; justify-self: start; }
     .change-note { grid-template-columns: 1fr; gap: 6px; }.loop-card { grid-template-columns: 35px 1fr; padding: 14px; gap: 9px; }.loop-index { width: 31px; height: 31px; }

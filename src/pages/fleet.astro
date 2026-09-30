@@ -17,7 +17,7 @@ export const meta = {
     <a class="head" href="#hq">A fleet of hives, one Head Office</a>
     <a class="sub" href="#hq-sync">Keeping the fleet in sync</a>
     <a class="sub" href="#hq-intake">Fielding what comes in</a>
-    <a class="head" href="#hosts">Hosts, leases, and the two loops</a>
+    <a class="head" href="#hosts">Who runs a hive</a>
     <a class="head" href="#pointers">Where the source of truth lives</a>
   </nav>
   <div class="pagemain">
@@ -25,8 +25,8 @@ export const meta = {
 <section id="hq">
   <div class="breakout">
     <div class="wrap" style="padding:0">
-      <div class="eyebrow display">07 · Hives → HQ</div>
-      <h2 class="display">A fleet of hives, one Head Office</h2>
+      <div class="eyebrow display"><span class="chap">05</span> Fleet</div>
+      <h1 class="display doc-title">A fleet of hives, one Head Office</h1>
       <p class="lede-sm">One team working this way is a demo. This page is what it looks like
       when every repo is a hive and you read the whole fleet from one seat.</p>
       <p>Each hive owns its issues; the workspace owns the view. <code>bh sync</code> aggregates
@@ -175,35 +175,18 @@ export const meta = {
 <section id="hosts">
   <div class="wrap">
     <div class="eyebrow display">Hosts</div>
-    <h2 class="display">Hosts, leases, and the two loops</h2>
-    <p class="lede-sm">A fleet is read from one seat; it is <em>run</em> by hosts. Three facts
-    about the host layer in 0.20.1 that the diagrams above don't show.</p>
-    <div class="cardgrid">
-      <div class="card"><h3><span class="hexdot">⬢</span>One primary lease per hive <span class="status shipped">shipped</span></h3>
-        <p><code>bh host provision</code> gives a Linux or macOS machine a role — executor,
-        transient or viewer — and <code>bh host lease adopt</code> takes a hive's lease through
-        HQ with compare-and-swap. A hive has one primary host at a time; a host without the
-        lease idles read-only. Host roles are not seats — <a href="/roles/#hosts">why the
-        vocabulary is kept apart</a>.</p></div>
-      <div class="card"><h3><span class="hexdot">⬢</span>Two dispatcher loops, two scopes <span class="status shipped">shipped</span></h3>
-        <p><code>bh host dispatch run --hive H</code> is the per-hive picker: it checks the lease
-        and starts kicked-off epics in <code>bd ready</code> order, at most three at a time.
-        Each child <code>bh work loop &lt;epic&gt;</code> drives one molecule: gates, claims,
-        heartbeats, stale recovery, seat processes. Neither is a cross-hive scheduler.</p></div>
-      <div class="card"><h3><span class="hexdot">⬢</span>Runtime tiers <span class="status direction">uneven</span></h3>
-        <p>One key, <code>work.runtime</code>: <code>local</code> is implemented and the default;
-        <code>claude</code> names today's Task-tool fan-out from a harness session and is
-        documented rather than scheduled by <code>bh</code>; <code>temporal</code> is not
-        implemented. Persisted supervision is systemd user units only.</p></div>
-    </div>
-    <p>Everything beyond this — Frames as a provisioning contract, admission, heartbeats,
-    failover between hosts — is a dated proposal, laid out with its status on the
-    <a href="/frame-model/">Frames page</a>.</p>
+    <h2 class="display">Who runs a hive</h2>
+    <p>A fleet is <em>read</em> from one seat; it is <em>run</em> by hosts. A host takes a
+    hive's lease through HQ — one primary host per hive, everything else read-only — and its
+    dispatcher loops start kicked-off epics in ready order. The host roles, the lease rules,
+    the two loop scopes, the runtime tiers, and the proposed Frame contract for provisioning
+    and failover are all on the <a href="/frame-model/">Frames page</a>, each with its
+    shipped / proposed status.</p>
   </div>
 </section>
 <section id="pointers">
   <div class="wrap">
-    <div class="eyebrow display">08 · Go deeper</div>
+    <div class="eyebrow display">Go deeper</div>
     <h2 class="display">Where the source of truth lives</h2>
     <div class="tablewrap">
       <table>

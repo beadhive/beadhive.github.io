@@ -734,6 +734,20 @@
   .notfound .eyebrow::after { display: none; }
   .notfound h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 26px; }
 
+  /* ---------- technical-docs register ----------
+     Field-guide pages (Beads, Process, Planes, Roles, Fleet, Frames, Ladder)
+     are informational, not landing pages: one h1 at document size, chapter
+     number only on the page title, section h2s at the global size. The
+     marketing register (Home, Start) keeps the large hero h1. */
+  h1.doc-title {
+    font-size: clamp(1.7rem, 3.6vw, 2.3rem); line-height: 1.12; margin: 8px 0 12px;
+  }
+  .doc-lede { font-size: 1.05rem; color: var(--ink-2); max-width: 62ch; margin: 0 0 22px; }
+  .eyebrow .chap {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-weight: 600; letter-spacing: .1em; color: var(--ink-3); margin-right: 2px;
+  }
+
   /* ---------- status chips: shipped / direction / proposed ----------
      The one vocabulary for maturity on the site (content-promotion ADR,
      amendment 1): a label in the page's own voice, adjacent to the claim,
