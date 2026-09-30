@@ -70,8 +70,8 @@ const references = [
     <a class="head" href="#ideation">Ideation</a>
     <a class="head" href="#planning">Planning</a>
     <a class="head" href="#development">Development</a>
-    <a class="head" href="#release">Release</a>
     <a class="head" href="#attestation">Validation + attestation</a>
+    <a class="head" href="#release">Release</a>
     <a class="head" href="#future">Next planes</a>
     <a class="head" href="#sources">Sources</a>
   </nav>
@@ -207,30 +207,6 @@ const references = [
     </div>
   </section>
 
-  <section class="plane-section release-section" id="release" aria-labelledby="release-title">
-    <div class="section-marker"><span>04</span><i></i><small>LOW-FREQUENCY / GUARDED</small></div>
-    <div class="section-content">
-      <div class="section-heading">
-        <div><p class="kicker">RELEASE PLANE · SHIPPED</p><h2 id="release-title" class="display">Prove the bump tree before it leaves.</h2></div>
-        <span class="tag shipped-tag">Guarded release flow</span>
-      </div>
-      <p class="section-intro">The release gate runs against the exact tree created by the version bump.
-        A local tag can still be recovered; publication is the point of no return, so main and tag move atomically only after green.</p>
-      <ol class="state-flow flow-5" aria-label="Release state machine">
-        {releaseFlow.map((step, index) => (
-          <li class={`state-node ${index === 1 ? 'risk-node' : ''} ${index === 4 ? 'green-node' : ''}`}>
-            <span class="node-index">R{String(index + 1).padStart(2, '0')}</span>
-            <b>{step.title}</b>
-            <small>{step.detail}</small>
-          </li>
-        ))}
-      </ol>
-      <p class="rule-note"><span class="rule-glyph">⬢</span> The tag reaching the remote is the point of no return: before it,
-        recovery undoes locally; after it, roll forward. The commands, merge ordering and
-        recovery are on <a href="/process/#release">the Process page</a>.</p>
-    </div>
-  </section>
-
   <section class="evidence-section" id="attestation" aria-labelledby="attestation-title">
     <div class="section-marker evidence-marker"><span>↗</span><i></i><small>CROSS-PLANE / EVIDENCE</small></div>
     <div class="section-content">
@@ -290,6 +266,30 @@ const references = [
           <div class="broker-points"><span>Shared broker interface</span><span>Nested checks use their parent's grant</span><span>Resource-aware admission</span><span>Backend choice unresolved</span></div>
         </div>
       </article>
+    </div>
+  </section>
+
+  <section class="plane-section release-section" id="release" aria-labelledby="release-title">
+    <div class="section-marker"><span>04</span><i></i><small>LOW-FREQUENCY / GUARDED</small></div>
+    <div class="section-content">
+      <div class="section-heading">
+        <div><p class="kicker">RELEASE PLANE · SHIPPED</p><h2 id="release-title" class="display">Prove the bump tree before it leaves.</h2></div>
+        <span class="tag shipped-tag">Guarded release flow</span>
+      </div>
+      <p class="section-intro">The validation path above is what supplies the proof: the release gate runs against the exact tree created by the version bump.
+        A local tag can still be recovered; publication is the point of no return, so main and tag move atomically only after green.</p>
+      <ol class="state-flow flow-5" aria-label="Release state machine">
+        {releaseFlow.map((step, index) => (
+          <li class={`state-node ${index === 1 ? 'risk-node' : ''} ${index === 4 ? 'green-node' : ''}`}>
+            <span class="node-index">R{String(index + 1).padStart(2, '0')}</span>
+            <b>{step.title}</b>
+            <small>{step.detail}</small>
+          </li>
+        ))}
+      </ol>
+      <p class="rule-note"><span class="rule-glyph">⬢</span> The tag reaching the remote is the point of no return: before it,
+        recovery undoes locally; after it, roll forward. The commands, merge ordering and
+        recovery are on <a href="/process/#release">the Process page</a>.</p>
     </div>
   </section>
 
