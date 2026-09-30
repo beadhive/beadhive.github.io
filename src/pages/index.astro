@@ -1,7 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Mark from '../components/Mark.astro';
-import { hero } from '../copy/heroes.ts';
+import { hero, heroes } from '../copy/heroes.ts';
+import { REVIEW_MODE } from '../copy/review.ts';
+// Review: every hero variant renders; data-hero on <html> shows one. When
+// REVIEW_MODE is off only the chosen `hero` renders.
+const heroVariants = REVIEW_MODE ? Object.entries(heroes) : [['current', hero]] as const;
 
 // Exported so /llms.txt can enumerate this page. Sourced from the hero rather
 // than restated, so the homepage still has exactly one description of itself.
@@ -39,8 +43,12 @@ const chev = (x: number, laneY: number) => {
   <div class="wrap">
     <Mark tier="core" size={54} class="hero-mark" />
     <div class="brandline display">{hero.eyebrow}</div>
-    <h1 class="display">{hero.title}</h1>
-    <p class="lede">{hero.lede}</p>
+    {heroVariants.map(([key, h]) => (
+      <div class="hero-variant" data-variant={key}>
+        <h1 class="display">{h.title}</h1>
+        <p class="lede">{h.lede}</p>
+      </div>
+    ))}
     <div class="herobar">
       <a class="btn btn-primary" href="/start/">Ship something real</a>
       <a class="btn btn-ghost" href="/process/">See how the factory works</a>
@@ -52,7 +60,7 @@ const chev = (x: number, laneY: number) => {
   <div class="wrap">
     <div class="eyebrow display">The problem</div>
     <div class="why-grid">
-      <div class="why-copy">
+      <div class="why-copy why-v1">
         <h2 class="display">Slop is a process problem, not an AI problem</h2>
         <p class="lede-sm">Unmaintainable software existed long before agents — AI just multiplied
         the speed it happens at. And process-as-brakes never worked either: discipline that slows
@@ -63,6 +71,19 @@ const chev = (x: number, laneY: number) => {
           <li>Reviews that change the process, not just the code</li>
           <li>Incidents that become guardrails, not just fixes</li>
           <li>Retros that rewrite the next plan</li>
+        </ul>
+        <p class="lede-sm">Agents do the discipline. You hold the gates.</p>
+      </div>
+      <div class="why-copy why-v2">
+        <h2 class="display">Code got fast. Everything around it didn't.</h2>
+        <p class="lede-sm">Agents made code cheap. Planning, review, release and the record of
+        <em>why</em> still run at human speed — or get skipped. That gap is where slop comes from,
+        and it was there long before agents; they just widened it. Beadhive runs everything
+        around the code at the code's pace:</p>
+        <ul class="bullets">
+          <li>Plans that are gated before any work starts</li>
+          <li>Merges that refuse while a gate is open</li>
+          <li>Releases that prove the exact tree they ship</li>
         </ul>
         <p class="lede-sm">Agents do the discipline. You hold the gates.</p>
       </div>
@@ -81,7 +102,7 @@ const chev = (x: number, laneY: number) => {
               <rect x={LANE_X} y={lane.y} width={LANE_W} height={LANE_H} rx="22"
                     fill="none" stroke="var(--mark-line)" stroke-width="2" opacity=".5"/>
               {CHEV_XS.map((x) => (
-                <path d={chev(x, lane.y)} fill="none"
+                <path class="wa-chev" style={`animation-delay:${-(x / 40) * 0.16}s`} d={chev(x, lane.y)} fill="none"
                       stroke={BEATS.includes(x) ? 'var(--honey)' : 'var(--mark-line)'}
                       stroke-width={BEATS.includes(x) ? 3 : 2.5}
                       opacity={BEATS.includes(x) ? 1 : 0.4}
@@ -164,8 +185,10 @@ const chev = (x: number, laneY: number) => {
         <ul class="bullets">
           <li>Reviews target the process, not just the incident — the output is a guardrail that
           prevents recurrence, not only a fix</li>
-          <li>Shipped: planning, dispatch, review, merge, release ordering</li>
-          <li>Building: the return path — prod signal into plans and guardrails</li>
+          <li><span><span class="status shipped">shipped</span> planning, dispatch, review,
+          merge, and a guarded release that proves the exact tree it publishes</span></li>
+          <li><span><span class="status direction">direction</span> the return path —
+          production signal into the next plan and its guardrails</span></li>
         </ul>
         <a class="deeplink" href="/process/">Follow a change through the line</a>
       </div>
@@ -184,7 +207,7 @@ const chev = (x: number, laneY: number) => {
         <p>Developers don't adopt infrastructure they can't read. Run the whole factory on a hobby
         project over a weekend and decide for yourself whether it's real.</p>
         <ul class="bullets">
-          <li>No server, no signup, no hosted dependency</li>
+          <li>No signup, no hosted dependency — everything runs on your machine</li>
         </ul>
         <a class="deeplink" href="https://github.com/beadhive/beadhive">Read the source</a>
       </div>
@@ -198,7 +221,8 @@ const chev = (x: number, laneY: number) => {
     <div class="eyebrow display">How it works</div>
     <h2 class="display">The parts you actually touch</h2>
     <p class="lede-sm"><code>bh</code> is a CLI. It drives <code>bd</code> for issues and
-    <code>git</code> for history — nothing to deploy, no database to run.</p>
+    <code>git</code> for history — nothing to deploy, nothing hosted; the issue database is a
+    local server <code>bd</code> starts for you.</p>
     <div class="bento reveal-stagger">
       <div class="card">
         <span class="kicker">substrate</span>
@@ -210,7 +234,7 @@ const chev = (x: number, laneY: number) => {
         <span class="kicker">roles</span>
         <h3><span class="hexdot">⬢</span>Seats, not workflows</h3>
         <p>Planner, dispatcher, developer, reviewer, merger, warden. A person or an agent fills
-        any of them.</p>
+        any of them, and every action is stamped with the seat that took it.</p>
       </div>
       <div class="card">
         <span class="kicker">control</span>
@@ -223,6 +247,12 @@ const chev = (x: number, laneY: number) => {
         <p>Each agent works in its own worktree under its own identity. You can always see which
         worker did what.</p>
       </div>
+      <div class="card">
+        <span class="kicker">evidence</span>
+        <h3><span class="hexdot">⬢</span>Green is proven, not assumed</h3>
+        <p>Validation results are keyed to the exact tree they ran on. A release can't push until
+        that tree is attested green; a reused result is never a claim about the whole tree.</p>
+      </div>
     </div>
     <a class="deeplink" href="/beads/">Why a dependency graph beats a task list</a>
   </div>
@@ -234,13 +264,14 @@ const chev = (x: number, laneY: number) => {
     <div class="eyebrow display">Try it</div>
     <h2 class="display">Start automating one step at a time</h2>
     <p class="lede-sm">Point it at a real repo. A hive writes nothing into yours until you ask
-    it to, and you don't have to run the whole ring to get something out of it.</p>
+    it to, and you don't have to run the whole line to get something out of it.</p>
     <div class="term reveal" style="margin-top:18px">
       <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
-<pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
-<span class="p">$</span> bh config init
-<span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
-<span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
+<pre><code><span class="p">$</span> nix profile add github:beadhive/beadhive/latest#default
+<span class="c"># → bd, dolt, gh, git-workspace — pinned</span>
+<span class="p">$</span> uv tool install --force 'beadhive[otel]'   <span class="c"># bh itself</span>
+<span class="p">$</span> bh setup check           <span class="c"># 4 of 4 tools present</span>
+<span class="p">$</span> bh config init &amp;&amp; bh setup guide   <span class="c"># first hive, guided</span></code></pre>
     </div>
 
     <p>From there, the agents take it: a planner turns your idea into a gated plan, a
@@ -272,6 +303,12 @@ const chev = (x: number, laneY: number) => {
         <p>Worktree → implement → review → merge, with the plan, kickoff and review gates.</p>
         <span class="cardcta display">Read Process →</span>
       </a>
+      <a class="card teaser" href="/planes/">
+        <h3><span class="hexdot">⬢</span>The planes</h3>
+        <p>Ideation, planning, development, release — each state machine, its re-entry paths,
+        and what counts as evidence.</p>
+        <span class="cardcta display">Read Planes →</span>
+      </a>
       <a class="card teaser" href="/roles/">
         <h3><span class="hexdot">⬢</span>Who does what</h3>
         <p>Four planes, their seats, blast radius — and the harnesses a seat runs under.</p>
@@ -281,6 +318,12 @@ const chev = (x: number, laneY: number) => {
         <h3><span class="hexdot">⬢</span>Scale</h3>
         <p>A fleet of hives, one Head Office, and what's actionable anywhere.</p>
         <span class="cardcta display">Read Fleet →</span>
+      </a>
+      <a class="card teaser" href="/frame-model/">
+        <h3><span class="hexdot">⬢</span>Frames</h3>
+        <p>Host roles versus seats, the two dispatcher loops, and how compute attaches to a hive
+        — what ships and what is proposed.</p>
+        <span class="cardcta display">Read Frames →</span>
       </a>
       <a class="card teaser" href="/data/">
         <h3><span class="hexdot">⬢</span>The ladder</h3>
@@ -294,6 +337,23 @@ const chev = (x: number, laneY: number) => {
 
 </Layout>
 
+<style is:global>
+  /* Review variants: each hero / "problem" version renders; the review switch
+     (data-hero, data-why on <html>) shows one. Delete with the switchboard. */
+  .hero-variant { display: none; }
+  :root:not([data-hero]) .hero-variant[data-variant="noslop"],
+  :root:not([data-hero]) .hero-variant[data-variant="current"],
+  :root[data-hero="noslop"] .hero-variant[data-variant="noslop"],
+  :root[data-hero="outrun"] .hero-variant[data-variant="outrun"],
+  :root[data-hero="keepup"] .hero-variant[data-variant="keepup"],
+  :root[data-hero="orgbehind"] .hero-variant[data-variant="orgbehind"],
+  :root[data-hero="pace"] .hero-variant[data-variant="pace"],
+  :root[data-hero="line"] .hero-variant[data-variant="line"],
+  .hero-variant[data-variant="current"] { display: block; }
+  .why-v2 { display: none; }
+  :root[data-why="v2"] .why-v1 { display: none; }
+  :root[data-why="v2"] .why-v2 { display: block; }
+</style>
 <style>
   /* Art slot: invisible on a stacked layout (the copy carries the argument
      there), a sized right column on a laptop. */

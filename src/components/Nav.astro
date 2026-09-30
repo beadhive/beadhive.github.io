@@ -6,15 +6,22 @@ interface Props {
 }
 const { active } = Astro.props;
 
+// `guide: true` marks the field-guide chapters. The flat nav ignores the flag;
+// the grouped nav (review switch `nav=grouped`) draws a divider + kicker
+// before them so Start (ICP-1) and the field guide (ICP-2) read as the two
+// forks gtm-dual-icp.md asks the first screen to offer.
 const links = [
   { href: '/', label: 'Home', key: 'home' },
   { href: '/start/', label: 'Start', key: 'start' },
-  { href: '/beads/', label: 'Beads', key: 'beads' },
-  { href: '/process/', label: 'Process', key: 'process' },
-  { href: '/roles/', label: 'Roles', key: 'roles' },
-  { href: '/fleet/', label: 'Fleet', key: 'fleet' },
-  { href: '/data/', label: 'Ladder', key: 'data' },
+  { href: '/beads/', label: 'Beads', key: 'beads', guide: true },
+  { href: '/process/', label: 'Process', key: 'process', guide: true },
+  { href: '/planes/', label: 'Planes', key: 'planes', guide: true },
+  { href: '/roles/', label: 'Roles', key: 'roles', guide: true },
+  { href: '/fleet/', label: 'Fleet', key: 'fleet', guide: true },
+  { href: '/frame-model/', label: 'Frames', key: 'frame-model', guide: true },
+  { href: '/data/', label: 'Ladder', key: 'data', guide: true },
 ];
+const firstGuide = links.findIndex((l) => l.guide);
 ---
 <nav class="topnav">
   <div class="breakout topnav-inner">
@@ -23,8 +30,11 @@ const links = [
       <span>bead<span class="wm-gold">hive</span></span>
     </a>
     <div class="navlinks display">
-      {links.map((l) => (
-        <a href={l.href} aria-current={active === l.key ? 'page' : undefined}>{l.label}</a>
+      {links.map((l, i) => (
+        <>
+          {i === firstGuide && <span class="navgroup" aria-hidden="true"><i></i>field guide</span>}
+          <a href={l.href} aria-current={active === l.key ? 'page' : undefined}>{l.label}</a>
+        </>
       ))}
     </div>
     <a class="ghlink display" href="https://github.com/beadhive/beadhive"

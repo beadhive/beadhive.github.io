@@ -1,0 +1,23 @@
+---
+// Factory readout: a one-line telemetry strip under the nav on field-guide
+// pages. The maturity legend in console voice — no version numbers; those live
+// in the repo (INSTALL.md / flake.nix) so the site can never go stale on them.
+// Shown only when the review switch `readout=on` (CSS-gated) until decided.
+interface Props { active?: string }
+const { active } = Astro.props;
+const GUIDE = new Set(['beads', 'process', 'planes', 'roles', 'fleet', 'frame-model', 'data']);
+---
+{active && GUIDE.has(active) && (
+  <div class="readout-wrap">
+    <div class="breakout readout">
+      <span><b>field guide</b></span>
+      <span class="live">main · attested green</span>
+      <span><a href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">toolchain pins ↗</a></span>
+      <span class="readout-legend">
+        <span class="status shipped">shipped</span>
+        <span class="status direction">direction</span>
+        <span class="status proposed">proposed</span>
+      </span>
+    </div>
+  </div>
+)}

@@ -106,16 +106,19 @@ const [npX, npY] = at(240, R + 28);
     <div class="step-grid">
       <div class="step-text">
         <h2 class="display">A running factory, against the repo you already have</h2>
-        <p class="lede-sm">No server, no signup, no hosted dependency — and nothing written into
-        your repo until you ask for it.</p>
+        <p class="lede-sm">No signup, no hosted dependency — the issue store is a local server
+        <code>bd</code> starts for you — and nothing written into your repo until you ask for
+        it. Installing <code>bh</code> alone from PyPI works too, but leaves the four tools it
+        drives for you to manage.</p>
       </div>
       <div class="step-side">
         <div class="term reveal">
           <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
-<pre><code><span class="p">$</span> uv tool install 'beadhive[otel]'
-<span class="p">$</span> bh config init
-<span class="p">$</span> bh hive onboard          <span class="c"># zero footprint by default</span>
-<span class="p">$</span> bh work ready            <span class="c"># what's actionable, in order</span></code></pre>
+<pre><code><span class="p">$</span> nix profile add github:beadhive/beadhive/latest#default
+<span class="c"># → bd, dolt, gh, git-workspace — pinned</span>
+<span class="p">$</span> uv tool install --force 'beadhive[otel]'   <span class="c"># bh itself</span>
+<span class="p">$</span> bh setup check           <span class="c"># 4 of 4 tools present</span>
+<span class="p">$</span> bh config init &amp;&amp; bh setup guide   <span class="c"># first hive, guided</span></code></pre>
         </div>
       </div>
     </div>

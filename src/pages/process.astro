@@ -12,32 +12,76 @@ export const meta = {
 };
 ---
 <Layout active="process" title={meta.title} description={meta.description}>
+<style is:global>
+  /* four-plane strip */
+  .planestrip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 18px 0 8px; }
+  .planestrip-control, .planestrip-assure {
+    grid-column: 1 / -1; padding: 8px 12px; border: 1px dashed var(--hairline); border-radius: 8px;
+    font-size: 12.5px; color: var(--ink-3);
+  }
+  .planestrip-control span, .planestrip-assure span {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: .12em;
+    color: var(--honey-strong); margin-right: 8px;
+  }
+  .planestrip-assure { border-style: solid; border-color: color-mix(in srgb, var(--honey) 40%, transparent); background: var(--lane); }
+  .planestrip-plane {
+    position: relative; display: grid; gap: 4px; align-content: start; padding: 12px 14px;
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: 10px;
+    text-decoration: none; color: inherit; box-shadow: var(--shadow);
+  }
+  .planestrip-plane:hover { border-color: var(--honey); }
+  .planestrip-plane b { font-family: "Futura","Avenir Next",system-ui,sans-serif; font-size: 15px; }
+  .planestrip-plane small { color: var(--ink-3); font-size: 12px; }
+  .planestrip-plane .status { justify-self: start; margin-top: 6px; white-space: normal; line-height: 1.4; }
+  .planestrip-plane.is-direction { border-style: dashed; }
+  .planestrip-plane:not(:last-of-type)::after {
+    content: "→"; position: absolute; right: -12px; top: 14px; color: var(--honey-strong); font-weight: 700;
+  }
+  @media (max-width: 719.98px) {
+    .planestrip { grid-template-columns: 1fr 1fr; }
+    .planestrip-plane::after { display: none; }
+  }
+  /* guarded bump */
+  .bumpflow { list-style: none; padding: 0; margin: 14px 0 16px; display: grid; gap: 8px; max-width: none; }
+  .bumpflow li {
+    display: grid; grid-template-columns: 7rem 1fr; gap: 12px; align-items: baseline;
+    padding: 9px 14px; background: var(--panel); border: 1px solid var(--hairline); border-radius: 8px;
+  }
+  .bumpflow li b { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 13px; color: var(--honey-strong); }
+  .bumpflow li span { font-size: 14px; color: var(--ink-2); }
+  .bumpflow li.is-green { border-color: color-mix(in srgb, var(--green) 50%, transparent); background: var(--green-wash); }
+  .bumpflow li.is-green b { color: var(--green); }
+  @media (max-width: 479.98px) { .bumpflow li { grid-template-columns: 1fr; gap: 2px; } }
+</style>
 <div class="pagegrid">
   <nav class="toc" aria-label="On this page">
     <p class="toc-title">On this page</p>
     <a class="head" href="#how">The mental model</a>
     <a class="sub" href="#how-tenets">The tenets</a>
     <a class="head" href="#ring">The ring</a>
+    <a class="head" href="#planes-strip">The four planes</a>
     <a class="head" href="#pipeline">The pipeline</a>
     <a class="sub" href="#pipeline-green">What keeps the line green</a>
     <a class="head" href="#release">Merge order is planned</a>
+    <a class="sub" href="#release-bump">The guarded bump</a>
   </nav>
   <div class="pagemain">
 
 <section id="how">
   <div class="wrap">
-    <div class="eyebrow display">03 · How it works</div>
-    <h2 class="display">The mental model in one breath</h2>
+    <div class="eyebrow display"><span class="chap">02</span> How work flows</div>
+    <h1 class="display doc-title">The mental model in one breath</h1>
     <p class="lede-sm">You've run pipelines like this with humans in every box. The difference
     to look for: every hand-off is a record, and nothing passes a gate on vibes.</p>
-    <p>Every repo is a <b>hive</b> — its own beads database, embedded as Dolt under the repo's
-    gitignored <code>.beads/</code>. Issues carry a short, stable <b>prefix</b>
+    <p>Every repo is a <b>hive</b> — its own beads database, served by <code>bd</code>'s shared
+    local Dolt server and kept out of your tracked tree under <code>.beads/</code> until you
+    furnish the hive. Issues carry a short, stable <b>prefix</b>
     (<code>acme-api-1</code>) derived from the stable part of identity (org + repo); the parts
     that can change (provider, org) live in <b>labels</b>. Issue history publishes to
     <code>refs/dolt/data</code> on the repo's <em>own git remote</em> — a separate ref namespace
-    that never touches branches or PRs, so there is <b>no server to run</b>. A workspace-level
-    aggregate (the <b>hub</b>, or its evolved form <b>Factory HQ</b>) pulls every hive into one
-    view, so you can ask "what's ready to work on anywhere?"</p>
+    that never touches branches or PRs, so there is <b>nothing hosted to run</b>. A workspace-level
+    aggregate (the <b>hub</b>) pulls every hive into one read view, so you can ask "what's ready
+    to work on anywhere?"; <b>HQ</b> is the separate, authoritative fleet store.</p>
     <p><code>bh</code> is deliberately a thin orchestrator: <code>bd</code> (beads) owns issues,
     <code>git</code> owns history, <code>git-workspace</code> owns cloning. What <code>bh</code>
     adds is the process — <code>bh work</code> drives a bead through its lifecycle so agents never
@@ -46,13 +90,15 @@ export const meta = {
     <h3 class="display" id="how-tenets">The tenets</h3>
     <div class="cardgrid">
       <div class="card"><h4><span class="hexdot">⬢</span>Planes, kept separate</h4>
-        <p><b>Control</b> governs the factory. <b>Planning</b> turns ideas into molecules.
-        <b>Integration</b> executes them. Each plane has its own verbs and seats; they hand off
-        sequentially and never step into each other's role. <b>Assurance</b> is the one
-        exception — a cross-cutting gate layer, not a sequential plane.</p></div>
+        <p><b>Control</b> governs the factory. <b>Planning</b> turns ideas into
+        molecules. <b>Development</b> — the CLI still calls it <em>Integration</em> — executes
+        them. <b>Release</b> proves a version and publishes it. Each plane has its own verbs and seats;
+        they hand off sequentially and never step into each other's role. <b>Assurance</b> is
+        the one exception — a cross-cutting gate layer, not a sequential plane.</p></div>
       <div class="card"><h4><span class="hexdot">⬢</span>Merging is not releasing</h4>
-        <p>Integration is high-frequency and dirty: each bead gets its own worktree and lands on
-        an <b>always-green</b> line. Release is a separate, deliberate, gated act.</p></div>
+        <p>Development is high-frequency and dirty: each bead gets its own worktree and lands on
+        an <b>always-green</b> line. Release is a separate, deliberate, gated act — preflight,
+        bump, attest, await, push — <a href="#release-bump">described below</a>.</p></div>
       <div class="card"><h4><span class="hexdot">⬢</span>Lossless history</h4>
         <p>Agents do the merging, so history is audited: merge <code>--no-ff</code> at the
         boundary, <b>never squash there</b>. Workers squash only their own local checkpoints
@@ -74,11 +120,36 @@ export const meta = {
     <LoopHex />
   </div>
 </section>
+<section id="planes-strip">
+  <div class="wrap">
+    <div class="eyebrow display">The four planes</div>
+    <h2 class="display">Ideation → Planning → Development → Release</h2>
+    <p class="lede-sm">Control governs the sequence; Assurance gates across it. Each plane is a
+    state machine with named re-entry doors — <a href="/planes/">the full map</a> shows every
+    state. This is the skeleton.</p>
+    <div class="planestrip" role="list">
+      <div class="planestrip-control"><span>CONTROL</span> supervisor · director · custodian · controller</div>
+      <a role="listitem" class="planestrip-plane is-direction" href="/planes/#ideation">
+        <b>Ideation</b><small>report → triage → adopt</small>
+        <span class="status direction">intake ships · plane is direction</span></a>
+      <a role="listitem" class="planestrip-plane" href="/planes/#planning">
+        <b>Planning</b><small>idea → gated molecule</small>
+        <span class="status shipped">shipped</span></a>
+      <a role="listitem" class="planestrip-plane" href="/planes/#development">
+        <b>Development</b><small>bead → merged · CLI: integration</small>
+        <span class="status shipped">shipped</span></a>
+      <a role="listitem" class="planestrip-plane" href="/planes/#release">
+        <b>Release</b><small>attested tree → atomic push</small>
+        <span class="status shipped">verbs shipped · seat roadmap</span></a>
+      <div class="planestrip-assure"><span>ASSURANCE</span> security gate, parallel to review, warden-only · <em>Observation and Feedback: named, not specified</em></div>
+    </div>
+  </div>
+</section>
 <section id="pipeline">
   <div class="breakout">
     <div class="wrap" style="padding:0">
-      <div class="eyebrow display">04 · The pipeline</div>
-      <h2 class="display">Planning → dispatch → develop → review → merge</h2>
+      <div class="eyebrow display">The pipeline</div>
+      <h2 class="display">Inside two planes: planning → dispatch → develop → review → merge</h2>
       <p>The full state machine, with its three feedback loops: the <b>spike loop</b> (settle
       feasibility before implementation beads exist), the <b>bounce loop</b>
       (review → changes-requested → resume), and the <b>replan door</b> (a mid-execution
@@ -91,20 +162,20 @@ export const meta = {
       <svg viewBox="0 0 1160 700" role="img" aria-label="State diagram of the AGF pipeline: planning plane stages flow through plan and kickoff gates into the integration plane, where beads are assigned, implemented, submitted through review and security gates, merged into a container, and finished onto main. Feedback loops: spike molecules, review bounce, and the replan door.">
         <defs>
           <marker id="m-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#9A8C71"/></marker>
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
           <marker id="m-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#C99038"/></marker>
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/></marker>
           <marker id="m-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#C0563C"/></marker>
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/></marker>
           <marker id="m-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#55996F"/></marker>
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
         </defs>
 
         <!-- ================= lanes ================= -->
         <rect class="lane-p" x="16" y="16" width="1128" height="240" rx="10"/>
         <text class="lane-label" x="32" y="38">PLANNING PLANE — HUMAN-INTERACTIVE · OUTPUTS BEADS + DECISION RECORDS, NEVER CODE</text>
         <rect class="lane-i" x="16" y="272" width="1128" height="330" rx="10"/>
-        <text class="lane-label" x="32" y="294">INTEGRATION PLANE — DISPATCHER · DEVELOPER · REVIEWER · MERGER</text>
+        <text class="lane-label" x="32" y="294">DEVELOPMENT PLANE (CLI NAME: INTEGRATION) — DISPATCHER · DEVELOPER · REVIEWER · MERGER</text>
 
         <!-- ================= planning row ================= -->
         <rect class="node" x="40" y="56" width="84" height="40" rx="7"/>
@@ -209,7 +280,7 @@ export const meta = {
         <path class="flow" d="M868,330 C 890,322 900,322 912,328" marker-end="url(#m-n)"/>
         <polygon class="gatehex" points="916,342 935,309 973,309 992,342 973,375 935,375"/>
         <text class="glabel" x="954" y="339">REVIEW</text>
-        <text class="gsub" x="954" y="353">human · timer · gh</text>
+        <text class="gsub" x="954" y="353">human · timer · gh:*</text>
 
         <path class="flow" d="M868,346 C 950,390 1010,390 1032,372" marker-end="url(#m-n)"/>
         <polygon class="gatehex" points="1016,342 1035,309 1073,309 1092,342 1073,375 1035,375"/>
@@ -253,17 +324,17 @@ export const meta = {
 
         <!-- main -->
         <line class="mainline" x1="40" y1="644" x2="1120" y2="644"/>
-        <circle cx="775" cy="644" r="6" fill="#55996F"/>
+        <circle cx="775" cy="644" r="6" fill="var(--green)"/>
         <text class="alabel-g" x="40" y="668">main — always green</text>
-        <text class="alabel-g" x="1120" y="668" text-anchor="end">merging ≠ releasing — release is a separate, gated act</text>
+        <text class="alabel-g" x="1120" y="668" text-anchor="end">merging ≠ releasing — the release gate runs on the bump tree, below</text>
       </svg>
       </div>
       <div class="legend display">
         <span><span class="sw hex"></span>gate (bd gate — seat-resolved)</span>
-        <span><span class="sw" style="background:#C99038"></span>approval / verdict</span>
-        <span><span class="sw" style="background:#C0563C"></span>feedback loop</span>
-        <span><span class="sw" style="background:#55996F"></span>always-green integration line</span>
-        <span><span class="sw" style="background:#9A8C71"></span>forward flow</span>
+        <span><span class="sw" style="background:var(--honey)"></span>approval / verdict</span>
+        <span><span class="sw" style="background:var(--red)"></span>feedback loop</span>
+        <span><span class="sw" style="background:var(--green)"></span>always-green integration line</span>
+        <span><span class="sw" style="background:var(--ink-3)"></span>forward flow</span>
       </div>
       <figcaption>The two-gate planning exit is deliberate: <b>plan approval</b> gates whether the
       decomposition is right; <b>kickoff approval</b> gates whether the work should start now.
@@ -287,28 +358,36 @@ export const meta = {
         <em>combination</em> is re-tested. If a re-validation fails on a safe-to-rewrite branch,
         the tip is rolled back before anyone can observe it; a shared branch escalates for a
         forward fix instead.</li>
+        <li><b>Evidence is keyed to the tree.</b> A green result is stored against the exact
+        tree hash and command that produced it. A fresh exact match may be reused where the caller
+        allows it; a graph-derived <em>attest key</em> may carry across a change only when its whole
+        input closure is unchanged. Unknown impact fails closed to the full run, and a reused key
+        is never a claim that the whole tree is green — <a href="/planes/#attestation">how reuse
+        works</a>.</li>
         <li><b>The batch exception.</b> Cohesive linear chains can run as one shared
         <code>wt/batch/&lt;group&gt;</code> worktree, merged once — guarded by cohesion, a size
-        cap of 5, one model tier, one review gate. A batch fails and bounces as a unit; per-bead
+        cap of 5, no conflicting model preferences, one review gate. A batch fails and bounces as a unit; per-bead
         commits stay bisectable inside the bubble.</li>
       </ul>
 
-      <div class="note"><b>Where the ideas come from.</b> The pipeline starts at
-      <em>ideate</em>, which quietly assumes someone showed up with an idea — capping the whole
-      factory at one person's imagination on a given afternoon. Upstream of planning there's a
-      loop that doesn't: read the repo's own vision and strategy documents, derive candidate
+      <div class="note"><b>Where the ideas come from.</b> <span class="status direction">direction</span>
+      The pipeline starts at <em>ideate</em>, which quietly assumes someone showed up with an
+      idea — capping the whole factory at one person's imagination on a given afternoon. What
+      ships upstream of planning today is <a href="/fleet/#hq-intake">intake and triage</a>.
+      The ideation plane is meant to add a loop that doesn't wait for someone to show up: read the repo's own vision and strategy documents, derive candidate
       topics from how those documents are actually structured rather than from a generic
       checklist, then generate against each topic in parallel — deliberately blind to the
       others, so the batch stays divergent instead of converging on the same three obvious
       ideas. Survivors are deduplicated, judged against the vision, and filed through
-      <code>bh plan file</code> like any other molecule, so nothing skips the kickoff gate.</div>
+      <code>bh plan file</code> like any other molecule, so nothing skips the kickoff gate. Its
+      states and seat are not defined yet.</div>
     </div>
   </div>
 </section>
 
 <section id="release">
   <div class="wrap">
-    <div class="eyebrow display">05 · Merge order</div>
+    <div class="eyebrow display">Merge order</div>
     <h2 class="display">Merge order is planned, not first-come-first-served</h2>
     <p>Landing approved beads in whatever order they clear review is fine until a molecule mixes
     <em>kinds</em> of change — a hotfix for the released version, additive features that should
@@ -335,9 +414,28 @@ export const meta = {
     <code>release-hold:</code> gate that blocks its merge until a releaser resolves it — and only
     a releaser can.</p>
 
-    <div class="note"><b>Merging is still not releasing.</b> All of this orders the green line;
-    it does not cut from it. Version determination, the changelog and the tag are the next piece
-    of the release plane, and they aren't built yet.</div>
+    <h3 class="display" id="release-bump">Cutting the version: the guarded bump <span class="status shipped">shipped</span></h3>
+    <p>Ordering decides what lands; the bump decides what ships. The rule that makes it safe:
+    the release gate runs against the <em>exact tree the bump creates</em>, not the tree that was
+    green before it.</p>
+    <ol class="bumpflow" aria-label="The guarded release bump">
+      <li><b>preflight</b><span>requires green proof for the current tree before anything moves</span></li>
+      <li><b>bump</b><span><code>cz bump</code> writes version metadata and a local tag — a new, unproven tree</span></li>
+      <li><b>attest</b><span>runs the <code>push-main</code> gate on that exact tree</span></li>
+      <li><b>await</b><span>blocks until the verdict; red refuses, green permits</span></li>
+      <li class="is-green"><b>push</b><span>one atomic push moves <code>main</code> and the tag together</span></li>
+    </ol>
+<pre><code>bh release preflight   # green proof for the current tree, or refuse
+cz bump                # new tree + local tag — unproven
+bh release attest      # the push-main gate against that exact tree
+bh release await       # block until GREEN, then push main + tag atomically
+bh release recover     # after a failed push: measure the remote before deciding</code></pre>
+    <p>The tag reaching the remote is the point of no return. Before it, recovery can undo
+    locally; after it, roll forward — published history is never rewritten.</p>
+    <div class="note"><b>Verbs ship; the seat is roadmap.</b> <span class="status direction">direction</span>
+    The commands above run today. The <em>releaser</em> seat that owns them in the org chart —
+    changelog authorship, the release plane as a staffed stage — is still marked roadmap in the
+    reference docs, so a human runs the bump.</div>
   </div>
 </section>
 

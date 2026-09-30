@@ -22,56 +22,97 @@
      line). The brand suite defines no such hues; these are warmed to sit in the
      honey family rather than invented afresh.
      ========================================================================= */
+  /* LIGHT = COOL GREY (decided 2026-09-29): the light ground matched to Mission
+     Control's chrome. The brand's cream light is kept as [data-light="cream"]
+     for comparison. Contrast: honey-strong 6E4F05 on F3F4F1 ≈ 7.9:1, ink-2 ≈ 6.9:1. */
   :root {
-    --bg: #F7F1E1;
-    --panel: #FFFBEE;
-    --panel-2: #F1EAD5;
-    --ink: #1D1708;
-    --ink-2: #6B6047;
-    --ink-3: #736850;
-    --hairline: #E4D9BC;
-    --honey: #C98F0A;
-    --honey-strong: #7E5C07;
-    --honey-wash: #F6E7C3;
-    --green: #3E7D56;
-    --green-wash: #DEEBDF;
-    --red: #B5462C;
-    --red-wash: #F4E0D8;
-    --node: #FFFBEE;
-    --node-stroke: #C9B98F;
-    --lane: rgba(201, 143, 10, 0.05);
-    --lane-2: rgba(62, 125, 86, 0.05);
-    --code-bg: #F1E8D0;
-    /* Brand `line` — the comb walls of the mark. */
-    --mark-line: #1D1708;
-    --shadow: 0 1px 2px rgba(29, 23, 8, 0.06), 0 4px 14px rgba(29, 23, 8, 0.05);
+    --bg: #F3F4F1; --panel: #FFFFFF; --panel-2: #E9ECE6; --ink: #1B2328;
+    --ink-2: #56626B; --ink-3: #5E6A73; --hairline: #D8DCD4;
+    --honey: #B8820A; --honey-strong: #6E4F05; --honey-wash: #F4E6C4;
+    --green: #2F7A55; --green-wash: #DDEEE4; --red: #B5412F; --red-wash: #F5E0DB;
+    --node: #FFFFFF; --node-stroke: #B9BFB5;
+    --lane: rgba(184,130,10,.06); --lane-2: rgba(47,122,85,.06);
+    --code-bg: #E9ECE6; --mark-line: #1B2328;
+    --shadow: 0 1px 2px rgba(27,35,40,.06), 0 4px 14px rgba(27,35,40,.05);
   }
+  /* DARK = MISSION CONTROL. The Beadhive UI's default operator palette
+     (beadhive-ui packages/agent-visualizer/src/palettes.css): cool blue-grey
+     chrome, warm ink, amber as telemetry. Amber = attention / human gates,
+     mint = verified / green, red = refusal / bounce, blue-grey = shell.
+     The brand's original black-and-honey dark is kept below as
+     [data-dark="honey"] for side-by-side review only. */
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #110D06;
-      --panel: #191307;
-      --panel-2: #201908;
-      --ink: #F2EAD6;
-      --ink-2: #A2946F;
-      --ink-3: #9C8E6D;
-      --hairline: #2E2510;
+      --bg: #0A0C10;
+      --panel: #111419;
+      --panel-2: #171B22;
+      --ink: #F0ECE2;
+      --ink-2: #A2AAB6;
+      --ink-3: #8A93A1;
+      --hairline: #242A34;
       --honey: #F0B429;
       --honey-strong: #F5C55E;
       --honey-wash: #33270F;
-      --green: #6FB388;
-      --green-wash: #1C2B20;
-      --red: #E07B5B;
-      --red-wash: #382018;
-      --node: #191307;
-      --node-stroke: #8F6D22;
-      --lane: rgba(240, 180, 41, 0.05);
-      --lane-2: rgba(111, 179, 136, 0.055);
-      --code-bg: #14100A;
-      --mark-line: #8F6D22;
+      --green: #6CE1B5;
+      --green-wash: #14261F;
+      --red: #F0676B;
+      --red-wash: #2B171A;
+      --node: #111419;
+      --node-stroke: #9A7526;
+      --lane: rgba(240, 180, 41, 0.055);
+      --lane-2: rgba(108, 225, 181, 0.055);
+      --code-bg: #0D1014;
+      --mark-line: #9A7526;
       --shadow: none;
     }
   }
   :root[data-theme="light"] {
+    --bg: #F3F4F1; --panel: #FFFFFF; --panel-2: #E9ECE6; --ink: #1B2328;
+    --ink-2: #56626B; --ink-3: #5E6A73; --hairline: #D8DCD4;
+    --honey: #B8820A; --honey-strong: #6E4F05; --honey-wash: #F4E6C4;
+    --green: #2F7A55; --green-wash: #DDEEE4; --red: #B5412F; --red-wash: #F5E0DB;
+    --node: #FFFFFF; --node-stroke: #B9BFB5;
+    --lane: rgba(184,130,10,.06); --lane-2: rgba(47,122,85,.06);
+    --code-bg: #E9ECE6; --mark-line: #1B2328;
+    --shadow: 0 1px 2px rgba(27,35,40,.06), 0 4px 14px rgba(27,35,40,.05);
+  }
+  :root[data-theme="dark"] {
+      --bg: #0A0C10;
+      --panel: #111419;
+      --panel-2: #171B22;
+      --ink: #F0ECE2;
+      --ink-2: #A2AAB6;
+      --ink-3: #8A93A1;
+      --hairline: #242A34;
+      --honey: #F0B429;
+      --honey-strong: #F5C55E;
+      --honey-wash: #33270F;
+      --green: #6CE1B5;
+      --green-wash: #14261F;
+      --red: #F0676B;
+      --red-wash: #2B171A;
+      --node: #111419;
+      --node-stroke: #9A7526;
+      --lane: rgba(240, 180, 41, 0.055);
+      --lane-2: rgba(108, 225, 181, 0.055);
+      --code-bg: #0D1014;
+      --mark-line: #9A7526;
+      --shadow: none;
+  }
+  /* Review-only comparison: the retired black-and-honey dark. Delete with the
+     review bar once the palette decision is settled. */
+  :root[data-dark="honey"]:not([data-theme="light"]) {
+    --bg: #110D06; --panel: #191307; --panel-2: #201908; --ink: #F2EAD6;
+    --ink-2: #A2946F; --ink-3: #9C8E6D; --hairline: #2E2510;
+    --honey: #F0B429; --honey-strong: #F5C55E; --honey-wash: #33270F;
+    --green: #6FB388; --green-wash: #1C2B20; --red: #E07B5B; --red-wash: #382018;
+    --node: #191307; --node-stroke: #8F6D22;
+    --lane: rgba(240,180,41,.05); --lane-2: rgba(111,179,136,.055);
+    --code-bg: #14100A; --mark-line: #8F6D22; --shadow: none;
+  }
+  /* Review-only comparison: the brand's cream light (retired default). */
+  :root[data-light="cream"]:not([data-theme="dark"]),
+  :root[data-light="cream"][data-theme="light"] {
     --bg: #F7F1E1; --panel: #FFFBEE; --panel-2: #F1EAD5; --ink: #1D1708;
     --ink-2: #6B6047; --ink-3: #736850; --hairline: #E4D9BC;
     --honey: #C98F0A; --honey-strong: #7E5C07; --honey-wash: #F6E7C3;
@@ -80,15 +121,6 @@
     --lane: rgba(201,143,10,.05); --lane-2: rgba(62,125,86,.05);
     --code-bg: #F1E8D0; --mark-line: #1D1708;
     --shadow: 0 1px 2px rgba(29,23,8,.06), 0 4px 14px rgba(29,23,8,.05);
-  }
-  :root[data-theme="dark"] {
-    --bg: #110D06; --panel: #191307; --panel-2: #201908; --ink: #F2EAD6;
-    --ink-2: #A2946F; --ink-3: #9C8E6D; --hairline: #2E2510;
-    --honey: #F0B429; --honey-strong: #F5C55E; --honey-wash: #33270F;
-    --green: #6FB388; --green-wash: #1C2B20; --red: #E07B5B; --red-wash: #382018;
-    --node: #191307; --node-stroke: #8F6D22;
-    --lane: rgba(240,180,41,.05); --lane-2: rgba(111,179,136,.055);
-    --code-bg: #14100A; --mark-line: #8F6D22; --shadow: none;
   }
 
   * { box-sizing: border-box; }
@@ -259,12 +291,12 @@
   .alabel-h { fill: var(--honey-strong); font-size: 10.5px; font-weight: 600; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
   .alabel-g { fill: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .04em;
               font-family: "Futura","Avenir Next",system-ui,sans-serif; }
-  .flow  { stroke: #9A8C71; stroke-width: 1.4; fill: none; }
-  .flow-h { stroke: #C99038; stroke-width: 1.6; fill: none; }
-  .flow-r { stroke: #C0563C; stroke-width: 1.5; fill: none; }
-  .flow-g { stroke: #55996F; stroke-width: 2.4; fill: none; }
+  .flow  { stroke: var(--ink-3); stroke-width: 1.4; fill: none; opacity: .85; }
+  .flow-h { stroke: var(--honey); stroke-width: 1.6; fill: none; }
+  .flow-r { stroke: var(--red); stroke-width: 1.5; fill: none; }
+  .flow-g { stroke: var(--green); stroke-width: 2.4; fill: none; }
   .dashed { stroke-dasharray: 5 4; }
-  .mainline { stroke: #55996F; stroke-width: 3; }
+  .mainline { stroke: var(--green); stroke-width: 3; }
 
   /* ---------- seats ---------- */
   .plane { margin: 26px 0; }
@@ -363,6 +395,15 @@
   }
   .navlinks a:hover { color: var(--ink); background: var(--panel); }
   .navlinks a[aria-current="page"] { color: var(--honey-strong); background: var(--honey-wash); }
+  /* grouped nav (review switch): a divider + kicker before the field guide */
+  :root[data-nav="flat"] .navgroup { display: none; }
+  .navgroup {
+    display: inline-flex; align-items: center; gap: 8px; margin: 0 4px 0 8px;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .navgroup i { width: 1px; height: 18px; background: var(--hairline); }
+  :root:not([data-nav="flat"]) .navlinks a { font-size: 13.5px; padding: 6px 8px; }
   .ghlink {
     margin-left: auto; flex: none;
     display: inline-flex; align-items: center; gap: 6px;
@@ -692,3 +733,123 @@
   .notfound .eyebrow { justify-content: center; margin-bottom: 12px; }
   .notfound .eyebrow::after { display: none; }
   .notfound h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0 0 26px; }
+
+  /* ---------- technical-docs register ----------
+     Field-guide pages (Beads, Process, Planes, Roles, Fleet, Frames, Ladder)
+     are informational, not landing pages: one h1 at document size, chapter
+     number only on the page title, section h2s at the global size. The
+     marketing register (Home, Start) keeps the large hero h1. */
+  h1.doc-title {
+    font-size: clamp(1.7rem, 3.6vw, 2.3rem); line-height: 1.12; margin: 8px 0 12px;
+  }
+  .doc-lede { font-size: 1.05rem; color: var(--ink-2); max-width: 62ch; margin: 0 0 22px; }
+  .eyebrow .chap {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-weight: 600; letter-spacing: .1em; color: var(--ink-3); margin-right: 2px;
+  }
+
+  /* ---------- status chips: shipped / direction / proposed ----------
+     The one vocabulary for maturity on the site (content-promotion ADR,
+     amendment 1): a label in the page's own voice, adjacent to the claim,
+     never smaller than the claim it qualifies. Mint = ships in this
+     version; amber = direction or naming proposal; dashed grey = design
+     proposal not accepted. */
+  .status {
+    display: inline-flex; align-items: center; gap: 6px; vertical-align: middle;
+    padding: 3px 8px; border: 1px solid var(--hairline); border-radius: 4px;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-3); white-space: nowrap; line-height: 1.3;
+  }
+  .status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+  .status.shipped { color: var(--green); border-color: color-mix(in srgb, var(--green) 40%, transparent); background: var(--green-wash); }
+  .status.direction { color: var(--honey-strong); border-color: color-mix(in srgb, var(--honey) 45%, transparent); background: var(--honey-wash); }
+  .status.proposed { border-style: dashed; color: var(--ink-2); }
+  .status.proposed::before { background: transparent; border: 1px solid currentColor; }
+  .status.open { color: var(--red); border-color: color-mix(in srgb, var(--red) 45%, transparent); background: var(--red-wash); }
+  h2 .status, h3 .status { margin-left: 10px; font-size: 10px; }
+
+  /* ---------- factory readout: a telemetry strip under the nav ----------
+     A "line status" rail for the field-guide pages: version pins and the
+     page's maturity legend, in the mono voice of a console. Static. */
+  .readout-wrap { display: none; }
+  :root[data-readout="on"] .readout-wrap { display: block; border-bottom: 1px solid var(--hairline); background: var(--panel); }
+  .readout-legend { margin-left: auto; display: inline-flex; gap: 6px; }
+  .readout i { font-style: normal; color: var(--ink-3); }
+  .readout {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 22px;
+    padding: 7px 24px;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 11px; letter-spacing: .06em; color: var(--ink-3);
+  }
+  .readout b { color: var(--ink-2); font-weight: 600; }
+  .readout .live { color: var(--green); }
+  .readout .live::before { content: "● "; animation: readout-blink 2.4s ease-in-out infinite; }
+  @keyframes readout-blink { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+  @media (prefers-reduced-motion: reduce) { .readout .live::before { animation: none; } }
+
+  /* ---------- gate pulse (opt-in: [data-fx-gates="on"]) ----------
+     A gate is where the line waits on a human. The pulse says exactly that:
+     amber breathing on the hexagon, nothing else moves. Carries the
+     argument (see the LoopHex motion note above) rather than decorating it. */
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-fx-gates="off"]) .gatehex {
+      animation: gate-breathe 7s ease-in-out infinite;
+      transform-box: fill-box; transform-origin: center;
+    }
+    :root:not([data-fx-gates="off"]) .gatehex:nth-of-type(2n) { animation-delay: -2.4s; }
+    :root:not([data-fx-gates="off"]) .gatehex:nth-of-type(3n) { animation-delay: -4.8s; }
+  }
+  @keyframes gate-breathe {
+    0%, 100% { stroke-width: 1.6; fill: var(--honey-wash); filter: none; }
+    50% { stroke-width: 2.4; fill: color-mix(in srgb, var(--honey) 28%, var(--honey-wash));
+          filter: drop-shadow(0 0 5px color-mix(in srgb, var(--honey) 60%, transparent)); }
+  }
+
+  /* ---------- conveyor march (opt-in: [data-fx-lanes="on"]) ----------
+     The matched-lanes diagram: chevrons advance at the same cadence in both
+     lanes. The motion IS the claim (same cadence), so it is allowed here. */
+  @media (prefers-reduced-motion: no-preference) {
+    :root:not([data-fx-lanes="off"]) .wa-chev { animation: chev-march 1.6s linear infinite; }
+  }
+  @keyframes chev-march {
+    0%   { opacity: .25; }
+    50%  { opacity: .9; }
+    100% { opacity: .25; }
+  }
+
+  /* ---------- station rail (opt-in: [data-nav-rail="on"]) ----------
+     The sticky side TOC redrawn as stations on a line: a hex marker per
+     heading, filled when its section is in view. The fill is driven by
+     ~12 lines of IntersectionObserver in Layout; without JS it is the same
+     list with an unfilled rail. */
+  :root:not([data-nav-rail="off"]) .toc { padding-left: 18px; border-left: 1px solid var(--hairline); }
+  :root:not([data-nav-rail="off"]) .toc a { position: relative; }
+  :root:not([data-nav-rail="off"]) .toc a.head::before {
+    content: ""; position: absolute; left: -24px; top: 9px; width: 11px; height: 11px;
+    background: var(--bg); border: 1.6px solid var(--node-stroke);
+    clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    transition: background .2s ease, border-color .2s ease;
+  }
+  :root:not([data-nav-rail="off"]) .toc a.head.is-here { color: var(--honey-strong); }
+  :root:not([data-nav-rail="off"]) .toc a.head.is-here::before { background: var(--honey); border-color: var(--honey); }
+
+  /* ---------- review bar (review builds only; see components/ReviewBar) ---------- */
+  .reviewbar {
+    position: fixed; right: 12px; bottom: 12px; z-index: 90;
+    background: var(--panel); border: 1px solid var(--honey); border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 11.5px;
+    color: var(--ink-2); max-width: 22rem;
+  }
+  .reviewbar:not([open]) { opacity: .85; }
+  .reviewbar > summary {
+    list-style: none; cursor: pointer; padding: 8px 12px;
+    color: var(--honey-strong); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  }
+  .reviewbar > summary::-webkit-details-marker { display: none; }
+  .reviewbar-body { padding: 4px 12px 12px; display: grid; gap: 9px; border-top: 1px solid var(--hairline); width: 20rem; max-width: 90vw; }
+  .reviewbar label { display: grid; gap: 3px; }
+  .reviewbar label > span { color: var(--ink); font-weight: 600; }
+  .reviewbar select, .reviewbar input { width: 100%; font: inherit; font-size: 11px; color: var(--ink); background: var(--code-bg); border: 1px solid var(--hairline); border-radius: 5px; padding: 3px 6px; }
+  .reviewbar small { display: block; color: var(--ink-3); font-size: 10px; }

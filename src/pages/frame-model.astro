@@ -1,0 +1,332 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+export const meta = {
+  order: 4.6,
+  label: 'Frames',
+  title: 'Roles, runtimes & Bead Frames · Beadhive',
+  description: 'A current-state and proposal-aware map of Beadhive roles, dispatcher loops, Bead Frame provisioning, and deployment topologies.',
+};
+
+const hostRoles = [
+  { role: 'executor', purpose: 'Long-lived host that owns a hive lease', state: 'current' },
+  { role: 'transient', purpose: 'Task-shaped host; releases its lease on exit', state: 'current' },
+  { role: 'viewer', purpose: 'Reads and files; never claims, submits, or merges', state: 'current' },
+];
+
+const workSeats = [
+  { seat: 'planner', scope: 'Frames an idea into a gated molecule', plane: 'Planning' },
+  { seat: 'dispatcher', scope: 'Starts a molecule and routes ready beads', plane: 'Development' },
+  { seat: 'developer', scope: 'Implements one bead in its worktree', plane: 'Development' },
+  { seat: 'reviewer', scope: 'Reviews submitted work and may request changes', plane: 'Development · review' },
+  { seat: 'merger', scope: 'Lands cleared work into the integration line', plane: 'Development' },
+];
+
+const topologies = [
+  {
+    n: '01', title: 'One person · laptop', tag: 'Current small shape',
+    body: 'One local Beadhive host and one or more hive repos. Keep HQ local until backup or a second host matters. The local runtime can plan, dispatch, review, and merge on that machine.',
+    status: 'shipped',
+  },
+  {
+    n: '02', title: 'Two people · shared desktop', tag: 'Needs validation',
+    body: 'A shared always-on host could be the single executor and lease holder, with separate human/seat identities for the two people. The product docs do not yet define OS-user isolation, shared checkout ownership, or credential boundaries for this setup.',
+    status: 'direction',
+  },
+  {
+    n: '03', title: 'One cloud VPS', tag: 'Host today · Frame adapter proposed',
+    body: 'The current Linux host-provision path configures executor/transient/viewer roles; `bh host lease adopt` establishes the primary lease for a selected hive. A provider-specific VPS Bead Frame adapter is planned: pinned NixOS image or slower nixos-anywhere path, enrollment, secret bootstrap, admission, then dispatch.',
+    status: 'direction',
+  },
+  {
+    n: '04', title: 'Several Frames · many repos', tag: 'Admission and routing are proposals',
+    body: 'Attach Frames to one or more hives. The draft allows one active Frame per hive; other Frames are drained or parked for failover. A Frame can serve multiple hives, but there is no shipped cross-hive capacity scheduler or same-hive parallel execution.',
+    status: 'proposed',
+  },
+];
+
+const sources = [
+  { label: 'Bead Frame provisioning · published revision 5', href: 'https://claude.ai/artifact/KWuP12oCbrJqJDPgUYSxvW' },
+  { label: 'Runtime tiers and dispatcher loop', href: 'https://github.com/beadhive/beadhive/blob/main/docs/WORK.md#runtime-tiers--workruntime' },
+  { label: 'Role and seat RBAC target', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/roles-rbac-matrix.md' },
+  { label: 'Hub across multiple hives', href: 'https://github.com/beadhive/beadhive/blob/main/docs/HUB.md' },
+];
+---
+
+<Layout active="frame-model" title={meta.title} description={meta.description}>
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#identity">Host role is not a seat</a>
+    <a class="head" href="#loops">The dispatcher loops</a>
+    <a class="head" href="#topologies">Compute shapes</a>
+    <a class="head" href="#enrollment">Frame provisioning</a>
+    <a class="head" href="#install">Toolchain + delivery</a>
+    <a class="head" href="#sources">Sources</a>
+  </nav>
+  <div class="pagemain">
+<div class="frame-map">
+  <header class="frame-hero">
+    <div class="frame-hero-grid">
+      <div>
+        <div class="eyebrow display"><span class="chap">06</span> Frames</div>
+        <h1 class="display doc-title">One hive of work. Many ways to host it.</h1>
+        <p class="doc-lede">Separate the identity that owns a machine from the seat that performs an action. Then scale compute around hives, with the current lease rules kept visible.</p>
+        <div class="frame-legend">
+          <span class="status shipped">shipped</span>
+          <span class="status direction">current seam / intended shape</span>
+          <span class="status proposed">provisioning draft</span>
+        </div>
+      </div>
+      <aside class="frame-readout">
+        <div class="readout-title"><span>FRAME CONTRACT</span><b>WIP · REV 5</b></div>
+        <strong>frame.beadhive.ai/<br />v1alpha1</strong>
+        <p>Review proposal dated 2026-09-29. The generic frame repo is still empty; the published design is not a shipped provisioning product.</p>
+        <a href="https://claude.ai/artifact/KWuP12oCbrJqJDPgUYSxvW">Open the published design ↗</a>
+      </aside>
+    </div>
+    <div class="frame-stats">
+      <span><small>HOST LEASE</small><b>One primary per hive</b></span>
+      <span><small>LOCAL DISPATCH</small><b>Implemented</b></span>
+      <span><small>FLEET SCHEDULER</small><b>Not shipped</b></span>
+    </div>
+  </header>
+
+  <section class="frame-section" id="identity">
+    <div class="frame-section-head">
+      <div><p class="frame-kicker">01 / TWO IDENTITY LAYERS</p><h2 class="display">Host role is not an agent seat.</h2></div>
+      <p>A host role governs lease tenure and machine participation. A seat scopes the authority for one action.</p>
+    </div>
+    <div class="identity-grid">
+      <article class="info-panel">
+        <div class="panel-label"><span>HOST ROLE</span><small>CURRENT</small></div>
+        <h3>Who may own execution?</h3>
+        <div class="role-list">
+          {hostRoles.map((item) => <div class="role-row"><b>{item.role}</b><span>{item.purpose}</span><i class="status-chip current">current</i></div>)}
+        </div>
+        <p class="panel-note">The lease is per hive and fenced through HQ. A viewer stays useful for reading and filing without becoming the write primary.</p>
+      </article>
+      <article class="info-panel seat-panel">
+        <div class="panel-label"><span>INFERENCE SEAT</span><small>WORKFLOW IDENTITY</small></div>
+        <h3>What may this session do now?</h3>
+        <div class="seat-list">
+          {workSeats.map((item) => <div class="seat-row"><b>{item.seat}</b><span>{item.scope}</span><small>{item.plane}</small></div>)}
+        </div>
+    <p class="panel-note">A session may hold different seats over time, but each <code>bh</code> action is stamped as one seat. The RBAC matrix marks Control, Planning, and Integration operational; its least-privilege reconciliation and some naming changes remain work in progress.</p>
+      </article>
+    </div>
+    <aside class="change-note"><strong>Role direction</strong><span>The target matrix folds epic-coordinator, epic-coordinator-deep, and foreman into dispatcher modes; “deep” becomes the <code>sub-dispatch:1</code> capability. It renames <code>crew/</code> to <code>dev/</code>. The matrix is a target-state design, so website copy should not imply every rename is already complete.</span></aside>
+  </section>
+
+  <section class="frame-section loop-section" id="loops">
+    <div class="frame-section-head">
+      <div><p class="frame-kicker">02 / THE DISPATCHER LOOPS</p><h2 class="display">A hive picker starts molecule loops.</h2></div>
+      <p>Two loops run at different scopes. Neither is a cross-hive scheduler.</p>
+    </div>
+    <div class="loop-stack">
+      <article class="loop-card hive-loop">
+        <div class="loop-index">A</div><div class="loop-body">
+          <div class="loop-title"><h3>Per-hive picker</h3><span class="status-chip current">implemented</span></div>
+          <p><code>bh host dispatch run --hive H</code> checks the host lease, reaps finished children, then starts kicked-off epics from <code>bd ready</code> order when capacity is available.</p>
+          <div class="loop-facts"><span><small>DEFAULT CAP</small><b>3 epic loops</b></span><span><small>POLL</small><b>10 seconds</b></span><span><small>SUPERVISOR</small><b>systemd user unit</b></span></div>
+        </div>
+      </article>
+      <div class="loop-connector"><span>one child per molecule</span></div>
+      <article class="loop-card molecule-loop">
+        <div class="loop-index">B</div><div class="loop-body">
+          <div class="loop-title"><h3>Per-molecule loop</h3><span class="status-chip current">implemented</span></div>
+          <p><code>bh work loop &lt;epic&gt;</code> checks gates, reclaims stale work, renews the host lease while active, heartbeats claims, harvests seats, claims the next bead safely, and spawns the role binary.</p>
+          <div class="loop-facts"><span><small>SEAT CAP</small><b>Configured per epic</b></span><span><small>RECOVERY</small><b>Re-derive from beads</b></span><span><small>PROCESS SAFETY</small><b>Own process group</b></span></div>
+        </div>
+      </article>
+    </div>
+    <div class="runtime-row">
+      <div class="runtime-label"><p class="frame-kicker">RUNTIME SEAM</p><h3>One config key.<br />Uneven implementation.</h3><code>work.runtime</code></div>
+      <div class="runtime-tier"><b>claude</b><span>Task-tool fanout from a human or headless Claude dispatcher session.</span><i>Documented behavior · harness-bound</i></div>
+      <div class="runtime-tier is-live"><b>local</b><span>Poll loop + subprocess supervision. Harness-agnostic default; no extra server.</span><i>Implemented · <code>bh work loop</code></i></div>
+      <div class="runtime-tier is-future"><b>temporal</b><span>Workers polling task queues for multi-machine operation.</span><i>Not implemented</i></div>
+    </div>
+    <p class="loop-footnote">Lifecycle state stays in Beads: gates, claims, heartbeats, and merge slots. The per-hive picker deliberately does no cross-hive arbitration or budget reasoning. systemd is the only installed dispatch supervisor today; launchd and container backends are named but unimplemented.</p>
+  </section>
+
+  <section class="frame-section topology-section" id="topologies">
+    <div class="frame-section-head">
+      <div><p class="frame-kicker">03 / COMPUTE SHAPES</p><h2 class="display">Start local. Add frames when reach requires it.</h2></div>
+      <p>The desktop/cloud/cluster view below follows the new Frame draft. It replaces the old onboarding topology picture.</p>
+    </div>
+    <div class="topology-grid">
+      {topologies.map((item) => <article class={`topology-card ${item.status}`}>
+        <div class="topology-top"><span>{item.n}</span><i class={`status-chip ${item.status}`}>{item.tag}</i></div>
+        <h3>{item.title}</h3><p>{item.body}</p>
+      </article>)}
+    </div>
+    <div class="frame-cluster" aria-label="One active frame per hive scheduling sketch">
+      <div class="cluster-hub"><small>HQ / REGISTRY</small><b>many repos<br />many hives</b><span>versioned config + lease coordination</span></div>
+      <div class="cluster-lines"><i></i><i></i><i></i></div>
+      <div class="cluster-frames">
+        <article><small>FRAME A · ACTIVE</small><b>Hive: repo-alpha</b><span>executor · eligible</span></article>
+        <article><small>FRAME B · ACTIVE</small><b>Hive: repo-beta</b><span>executor · eligible</span></article>
+        <article class="standby"><small>FRAME C · DRAINED</small><b>Hive: repo-alpha</b><span>failover capacity · not running work</span></article>
+      </div>
+      <p class="cluster-caption">Different hives may run on different active Frames. A second Frame attached to the same hive is standby/failover under the proposal, not parallel same-hive capacity.</p>
+    </div>
+    <div class="shape-strip"><span>VM / Proxmox</span><span>Cloud VM / EC2 · VPS</span><span>Compose</span><span>Kubernetes Pod</span><span>Managed sandbox</span><span>Existing Linux host</span></div>
+    <p class="loop-footnote">Frame shapes are proposed adapters, not a shipping support matrix. The draft chooses NixOS for VM/cloud VM shapes, OCI images from the same flake for container/pod/sandbox shapes, and Debian + Nix via System Manager with Ansible fallback for host convergence.</p>
+  </section>
+
+  <section class="frame-section onboarding-section" id="enrollment">
+    <div class="frame-section-head">
+      <div><p class="frame-kicker">04 / FRAME PROVISIONING</p><h2 class="display">Allocate, enroll, prove, admit.</h2></div>
+      <p>Dispatch stays off until the frame is trusted, healthy, and the product eligibility gates exist.</p>
+    </div>
+    <ol class="enroll-flow">
+      <li><span>01</span><b>Plan + apply</b><small>Allocate VM, pod, or sandbox; pin the release digest.</small></li>
+      <li><span>02</span><b>Inject enrollment</b><small>Strict non-secret contract plus bootstrap credential reference.</small></li>
+      <li><span>03</span><b>Resolve secrets</b><small>fnox maps logical names to the chosen vault; secrets enter tmpfs.</small></li>
+      <li><span>04</span><b>Register pending</b><small><code>bh host provision</code> then HQ push; report health and signed heartbeat.</small></li>
+      <li><span>05</span><b>Attest + admit</b><small>Check identity, release, capabilities, conformance, and three verified beats.</small></li>
+      <li><span>06</span><b>Enable dispatch</b><small>Only an admitted, eligible frame may claim for its hive.</small></li>
+    </ol>
+    <div class="two-notes">
+      <article><p class="frame-kicker">IDENTITY ATTESTATION</p><h3>Prove the frame before it runs.</h3><p>The draft defaults to manual operator admission. It defines operator, cloud instance identity, Kubernetes service-account, and sandbox API attestors. A frame's SSH key is reused for HQ/hive Git access and commit/heartbeat signing; it is a separate concept from test attest keys.</p></article>
+      <article><p class="frame-kicker">SAFE SHUTDOWN</p><h3>Drain to remote before parking.</h3><p>Stop taking claims, let seats finish to a deadline, push branches and bead state, release leases, and record a clean checkpoint. Live session suspend/resume remains blocked on a gateway contract; a provider memory snapshot does not count as a work checkpoint.</p></article>
+    </div>
+  </section>
+
+  <section class="frame-section install-section" id="install">
+    <div class="frame-section-head">
+      <div><p class="frame-kicker">05 / TOOLCHAIN + DELIVERY</p><h2 class="display">Pin the tools. Deliver an immutable frame.</h2></div>
+      <p>Beads and Dolt are part of the runtime chain; a standalone central Dolt service is optional.</p>
+    </div>
+    <div class="install-grid">
+      <article class="install-terminal">
+        <div class="terminal-top"><i></i><i></i><i></i><span>WHERE THE PINS LIVE</span></div>
+        <code><b>$ bh setup check</b><br />bd · dolt · gh · git-workspace<br /><br /><b>flake.nix</b> → <a href="https://github.com/beadhive/beadhive/blob/main/flake.nix">pinned versions ↗</a></code>
+      </article>
+      <div class="install-copy">
+        <p><strong>Current Beadhive install:</strong> the managed Nix route pins the driver toolchain, then <code>uv tool install --force 'beadhive[otel]'</code> installs the Python <code>bh</code> CLI; <code>bh setup check</code> verifies the tools it drives. The PyPI/uv route installs <code>bh</code> only and leaves <code>bd</code>, Dolt, GitHub CLI, and git-workspace to the operator.</p>
+        <p><strong>Beads</strong> provides the per-hive bead store and the optional <code>bd serve</code> API. A hive's data lives on one shared local Dolt SQL server per host that <code>bd</code> starts for you; the managed toolchain and the Frame draft pin the same Dolt release, and the pin is deliberately not the newest Dolt. The older per-hive <em>embedded</em> mode is legacy and has its own documented minimum Dolt version for the <code>bd dolt pull</code> hang — "any Dolt 2.x" is too broad. The exact pins live in the repo's <a href="https://github.com/beadhive/beadhive/blob/main/flake.nix">flake</a> and <a href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">INSTALL.md</a>, never here.</p>
+        <p><code>bh dolt up</code> starts a separate, optional <em>central</em> Dolt service; it is not required for ordinary local operation. The Frame proposal's future <code>dolt-server</code> HQ mode is another distinct fleet control-plane option.</p>
+        <div class="build-flow"><span>pinned source + lock</span><b>→</b><span>builder signs closure / image</span><b>→</b><span>artifact store by digest</span><b>→</b><span>frame activates</span></div>
+        <p class="limitation"><b>Implementation gap:</b> Beadhive's current flake is toolchain-only. It has no NixOS module, OCI outputs, or Nix-built <code>bh</code>; the Nix-built <code>bh</code> package is the first hard blocker for a proper NixOS frame.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="frame-sources" id="sources">
+    <div><p class="frame-kicker">SOURCE NOTES</p><h2 class="display">Draft status stays visible.</h2><p>The September 29 homelab document is WIP revision 5. Its D1–D16 decisions await review; the frame and homelab rollout work has not been filed or applied. Use it as the updated topology source, not the older onboarding diagrams.</p></div>
+    <ul>{sources.map((item) => <li><a href={item.href}>{item.label} ↗</a></li>)}</ul>
+  </section>
+</div>
+  </div>
+</div>
+
+<style>
+  .frame-map { max-width: 1240px; margin: 0 auto; padding: 0 32px 96px; color: var(--ink); }
+  .frame-hero { padding: 26px 0 26px; border-bottom: 1px solid var(--hairline); }
+  .frame-eyebrow, .frame-kicker { color: var(--honey-strong); font: 700 .68rem/1.3 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase; }
+  .frame-eyebrow { display: flex; align-items: center; gap: 12px; margin: 0 0 30px; }
+  .frame-eyebrow span { width: 48px; border-top: 1px solid var(--mark-line); }
+  .frame-hero-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(250px, .72fr); gap: 44px; align-items: center; }
+  .frame-kicker { margin: 0 0 12px; }
+  .frame-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+  .frame-readout, .info-panel, .topology-card, .two-notes article { border: 1px solid var(--hairline); background: var(--panel); }
+  .frame-readout { padding: 22px; border-top: 2px solid var(--honey); }
+  .readout-title, .panel-label, .loop-title, .topology-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .readout-title { color: var(--ink-3); font: 700 .62rem "JetBrains Mono", ui-monospace, monospace; letter-spacing: .1em; }
+  .readout-title b { color: var(--honey-strong); font-size: .59rem; }
+  .frame-readout strong { display: block; margin-top: 24px; color: var(--ink); font: 600 1.55rem/1.25 "JetBrains Mono", ui-monospace, monospace; }
+  .frame-readout p { color: var(--ink-2); font-size: .84rem; line-height: 1.55; }
+  .frame-readout a, .frame-sources a { color: var(--honey-strong); text-decoration-color: var(--mark-line); text-underline-offset: 4px; }
+  .frame-readout a { font-size: .78rem; }
+  .frame-stats { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 27px; border: 1px solid var(--hairline); background: var(--panel); }
+  .frame-stats span { padding: 15px 17px; border-right: 1px solid var(--hairline); }.frame-stats span:last-child { border: 0; }
+  .frame-stats small, .loop-facts small { display: block; color: var(--ink-3); font: 600 .58rem "JetBrains Mono", ui-monospace, monospace; letter-spacing: .1em; }
+  .frame-stats b { display: block; margin-top: 7px; font-size: .85rem; }
+  .frame-section { padding: 75px 0 0; }
+  .frame-section-head { display: flex; justify-content: space-between; align-items: end; gap: 30px; margin-bottom: 24px; }
+  .frame-section-head h2, .frame-sources h2 { margin: 0; }
+  .frame-section-head > p { max-width: 400px; margin: 0 0 5px; color: var(--ink-2); line-height: 1.55; font-size: .91rem; }
+  .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .info-panel { padding: 22px; }
+  .panel-label { color: var(--honey-strong); font: 700 .62rem "JetBrains Mono", ui-monospace, monospace; letter-spacing: .1em; }
+  .panel-label small { color: var(--ink-3); font-size: .58rem; }
+  .info-panel h3 { margin: 19px 0; font-size: 1.35rem; letter-spacing: -.02em; }
+  .role-row { display: grid; grid-template-columns: 92px 1fr auto; gap: 10px; align-items: center; min-height: 51px; border-top: 1px solid var(--hairline); }
+  .role-row b, .seat-row b { font: 600 .78rem "JetBrains Mono", ui-monospace, monospace; color: var(--ink); }
+  .role-row span, .seat-row span { color: var(--ink-2); font-size: .77rem; line-height: 1.4; }
+  .status-chip { display: inline-flex; align-items: center; padding: 5px 7px; border: 1px solid var(--hairline); color: var(--ink-3); font: 600 .55rem "JetBrains Mono", ui-monospace, monospace; letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
+  .status-chip.current, .status-chip.shipped { color: var(--green); border-color: color-mix(in srgb, var(--green) 34%, transparent); background: var(--green-wash); }
+  .status-chip.direction { color: var(--honey-strong); border-color: color-mix(in srgb, var(--honey) 40%, transparent); background: var(--honey-wash); }
+  .status-chip.proposed { color: var(--ink-2); border-style: dashed; }
+  .seat-row { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; padding: 10px 0; border-top: 1px solid var(--hairline); }
+  .seat-row small { grid-column: 2; color: var(--honey-strong); font: 600 .59rem "JetBrains Mono", ui-monospace, monospace; }
+  .panel-note { margin: 17px 0 0; padding-top: 13px; border-top: 1px solid var(--hairline); color: var(--ink-3); font-size: .72rem; line-height: 1.55; }
+  .panel-note code, .change-note code, .loop-card code, .install-copy code, .enroll-flow code { color: var(--honey-strong); font-size: .88em; }
+  .change-note { display: grid; grid-template-columns: 145px 1fr; gap: 14px; margin-top: 16px; padding: 16px 18px; border-left: 2px solid var(--honey); background: var(--honey-wash); color: var(--ink-2); font-size: .78rem; line-height: 1.55; }
+  .change-note strong { color: var(--honey-strong); }
+  .loop-stack { max-width: 880px; margin: 0 auto; }
+  .loop-card { display: grid; grid-template-columns: 56px 1fr; gap: 15px; padding: 20px; border: 1px solid var(--hairline); background: var(--panel); }
+  .loop-index { display: grid; place-items: center; width: 43px; height: 43px; border: 1px solid var(--mark-line); color: var(--honey-strong); font: 700 1rem "JetBrains Mono", ui-monospace, monospace; }
+  .loop-title h3 { margin: 0; font-size: 1.16rem; }
+  .loop-card p { max-width: 700px; color: var(--ink-2); font-size: .85rem; line-height: 1.65; }
+  .loop-facts { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 17px; padding-top: 14px; border-top: 1px solid var(--hairline); }
+  .loop-facts b { display: block; margin-top: 6px; font-size: .74rem; }
+  .loop-connector { height: 45px; border-left: 1px dashed var(--mark-line); margin-left: 41px; display: flex; align-items: center; padding-left: 16px; }
+  .loop-connector span { padding: 4px 8px; color: var(--ink-3); background: var(--bg); font: 600 .59rem "JetBrains Mono", ui-monospace, monospace; text-transform: uppercase; }
+  .runtime-row { display: grid; grid-template-columns: 1.08fr repeat(3,1fr); gap: 10px; margin-top: 25px; }
+  .runtime-label, .runtime-tier { padding: 17px; border: 1px solid var(--hairline); background: var(--panel); }
+  .runtime-label h3 { margin: 0 0 10px; font-size: 1.05rem; }.runtime-label code { color: var(--ink-3); font-size: .7rem; }
+  .runtime-tier { display: flex; flex-direction: column; min-height: 160px; }
+  .runtime-tier > b { color: var(--ink); font: 700 1.1rem "JetBrains Mono", ui-monospace, monospace; }
+  .runtime-tier > span { margin-top: 12px; color: var(--ink-2); font-size: .76rem; line-height: 1.5; }
+  .runtime-tier > i { margin-top: auto; padding-top: 13px; color: var(--ink-3); font-size: .65rem; font-style: normal; }
+  .runtime-tier.is-live { border-color: color-mix(in srgb, var(--green) 45%, transparent); }.runtime-tier.is-live > i { color: var(--green); }
+  .runtime-tier.is-future { border-style: dashed; }.runtime-tier.is-future > i { color: var(--honey-strong); }
+  .loop-footnote { margin: 16px 0 0; color: var(--ink-3); font-size: .75rem; line-height: 1.65; }
+  .topology-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+  .topology-card { padding: 21px; min-height: 220px; border-top: 2px solid var(--hairline); }
+  .topology-card.shipped { border-top-color: var(--green); }.topology-card.direction { border-top-color: var(--honey); }.topology-card.proposed { border-top-style: dashed; border-top-color: var(--ink-3); }
+  .topology-top > span { color: var(--ink-3); font: 600 .72rem "JetBrains Mono", ui-monospace, monospace; }
+  .topology-card h3 { margin: 27px 0 9px; font-size: 1.22rem; letter-spacing: -.025em; }
+  .topology-card p { margin: 0; color: var(--ink-2); font-size: .79rem; line-height: 1.65; }
+  .frame-cluster { display: grid; grid-template-columns: 180px 56px 1fr; align-items: center; gap: 12px; margin-top: 22px; padding: 22px; border: 1px solid var(--hairline); background: var(--panel); }
+  .cluster-hub { padding: 16px; border: 1px solid var(--mark-line); background: var(--honey-wash); }
+  .cluster-hub small, .cluster-frames small { display: block; color: var(--honey-strong); font: 600 .56rem "JetBrains Mono", ui-monospace, monospace; letter-spacing: .08em; }
+  .cluster-hub b { display: block; margin: 10px 0; font-size: 1.05rem; }.cluster-hub span, .cluster-frames span { display: block; color: var(--ink-3); font-size: .65rem; line-height: 1.45; }
+  .cluster-lines { display: flex; flex-direction: column; justify-content: center; height: 160px; gap: 27px; }.cluster-lines i { border-top: 1px solid var(--mark-line); }
+  .cluster-frames { display: grid; grid-template-columns: repeat(3,1fr); gap: 9px; }
+  .cluster-frames article { padding: 12px; border: 1px solid color-mix(in srgb, var(--green) 35%, transparent); background: var(--green-wash); }.cluster-frames article.standby { border-style: dashed; border-color: var(--hairline); background: var(--panel-2); }
+  .cluster-frames article.standby small { color: var(--ink-3); }.cluster-frames b { display: block; margin: 9px 0; font-size: .71rem; }
+  .cluster-caption { grid-column: 1/-1; margin: 8px 0 0; color: var(--ink-3); font-size: .7rem; line-height: 1.5; }
+  .shape-strip { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }.shape-strip span { padding: 7px 9px; border: 1px solid var(--hairline); color: var(--ink-2); font: 600 .61rem "JetBrains Mono", ui-monospace, monospace; }
+  .enroll-flow { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; list-style: none; margin: 0; padding: 0; counter-reset: enroll; }
+  .enroll-flow li { position: relative; min-height: 144px; padding: 16px; border: 1px solid var(--hairline); background: var(--panel); }
+  .enroll-flow li > span { display: block; color: var(--honey-strong); font: 600 .62rem "JetBrains Mono", ui-monospace, monospace; }
+  .enroll-flow b { display: block; margin: 18px 0 7px; font-size: .9rem; }.enroll-flow small { color: var(--ink-2); font-size: .72rem; line-height: 1.5; }
+  .two-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 15px; }.two-notes article { padding: 18px; }
+  .two-notes h3 { margin: 0; font-size: 1.06rem; }.two-notes p:last-child { margin-bottom: 0; color: var(--ink-2); font-size: .77rem; line-height: 1.65; }
+  .install-grid { display: grid; grid-template-columns: minmax(245px,.68fr) minmax(0,1.32fr); gap: 24px; }
+  .install-terminal { align-self: start; border: 1px solid var(--hairline); background: var(--code-bg); }
+  .terminal-top { display: flex; align-items: center; gap: 5px; padding: 12px; border-bottom: 1px solid var(--hairline); }.terminal-top i { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }.terminal-top i:nth-child(2) { background: var(--honey); }.terminal-top i:nth-child(3) { background: var(--green); }.terminal-top span { margin-left: auto; color: var(--ink-3); font: 600 .52rem "JetBrains Mono", ui-monospace, monospace; }
+  .install-terminal > code { display: block; padding: 20px; color: var(--green); font: 500 .84rem/1.8 "JetBrains Mono", ui-monospace, monospace; }.install-terminal code b { color: var(--ink-2); }
+  .install-copy p { margin: 0 0 15px; color: var(--ink-2); font-size: .82rem; line-height: 1.68; }.install-copy strong { color: var(--ink); }.install-copy code { color: var(--honey-strong); }
+  .build-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 18px 0; padding: 14px; border: 1px solid var(--hairline); background: var(--panel); }.build-flow span { color: var(--ink); font: 600 .62rem "JetBrains Mono", ui-monospace, monospace; }.build-flow b { color: var(--honey); }
+  .install-copy p.limitation { padding: 13px; border-left: 2px solid var(--red); background: var(--red-wash); color: var(--ink-2); font-size: .73rem; }.limitation b { color: var(--red); }
+  .frame-sources { display: grid; grid-template-columns: 1fr .8fr; gap: 30px; margin-top: 82px; padding: 27px 0 0; border-top: 1px solid var(--hairline); }.frame-sources h2 { font-size: 1.8rem; }.frame-sources p { max-width: 680px; color: var(--ink-2); font-size: .77rem; line-height: 1.65; }.frame-sources ul { margin: 0; padding: 0; list-style: none; }.frame-sources li { padding: 10px 0; border-bottom: 1px solid var(--hairline); font-size: .77rem; }
+  @media (min-width: 1280px) { .frame-map { padding-left: 0; padding-right: 0; } }
+  @media (max-width: 850px) {
+    .frame-hero-grid, .identity-grid, .install-grid, .frame-sources { grid-template-columns: 1fr; }
+    .frame-stats { grid-template-columns: 1fr; }.frame-stats span { border-right: 0; border-bottom: 1px solid var(--hairline); }.frame-stats span:last-child { border-bottom: 0; }
+    .runtime-row { grid-template-columns: 1fr 1fr; }.runtime-label { grid-column: 1/-1; }
+    .frame-cluster { grid-template-columns: 1fr; }.cluster-lines { height: 30px; flex-direction: row; }.cluster-lines i { width: 28%; transform: rotate(90deg); }
+  }
+  @media (max-width: 560px) {
+    .frame-map { padding: 0 18px 64px; }.frame-hero { padding-top: 32px; }.frame-hero-grid { gap: 26px; }
+    .frame-section { padding-top: 55px; }.frame-section-head { display: block; }.frame-section-head > p { margin-top: 13px; }
+    .frame-stats span { padding: 12px; }.frame-stats b { font-size: .72rem; }.role-row { grid-template-columns: 78px 1fr; padding: 8px 0; }.role-row .status-chip { grid-column: 2; justify-self: start; }
+    .change-note { grid-template-columns: 1fr; gap: 6px; }.loop-card { grid-template-columns: 35px 1fr; padding: 14px; gap: 9px; }.loop-index { width: 31px; height: 31px; }
+    .loop-title { align-items: start; flex-direction: column; }.loop-facts { grid-template-columns: 1fr 1fr; }.runtime-row, .topology-grid, .enroll-flow, .two-notes, .cluster-frames { grid-template-columns: 1fr; }.runtime-label { grid-column: auto; }.topology-card { min-height: 0; }.cluster-lines { display: none; }.cluster-caption { grid-column: auto; }.build-flow { align-items: flex-start; flex-direction: column; }.build-flow b { transform: rotate(90deg); margin-left: 10px; }.frame-sources { margin-top: 60px; }
+  }
+</style>
+</Layout>
