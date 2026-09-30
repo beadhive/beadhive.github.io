@@ -32,10 +32,11 @@ export const meta = {
       <p><b>Beads</b> (<code>bd</code>) is a lightweight, git-embedded issue tracker with
       first-class dependency support — <em>"issues chained together like beads."</em> Each
       issue (a <b>bead</b>) is a structured record — type, status, priority, labels, typed
-      dependency edges, gates, comments, notes — stored in a versioned SQL database (Dolt)
-      inside the repo and distributed through git itself. There is no web app to log into and
-      no hosted service to run: the entire tracker is a local CLI, which is exactly what makes
-      it the right substrate for agents.</p>
+      dependency edges, gates, comments, notes — stored in a versioned SQL database (Dolt) that
+      <code>bd</code> serves locally, one shared server per host, started for you, and
+      distributed through git itself. There is no web app to log into and no hosted service:
+      the entire tracker is a local CLI, which is exactly what makes it the right substrate for
+      agents.</p>
 
       <h3 class="display" id="beads-efficient">Why it's more efficient for agents than a hosted tracker</h3>
       <p>An agent's scarcest resources are <b>context tokens</b> and <b>round-trips</b>. A
@@ -50,13 +51,15 @@ export const meta = {
         <li><b>Coordination primitives built in.</b> Atomic claims, gates,
         merge-slots, and a per-actor audit trail are tracker features, not conventions an
         agent must remember to follow.</li>
-        <li><b>Knowledge rides along.</b> <code>bd remember</code> / <code>bd memories</code>
-        persist insights next to the work, so learning survives the session that produced it.</li>
+        <li><b>Duplicates surface, not bury.</b> <code>bd find-duplicates</code> runs when a
+        report lands and again at triage, so a colliding request never buries the queue. (Beads
+        also ships a memory store; a hive keeps beads <em>issues only</em> and denies it — knowledge
+        belongs in the project's own records.)</li>
       </ul>
 
       <h3 class="display" id="beads-workgraph">The work-graph: one DAG across every repo and product</h3>
       <p>Because dependencies are typed edges (<em>blocks</em>, <em>related</em>,
-      <em>parent-child</em>, <em>discovered-from</em>), the backlog isn't a list — it's a
+      <em>parent-child</em>, <em>discovered-from</em>, among others), the backlog isn't a list — it's a
       traversable graph. Epics group beads into molecules; a <b>workstream</b> is just an epic
       whose children are epics — which is how a whole <em>product</em> is represented with no
       new machinery. Every repo is a hive, HQ aggregates them, and cross-hive references link
@@ -80,11 +83,11 @@ export const meta = {
       <svg viewBox="0 0 1160 420" role="img" aria-label="Diagram: two hive repos contain bead dependency chains linked by a cross-hive blocking edge and rolled up into a product workstream; agents query the graph with bd ready, blocked, and graph; the graph syncs bi-directionally with GitHub Issues, Jira, Linear, GitLab, and Azure DevOps for humans.">
         <defs>
           <marker id="w-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#9A8C71"/></marker>
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
           <marker id="w-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#C0563C"/></marker>
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/></marker>
           <marker id="w-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#C99038"/></marker>
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/></marker>
         </defs>
 
         <text class="lane-label" x="36" y="32">THE WORK-GRAPH — SPANS EVERY HIVE</text>
@@ -97,7 +100,7 @@ export const meta = {
         <path class="flow dashed" d="M126,106 L100,138" marker-end="url(#w-n)"/>
         <path class="flow dashed" d="M170,106 L272,138" marker-end="url(#w-n)"/>
 
-        <rect class="node" x="60" y="140" width="80" height="30" rx="6" style="stroke:#55996F;stroke-width:1.8"/>
+        <rect class="node" x="60" y="140" width="80" height="30" rx="6" style="stroke:var(--green);stroke-width:1.8"/>
         <text class="nsub" x="100" y="159" style="fill:var(--ink)">api-3</text>
         <path class="flow" d="M140,155 H158" marker-end="url(#w-n)"/>
         <rect class="node" x="160" y="140" width="80" height="30" rx="6"/>
@@ -113,7 +116,7 @@ export const meta = {
         <text class="nsub" x="126" y="300" style="fill:var(--honey-strong)">epic acme-web-1</text>
         <path class="flow dashed" d="M126,310 L100,336" marker-end="url(#w-n)"/>
 
-        <rect class="node" x="60" y="338" width="80" height="30" rx="6" style="stroke:#C0563C;stroke-width:1.8"/>
+        <rect class="node" x="60" y="338" width="80" height="30" rx="6" style="stroke:var(--red);stroke-width:1.8"/>
         <text class="nsub" x="100" y="357" style="fill:var(--ink)">web-4</text>
         <path class="flow" d="M140,353 H158" marker-end="url(#w-n)"/>
         <rect class="node" x="160" y="338" width="80" height="30" rx="6"/>
@@ -132,10 +135,10 @@ export const meta = {
 
         <!-- agent queries -->
         <text class="lane-label" x="560" y="60">AGENTS ASK THE GRAPH</text>
-        <rect class="node" x="560" y="76" width="230" height="40" rx="8" style="stroke:#55996F"/>
+        <rect class="node" x="560" y="76" width="230" height="40" rx="8" style="stroke:var(--green)"/>
         <text class="nlabel" x="675" y="93">bd ready</text>
         <text class="nsub" x="675" y="108">the unblocked frontier — anywhere</text>
-        <rect class="node" x="560" y="130" width="230" height="40" rx="8" style="stroke:#C0563C"/>
+        <rect class="node" x="560" y="130" width="230" height="40" rx="8" style="stroke:var(--red)"/>
         <text class="nlabel" x="675" y="147">bd blocked</text>
         <text class="nsub" x="675" y="162">what's stuck, and on what</text>
         <rect class="node" x="560" y="184" width="230" height="40" rx="8"/>
@@ -198,7 +201,8 @@ bd github sync           # mirror to / from the humans' board</code></pre>
         <p>Context windows compact, sessions die, threads reset. Beads is the durable shared
         memory that survives all of it: any agent runs <code>bd prime</code> and recovers the
         full project state. Work that must outlive a session goes in a bead, never a scratch
-        file — markdown TODOs as source of truth are explicitly prohibited.</p></div>
+        file — once a plan is filed, beads is the source of truth and the spec that produced it
+        is absorbed scaffolding.</p></div>
       <div class="card"><h3><span class="hexdot">⬢</span>"What next?" is computable</h3>
         <p>Issues form a dependency DAG, so <code>bd ready</code> mechanically yields the
         unblocked frontier. An agent never has to infer priorities from prose — the tracker
@@ -210,7 +214,7 @@ bd github sync           # mirror to / from the humans' board</code></pre>
         (<code>bd --actor</code>) so the audit trail says exactly who did what.</p></div>
       <div class="card"><h3><span class="hexdot">⬢</span>Git-native, serverless</h3>
         <p>Issue history rides <code>refs/dolt/data</code> on the repo's own remote.
-        Nothing to provision, nothing to pay for, nothing to be down: a fresh clone plus
+        Nothing hosted, nothing to pay for, nothing to be down: a fresh clone plus
         <code>bd bootstrap</code> is a fully hydrated tracker. Backup rides wherever the repo
         is mirrored. Distribution to a fleet of agents is just git.</p></div>
       <div class="card"><h3><span class="hexdot">⬢</span>Gates are machine-readable state</h3>

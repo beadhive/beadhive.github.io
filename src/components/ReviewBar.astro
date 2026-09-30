@@ -1,0 +1,39 @@
+---
+// The review switchboard. Renders nothing when REVIEW_MODE is off.
+import { REVIEW_MODE, FLAGS } from '../copy/review.ts';
+---
+{REVIEW_MODE && (
+  <details class="reviewbar">
+    <summary>⬡ review switches</summary>
+    <div class="reviewbar-body">
+      {FLAGS.map((f) => (
+        <label>
+          <span>{f.label}{f.note && <small>{f.note}</small>}</span>
+          <select data-flag={f.key} aria-label={f.label}>
+            {f.options.map((o) => <option value={o.value}>{o.label}</option>)}
+          </select>
+        </label>
+      ))}
+      <small>Local review only. Choices persist in this browser.</small>
+    </div>
+    <script is:inline define:vars={{ flags: FLAGS }}>
+      (function () {
+        var root = document.documentElement;
+        function stored(k) { try { return localStorage.getItem('review:' + k); } catch (e) { return null; } }
+        flags.forEach(function (f) {
+          var sel = document.querySelector('select[data-flag="' + f.key + '"]');
+          if (!sel) return;
+          var cur = root.dataset[camel(f.key)] || stored(f.key) || f.default;
+          sel.value = cur;
+          apply(f.key, cur);
+          sel.addEventListener('change', function () {
+            apply(f.key, sel.value);
+            try { localStorage.setItem('review:' + f.key, sel.value); } catch (e) {}
+          });
+        });
+        function camel(k) { return k.replace(/-([a-z])/g, function (_, c) { return c.toUpperCase(); }); }
+        function apply(k, v) { root.dataset[camel(k)] = v; }
+      })();
+    </script>
+  </details>
+)}

@@ -72,8 +72,10 @@ export const meta = {
         whoever held the seat.</p>
         <p><b>Payoff:</b> a bounce targets the process that produced the defect, not just the
         diff, so the correction sticks.</p></div></div>
-      <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>4</span></span> Hook up the telemetry</h4>
-        <p>Production signal joins the same graph the planner reads.</p>
+      <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>4</span></span> Hook up the telemetry <span class="status direction">direction</span></h4>
+        <p>Production signal joins the same graph the planner reads. Today <code>bh</code> exports
+        its own traces and metrics; the return path from production into plans is the part
+        still being built.</p>
         <p><b>Payoff:</b> an incident doesn't end at mitigation — it becomes a guardrail in
         the next plan, the loop everything else on this site exists to close.</p></div></div>
     </div>

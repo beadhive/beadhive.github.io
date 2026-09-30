@@ -15,7 +15,8 @@ export const meta = {
   <nav class="toc" aria-label="On this page">
     <p class="toc-title">On this page</p>
     <a class="head" href="#humans">One process, two kinds of worker</a>
-    <a class="head" href="#seats">Four planes, one spine</a>
+    <a class="head" href="#seats">The planes, one spine</a>
+    <a class="head" href="#hosts">Host roles are not seats</a>
     <a class="head" href="#harnesses">Which harness a seat runs under</a>
     <a class="head" href="#next">What's next</a>
   </nav>
@@ -35,12 +36,14 @@ export const meta = {
     <ul>
       <li><b>Humans hold the gates.</b> Plan approval and kickoff approval are explicit human
       checkpoints; the default review gate is <code>human</code>; a reviewer bounce sends the
-      bead back with written feedback rather than silently failing. <code>bd human</code>
-      exists to flag any decision for a person.</li>
+      bead back with written feedback rather than silently failing. Any decision can be parked
+      behind a <code>type:human</code> gate for a person, and a seat approving its own
+      submission is refused by default.</li>
       <li><b>Every agent signs its work.</b> In <code>agent</code> identity mode each worktree
       is stamped with a distinct author and a dedicated SSH signing key, so agent commits are
-      attributable and verifiable. In <code>supervised</code> mode the worktree inherits the
-      human's keys — "under my keys, with direct supervision."</li>
+      attributable and verifiable; refusing <em>unsigned</em> commits at merge is a per-hive
+      opt-in. In <code>supervised</code> mode the worktree inherits the human's keys — "under
+      my keys, with direct supervision."</li>
       <li><b>Seat typing is enforced.</b> An epic can only be started by a dispatcher
       (<code>disp/</code>), a leaf bead only claimed by a developer (<code>dev/</code>), a
       <code>security:*</code> gate only resolved by a warden. Humans (non-seat identities)
@@ -54,11 +57,17 @@ export const meta = {
 <section id="seats">
   <div class="wrap">
     <div class="eyebrow display">06 · Roles &amp; seats</div>
-    <h2 class="display">Four planes, one orchestration spine</h2>
+    <h2 class="display">The planes, one orchestration spine</h2>
     <p>Seats are separated by <b>blast radius</b>: the seat that routes work holds no secrets,
     the seat that holds secrets makes no decisions, the seat that observes writes nothing. A
     small single-hive factory collapses the four control seats into just the supervisor —
     deliberately, so the split is a designed merge, not an accident.</p>
+    <p class="lede-sm">Seat identities below are the prefixes <code>bh</code> stamps on every
+    action (<code>disp/</code>, <code>dev/</code>, …). The full matrix — who may resolve which
+    gate, which tools each seat is denied — is a <a href="https://github.com/beadhive/beadhive/blob/main/docs/design/roles-rbac-matrix.md">target-state
+    design</a> <span class="status direction">reconciling</span>: the prefixes and gate rules
+    ship; some renames and least-privilege tool lists are still being reconciled across docs
+    and agent definitions.</p>
 
     <div class="spine display">
       <b>supervisor</b> <span class="arr">→</span> <b>director</b> <span class="arr">→</span>
@@ -93,12 +102,12 @@ export const meta = {
       <div class="plane-h"><b>Planning plane</b><span>idea → gated molecule · human-interactive ·
         beads + decision records, never code</span></div>
       <div class="seatgrid">
-        <div class="seat"><div class="sid"><b>planner</b><code>plan</code></div>
+        <div class="seat"><div class="sid"><b>planner</b><code>plan/</code></div>
           <p>The cartographer. Drives ideate → research → architecture → decompose → file across
           three fidelity tiers (quick / spec / deep); files spike molecules when feasibility is
           open; owns replan and groom.</p>
           <div class="auth">authority: decomposition · <span class="no">no implement, no dispatch</span></div></div>
-        <div class="seat"><div class="sid"><b>analyst</b><code>sub-agent</code></div>
+        <div class="seat"><div class="sid"><b>analyst</b><code>analyst/</code></div>
           <p>Fire-and-forget research: codebase discovery plus external docs/web research,
           returning structured findings to the planner on deep-tier work.</p>
           <div class="auth">authority: none · read-only</div></div>
@@ -106,22 +115,24 @@ export const meta = {
     </div>
 
     <div class="plane">
-      <div class="plane-h"><b>Integration plane</b><span>molecule → merged · the
-        <code>bh work</code> loop · parallel devs, serial merge</span></div>
+      <div class="plane-h"><b>Development plane</b><span>the CLI calls it <em>Integration</em> ·
+        molecule → merged · the <code>bh work</code> loop · parallel devs, serial merge</span></div>
       <div class="seatgrid">
         <div class="seat"><div class="sid"><b>dispatcher</b><code>disp/</code></div>
           <p>Delivers an epic: opens the container branch, assigns beads, fans out developer
-          sub-agents (model per bead) or collapses onto a shared batch branch, watches gates.</p>
+          sub-agents (model per bead) or collapses onto a shared batch branch, watches gates.
+          The older epic-coordinator and foreman names fold into its modes.</p>
           <div class="auth">authority: scheduling · fanout mode never implements</div></div>
         <div class="seat"><div class="sid"><b>developer</b><code>dev/</code></div>
           <p>Implements one bead to a reviewable state in its own worktree: claim → implement →
-          show/refine → check → submit. Squashes its own noise into conventional digests.</p>
+          show/refine → check → submit. Squashes its own noise into conventional digests.
+          (<code>crew/</code> is the retired name; still recognised, with a warning.)</p>
           <div class="auth">authority: one bead · <span class="no">no merge, no lifecycle improv</span></div></div>
-        <div class="seat"><div class="sid"><b>reviewer</b><code>seat</code></div>
+        <div class="seat"><div class="sid"><b>reviewer</b><code>rev/</code></div>
           <p>Walks the submitted change: reads intent + diff, runs tests and a feature demo
           locally, checks acceptance criteria, then approves or bounces with written feedback.</p>
           <div class="auth">authority: gate verdict · <span class="no">read-only re: code</span></div></div>
-        <div class="seat"><div class="sid"><b>merger</b><code>seat</code></div>
+        <div class="seat"><div class="sid"><b>merger</b><code>merge/</code></div>
           <p>The merge owner. Serializes approved beads onto the green line via the merge slot,
           <code>--no-ff</code>, conflict ladder, escalates rather than drops work.</p>
           <div class="auth">authority: landing · <span class="no">no dispatch, no implement</span></div></div>
@@ -145,6 +156,42 @@ export const meta = {
       </div>
     </div>
 
+    <div class="plane">
+      <div class="plane-h"><b>Release plane</b><span>verbs ship · the seat is roadmap
+        <span class="status direction">seat: roadmap</span></span></div>
+      <div class="seatgrid">
+        <div class="seat"><div class="sid"><b>releaser</b><code>release/</code></div>
+          <p>Owns the guarded bump — <a href="/process/#release-bump">preflight, bump, attest,
+          await, atomic push</a> — and is the only seat that can clear a
+          <code>release-hold:</code> gate on a breaking change. The verbs run today; the seat is
+          not yet a staffed stage, so a human runs them.</p>
+          <div class="auth">authority: cut the version · <span class="no">no merge, no dispatch</span></div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="hosts">
+  <div class="wrap">
+    <div class="eyebrow display">Hosts</div>
+    <h2 class="display">Host roles are not seats</h2>
+    <p>A <b>seat</b> answers "what may this session do right now?" and is stamped per action. A
+    <b>host role</b> answers "may this machine own execution for a hive?" and governs a lease.
+    They are different layers and the vocabulary is kept apart on purpose:</p>
+    <div class="cardgrid">
+      <div class="card"><h3><span class="hexdot">⬢</span>executor</h3>
+        <p>Long-lived host. Holds a hive's <em>one</em> primary lease and runs its dispatcher
+        loops.</p></div>
+      <div class="card"><h3><span class="hexdot">⬢</span>transient</h3>
+        <p>Task- or CI-shaped host. Takes a lease for the job and releases it on exit.</p></div>
+      <div class="card"><h3><span class="hexdot">⬢</span>viewer</h3>
+        <p>Reads and files. Never claims, submits or merges — by definition, not by
+        configuration.</p></div>
+    </div>
+    <p>A session on an executor may hold several seats over a day; the executor still holds
+    exactly one lease per hive. How hosts are provisioned, leased and (proposed) enrolled as
+    Frames is on the <a href="/frame-model/">Frames page</a>.</p>
   </div>
 </section>
 
@@ -218,12 +265,14 @@ bh hive onboard --opencode              # …or for OpenCode</code></pre>
     <p>These are named so the direction is visible, not described — a guide that documents
     unbuilt work reads as finished when it isn't. Detail lands with the code.</p>
     <ul>
-      <li><b>Release</b> · cutting the version itself. The <a href="/process/#release">ordering
-      half already ships</a>; determination, changelog and tag are next</li>
-      <li><b>Contribution</b> · gated contributions to repos we don't own</li>
-      <li><b>Build</b> · pulling upstream progress into local build branches</li>
-      <li><b>Delivery</b> · reconciling a cut release into running systems</li>
-      <li><b>Ideation</b> · deriving candidate work from a repo's own vision documents</li>
+      <li><b>Release</b> · the <a href="/process/#release-bump">guarded bump ships</a>; the
+      releaser as a staffed seat, and changelog authorship, are next</li>
+      <li><b>Contribution</b> · gated contributions to repos we don't own (contributor seat)</li>
+      <li><b>Delivery</b> · reconciling a cut release into running systems (operator seat)</li>
+      <li><b>Ideation</b> · deriving candidate work from a repo's own vision and accumulated
+      evidence — intake and adoption ship today, the plane's states do not</li>
+      <li><b>Observation and Feedback</b> · named placeholders; owners, inputs and transitions
+      are undecided</li>
     </ul>
   </div>
 </section>

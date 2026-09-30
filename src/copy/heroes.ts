@@ -88,6 +88,29 @@ const orgbehind: Hero = {
   siteDescription,
 };
 
-const HERO: 'outrun' | 'keepup' | 'noslop' | 'orgbehind' = 'noslop';
+/** NEW (v0.20.1 pass) — speed-matching in the title, the record + gates in the lede. */
+const pace: Hero = {
+  eyebrow: 'Beadhive',
+  title: 'Engineering at the pace of the code',
+  lede:
+    'An open-source software factory. Agents run planning, review, integration and release at ' +
+    'the speed the code gets written; every hand-off is a record, and you hold the gates.',
+  siteTitle: 'Beadhive — engineering at the pace of the code',
+  siteDescription,
+};
 
-export const hero: Hero = { outrun, keepup, noslop, orgbehind }[HERO];
+/** NEW (v0.20.1 pass) — the whole line in the title, now that release ships. */
+const line: Hero = {
+  eyebrow: 'Beadhive',
+  title: 'From idea to a proven release, on one line',
+  lede:
+    'An open-source software factory: agents plan, build, review, merge and release at the ' +
+    'speed the code gets written. Nothing lands without evidence, and every gate defaults to you.',
+  siteTitle: 'Beadhive — from idea to a proven release, on one line',
+  siteDescription,
+};
+
+const HERO: 'outrun' | 'keepup' | 'noslop' | 'orgbehind' | 'pace' | 'line' = 'noslop';
+
+export const heroes = { outrun, keepup, noslop, orgbehind, pace, line } as const;
+export const hero: Hero = heroes[HERO];

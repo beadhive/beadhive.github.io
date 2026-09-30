@@ -1,0 +1,544 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+export const meta = {
+  order: 4.5,
+  label: 'Planes',
+  title: 'The factory planes · Beadhive',
+  description: 'A versioned map of the Beadhive work lifecycle: ideation, planning, development, release, validation evidence, and the planes still to be designed.',
+};
+
+const ideationFlow = [
+  { title: 'Idea or report', detail: 'Vision, roadmap, operator input' },
+  { title: 'Untriaged intake', detail: 'bh report · bh work intake' },
+  { title: 'Human triage', detail: 'accept · reject · reroute · promote' },
+  { title: 'Planning frame', detail: 'bh plan adopt' },
+];
+
+const planningFlow = [
+  { title: 'Ideate', detail: 'Frame the request with the human' },
+  { title: 'Research', detail: 'Read the repo and its constraints' },
+  { title: 'Architecture', detail: 'Decisions, trade-offs, open questions' },
+  { title: 'Decompose', detail: 'Issues + dependency graph' },
+  { title: 'File molecule', detail: 'bh plan file' },
+];
+
+const developmentFlow = [
+  { title: 'Ready work', detail: 'Approved roots surface to dispatch' },
+  { title: 'Assign + claim', detail: 'Dispatcher routes · developer claims' },
+  { title: 'Worktree', detail: 'Isolated branch for one bead' },
+  { title: 'Implement + refine', detail: 'Show history · shape clean commits' },
+  { title: 'Check + submit', detail: 'Validate a clean proposed tree' },
+];
+
+const landingFlow = [
+  { title: 'Review gates', detail: 'Review and security must clear' },
+  { title: 'Merge bead', detail: 'Serial merge into its molecule' },
+  { title: 'Finish molecule', detail: 'Validate and land the assembled work' },
+  { title: 'Integration line', detail: 'Main remains green' },
+];
+
+const releaseFlow = [
+  { title: 'Preflight', detail: 'Require green proof for current tree' },
+  { title: 'Bump + tag', detail: 'Creates a new, unproven tree' },
+  { title: 'Attest', detail: 'Run the release gate on that exact tree' },
+  { title: 'Await verdict', detail: 'Green permits push · red refuses' },
+  { title: 'Atomic push', detail: 'Main + tag together · remote tag is the boundary' },
+];
+
+const proofFlow = [
+  { title: 'Resolve keys', detail: 'Impact receipt selects what changed' },
+  { title: 'Reuse only proof', detail: 'Exact tree or proven unchanged closure' },
+  { title: 'Serialize identity', detail: 'Hive + tree + command hash' },
+  { title: 'Acquire slot', detail: 'Host-wide validation capacity' },
+  { title: 'Run + record', detail: 'Full clean green run earns proof' },
+];
+
+const references = [
+  { label: 'Planning plane + spike loop', href: 'https://github.com/beadhive/beadhive/blob/main/docs/PLANNING-PLANE.md' },
+  { label: 'Development lifecycle', href: 'https://github.com/beadhive/beadhive/blob/main/docs/WORK.md' },
+  { label: 'Graph-derived attest keys', href: 'https://github.com/beadhive/beadhive/blob/main/docs/ATTEST-KEYS.md' },
+  { label: 'Attested Green decisions', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/attested-green-adr.md' },
+  { label: 'Validation broker proposal', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/validation-broker-proposal.md' },
+];
+---
+
+<Layout active="planes" title={meta.title} description={meta.description}>
+<div class="system-map">
+  <header class="map-hero">
+    <p class="eyebrow display">Factory map <span class="eyebrow-rule"></span> local content preview</p>
+    <div class="hero-grid">
+      <div>
+        <h1 class="display">One idea.<br /><span>Four working planes.</span></h1>
+        <p class="hero-copy">A source-backed map of Beadhive <code>0.20.1</code>: where work begins,
+          how it earns its way to main, and what has to be true before a release leaves the hive.</p>
+        <div class="status-legend" aria-label="Status legend">
+          <span><i class="status-dot shipped"></i> In 0.20.1</span>
+          <span><i class="status-dot direction"></i> Direction / naming proposal</span>
+          <span><i class="status-dot proposed"></i> Design proposal</span>
+        </div>
+      </div>
+      <aside class="map-console" aria-label="Lifecycle overview">
+        <div class="console-head"><span>BEADHIVE / WORKFLOW</span><span>0.20.1</span></div>
+        <ol class="plane-spine">
+          <li class="spine-concept"><span class="spine-mark">I</span><span><b>Ideation</b><small>intake exists · plane is future</small></span><em>01</em></li>
+          <li><span class="spine-mark">P</span><span><b>Planning</b><small>idea → approved molecule</small></span><em>02</em></li>
+          <li><span class="spine-mark">D</span><span><b>Development</b><small>CLI calls this Integration</small></span><em>03</em></li>
+          <li><span class="spine-mark">R</span><span><b>Release</b><small>attested tree → atomic push</small></span><em>04</em></li>
+        </ol>
+        <div class="console-foot"><span>ASSURANCE</span><b>cross-cutting gates</b><span class="live-indicator">●</span></div>
+      </aside>
+    </div>
+    <div class="hero-readout">
+      <span><small>LOCAL CLI</small><b>bh 0.20.1</b></span>
+      <span><small>DEFAULT UI PALETTE</small><b>Mission Control</b></span>
+      <span><small>MERGE ≠ RELEASE</small><b>Two separate gates</b></span>
+    </div>
+  </header>
+
+  <section class="plane-section idea-section" id="ideation" aria-labelledby="ideation-title">
+    <div class="section-marker"><span>01</span><i></i><small>UPSTREAM / CONCEPT</small></div>
+    <div class="section-content">
+      <div class="section-heading">
+        <div><p class="kicker">IDEATION PLANE</p><h2 id="ideation-title" class="display">Turn signals into a useful question.</h2></div>
+        <span class="tag direction-tag">Future plane · intake ships today</span>
+      </div>
+      <p class="section-intro">Beadhive 0.20.1 has report intake and planner adoption, while a distinct
+        ideation plane is still a future concept. This transition shows the current entry points
+        without claiming that candidate discovery is automated.</p>
+      <ol class="state-flow flow-4" aria-label="Current intake path and proposed ideation handoff">
+        {ideationFlow.map((step, index) => (
+          <li class="state-node">
+            <span class="node-index">I{String(index + 1).padStart(2, '0')}</span>
+            <b>{step.title}</b>
+            <small>{step.detail}</small>
+          </li>
+        ))}
+      </ol>
+      <div class="branch-note"><span class="branch-arrow">↳</span>
+        <p><b>Design boundary</b> · <code>bh report</code> creates intake; triage can promote it;
+          <code>bh plan adopt</code> seeds a planning frame. A richer loop from repo vision and
+          accumulated feedback into candidate work needs its own contract.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="plane-section" id="planning" aria-labelledby="planning-title">
+    <div class="section-marker"><span>02</span><i></i><small>HUMAN-INTERACTIVE</small></div>
+    <div class="section-content">
+      <div class="section-heading">
+        <div><p class="kicker">PLANNING PLANE · SHIPPED</p><h2 id="planning-title" class="display">Shape a plan before work exists.</h2></div>
+        <span class="tag shipped-tag">Current state machine</span>
+      </div>
+      <p class="section-intro">The planner turns an idea into a dependency-linked molecule.
+        Planning produces bead specifications and decision records; implementation stays downstream.</p>
+      <ol class="state-flow flow-5" aria-label="Planning state machine">
+        {planningFlow.map((step, index) => (
+          <li class="state-node">
+            <span class="node-index">P{String(index + 1).padStart(2, '0')}</span>
+            <b>{step.title}</b>
+            <small>{step.detail}</small>
+          </li>
+        ))}
+      </ol>
+      <div class="gate-rail" aria-label="Planning exit gates">
+        <span class="gate-label">PLAN APPROVAL <small>Is the decomposition right?</small></span>
+        <span class="gate-connector" aria-hidden="true">→</span>
+        <span class="gate-label">KICKOFF APPROVAL <small>Should this work start now?</small></span>
+        <span class="gate-connector" aria-hidden="true">→</span>
+        <span class="ready-state"><b>Roots surface in <code>bd ready</code></b><small>Dispatcher may start the molecule</small></span>
+      </div>
+      <div class="branch-grid">
+        <article class="branch-card">
+          <span class="branch-title">SPIKE LOOP <i>when feasibility is open</i></span>
+          <p>Open question → file a spike molecule → development runs the spike → decision bead records a verdict.</p>
+          <div class="outcomes"><span><b>GO</b> · replan into implementation</span><span><b>NO-GO</b> · record ADR, close</span></div>
+        </article>
+        <article class="branch-card">
+          <span class="branch-title">REPLAN DOOR <i>one scoped re-entry</i></span>
+          <p>A spike verdict or mid-work discovery returns one molecule to planning. Backlog-wide reconciliation is groom, not replan.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="plane-section" id="development" aria-labelledby="development-title">
+    <div class="section-marker"><span>03</span><i></i><small>INTEGRATION LOOP</small></div>
+    <div class="section-content">
+      <div class="section-heading">
+        <div><p class="kicker">DEVELOPMENT PLANE · CLI NAME: INTEGRATION</p><h2 id="development-title" class="display">Move one bead through its gates.</h2></div>
+        <span class="tag shipped-tag">Current state machine</span>
+      </div>
+      <p class="section-intro">Parallel developers can work in separate worktrees; merges serialize.
+        A molecule lands as one assembled unit, keeping main green between releases.</p>
+      <ol class="state-flow flow-5" aria-label="Development work state machine, start through submission">
+        {developmentFlow.map((step, index) => (
+          <li class="state-node">
+            <span class="node-index">D{String(index + 1).padStart(2, '0')}</span>
+            <b>{step.title}</b>
+            <small>{step.detail}</small>
+          </li>
+        ))}
+      </ol>
+      <div class="handoff-label"><span>ACCEPTED SUBMISSION</span><i></i><small>Both required gates resolve before landing</small></div>
+      <ol class="state-flow flow-4 landing-flow" aria-label="Development landing path">
+        {landingFlow.map((step, index) => (
+          <li class="state-node landing-node">
+            <span class="node-index">D{String(index + 6).padStart(2, '0')}</span>
+            <b>{step.title}</b>
+            <small>{step.detail}</small>
+          </li>
+        ))}
+      </ol>
+      <div class="loop-grid">
+        <div class="loop-card return-loop"><b>REVIEW BOUNCE</b><span>Changes requested → developer resumes with written feedback → check and submit again.</span></div>
+        <div class="loop-card replan-loop"><b>BLOCKER / DISCOVERY</b><span>Evidence that invalidates the molecule returns through the planning plane's replan door.</span></div>
+      </div>
+      <p class="rule-note"><span class="rule-glyph">⬢</span> For a molecule, beads merge serially into its container branch. <code>bh work finish</code>
+        validates the assembled molecule and lands it as one <code>--no-ff</code> bubble.</p>
+    </div>
+  </section>
+
+  <section class="plane-section release-section" id="release" aria-labelledby="release-title">
+    <div class="section-marker"><span>04</span><i></i><small>LOW-FREQUENCY / GUARDED</small></div>
+    <div class="section-content">
+      <div class="section-heading">
+        <div><p class="kicker">RELEASE PLANE · SHIPPED</p><h2 id="release-title" class="display">Prove the bump tree before it leaves.</h2></div>
+        <span class="tag shipped-tag">Guarded release flow</span>
+      </div>
+      <p class="section-intro">The release gate runs against the exact tree created by the version bump.
+        A local tag can still be recovered; publication is the point of no return, so main and tag move atomically only after green.</p>
+      <ol class="state-flow flow-5" aria-label="Release state machine">
+        {releaseFlow.map((step, index) => (
+          <li class={`state-node ${index === 1 ? 'risk-node' : ''} ${index === 4 ? 'green-node' : ''}`}>
+            <span class="node-index">R{String(index + 1).padStart(2, '0')}</span>
+            <b>{step.title}</b>
+            <small>{step.detail}</small>
+          </li>
+        ))}
+      </ol>
+      <div class="release-detail">
+        <div><b>Read-only companion</b><code>bh release order</code><small>Strategy-preferred sequence for gated-ready work; advisory, not a version cut.</small></div>
+        <div><b>On a failed push</b><code>bh release recover</code><small>Measures the actual remote tag before choosing recovery. A network error means decide nothing.</small></div>
+        <div class="point-of-no-return"><b>Publication boundary</b><span>Before the tag reaches remote, recovery can undo locally. After publication, roll forward.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="evidence-section" id="attestation" aria-labelledby="attestation-title">
+    <div class="section-marker evidence-marker"><span>↗</span><i></i><small>CROSS-PLANE / EVIDENCE</small></div>
+    <div class="section-content">
+      <div class="section-heading">
+        <div><p class="kicker">VALIDATION + ATTESTATION</p><h2 id="attestation-title" class="display">Reuse proof only when its inputs still match.</h2></div>
+        <span class="tag shipped-tag">0.20.1 capability</span>
+      </div>
+      <p class="section-intro">Two reuse paths share a safety rule: proof is narrow, recent, and tied to what actually ran.
+        A reused key is not a claim that every key—or the new tree as a whole—is green.</p>
+      <div class="evidence-compare">
+        <article class="evidence-card">
+          <p class="micro-label">PATH A · EXACT-TREE VERDICT</p>
+          <h3>Same tree, same command.</h3>
+          <p>The ledger keys a completed green result by tree hash and command hash, with a freshness window.
+            Red, stale, missing, or ambiguous results run again. Git-metadata checks may still run on a cache hit.</p>
+          <div class="key-chip"><span>TREE</span><b>+ COMMAND HASH</b><span>+ FRESHNESS</span></div>
+        </article>
+        <article class="evidence-card">
+          <p class="micro-label">PATH B · GRAPH-DERIVED ATTEST KEYS</p>
+          <h3>Carry only unaffected keys.</h3>
+          <p>An impact receipt maps changed inputs to named validation keys. A key can carry from a current green source
+            only when its complete input closure is unchanged. Carries do not chain or refresh age.</p>
+          <div class="key-chip"><span>IMPACT RECEIPT</span><b>→ KEY CLOSURE</b><span>→ RUN OR CARRY</span></div>
+        </article>
+      </div>
+      <div class="conservative-callout"><span class="callout-icon">!</span><p><b>Unknown impact means full validation.</b>
+        <code>native-full</code> invalidates every key; selective validation is opt-in. Unowned paths,
+        resolver trouble, an unproven selector, and build-system changes fail closed to the complete key set.</p></div>
+      <div class="proof-pipeline">
+        <div class="pipeline-head"><b>THE VALIDATION PATH TODAY</b><small>per hive · host-wide capacity</small></div>
+        <ol class="state-flow flow-5" aria-label="Current validation and attestation path">
+          {proofFlow.map((step, index) => (
+            <li class="state-node proof-node">
+              <span class="node-index">V{String(index + 1).padStart(2, '0')}</span>
+              <b>{step.title}</b>
+              <small>{step.detail}</small>
+            </li>
+          ))}
+        </ol>
+        <div class="slot-facts">
+          <span><b>Slot default</b> <code>work.validation_slots: 1</code></span>
+          <span><b>Host override</b> <code>BH_VALIDATION_SLOTS</code></span>
+          <span><b>Same identity</b> serialized before admission</span>
+          <span><b>Green proof</b> one full, clean confirming run</span>
+        </div>
+      </div>
+      <article class="broker-proposal">
+        <div class="broker-stamp"><span>DESIGN</span><b>PROPOSAL</b><small>2026-09-26</small></div>
+        <div class="broker-copy">
+          <p class="micro-label">VALIDATION BROKER · NOT SHIPPED IN 0.20.1</p>
+          <h3>Make slots understand the work they admit.</h3>
+          <p>The current host-slot semaphore grants equal permits. The proposal replaces independent limits
+            with a host-wide queue: each opaque key command declares CPU, memory, and named-pool needs;
+            the broker admits the whole reservation, then passes the grant to the runner through an
+            environment contract. Priority and measured runtime guide the queue. The backend bake-off
+            considers pueue + a packer or HyperQueue; the ADR is still pending.</p>
+          <div class="broker-points"><span>Shared broker interface</span><span>Nested checks use their parent's grant</span><span>Resource-aware admission</span><span>Backend choice unresolved</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="future-section" id="future" aria-labelledby="future-title">
+    <div class="section-marker future-marker"><span>··</span><i></i><small>PLACEHOLDERS</small></div>
+    <div class="section-content">
+      <div class="section-heading">
+        <div><p class="kicker">NEXT PLANES · NOT SPECIFIED</p><h2 id="future-title" class="display">Leave room for the loop to learn.</h2></div>
+        <span class="tag future-tag">State machines TBD</span>
+      </div>
+      <div class="future-grid">
+        <article class="future-card">
+          <div class="future-title"><span>05</span><h3>Observation</h3></div>
+          <p>A placeholder for the eventual evidence-gathering plane. Inputs, states, seat ownership, and outputs remain to be designed.</p>
+          <div class="empty-rail"><i></i><i></i><i></i><i></i><b>FLOW TBD</b></div>
+        </article>
+        <article class="future-card">
+          <div class="future-title"><span>06</span><h3>Feedback</h3></div>
+          <p>The website already sketches a production-to-idea feedback edge; this separate plane needs an explicit contract before it is described as shipped.</p>
+          <div class="empty-rail"><i></i><i></i><i></i><i></i><b>FLOW TBD</b></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="source-section" id="sources" aria-labelledby="sources-title">
+    <div class="section-marker source-marker"><span>§</span><i></i><small>READ THE CONTRACTS</small></div>
+    <div class="section-content source-content">
+      <div><p class="kicker">SOURCE NOTES</p><h2 id="sources-title" class="display">Follow the implementation.</h2></div>
+      <ul>{references.map((reference) => <li><a href={reference.href}>{reference.label}<span aria-hidden="true">↗</span></a></li>)}</ul>
+      <p class="source-foot">Palette: the site's dark theme is the Beadhive UI's default <code>Mission Control</code>;
+        light mode keeps the brand's cream ground.</p>
+    </div>
+  </section>
+</div>
+</Layout>
+
+<style is:global>
+  .system-map {
+    --map-max: 92rem;
+    width: min(var(--map-max), 94vw);
+    margin: 0 auto;
+    padding: 38px 0 96px;
+  }
+  .system-map * { box-sizing: border-box; }
+  .system-map a { color: var(--honey-strong); }
+  .map-hero { padding: 22px 0 56px; }
+  .map-hero .eyebrow { display: flex; align-items: center; gap: 14px; margin: 0 0 27px; color: var(--honey-strong); font-size: .72rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+  .eyebrow-rule { height: 1px; width: 68px; background: var(--honey); opacity: .58; }
+  .hero-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(310px, .75fr); align-items: center; gap: clamp(36px, 8vw, 130px); }
+  .map-hero h1 { margin: 0 0 24px; max-width: 13ch; font-size: clamp(2.8rem, 6vw, 5.7rem); line-height: .98; letter-spacing: -.055em; }
+  .map-hero h1 span { color: var(--honey-strong); }
+  .hero-copy { max-width: 61ch; margin: 0; color: var(--ink-2); font-size: clamp(1rem, 1.4vw, 1.23rem); }
+  .hero-copy code { color: var(--ink); background: var(--panel-2); }
+  .status-legend { display: flex; flex-wrap: wrap; gap: 9px 20px; margin-top: 31px; color: var(--ink-2); font-size: .76rem; }
+  .status-legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 12px color-mix(in srgb, var(--green) 45%, transparent); }
+  .status-dot.direction { background: var(--honey); box-shadow: none; }
+  .status-dot.proposed { background: var(--ink-3); box-shadow: none; }
+  .map-console { border: 1px solid var(--hairline); border-radius: 9px; background: linear-gradient(150deg, var(--panel-2), var(--panel) 74%); box-shadow: 0 24px 70px color-mix(in srgb, var(--ink) 18%, transparent); overflow: hidden; }
+  .console-head, .console-foot { display: flex; align-items: center; gap: 10px; padding: 14px 18px; color: var(--ink-3); font: 600 .64rem/1.2 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .1em; }
+  .console-head { justify-content: space-between; border-bottom: 1px solid var(--hairline); }
+  .plane-spine { position: relative; display: grid; gap: 2px; list-style: none; margin: 0; padding: 12px 18px; }
+  .plane-spine::before { position: absolute; content: ""; left: 32px; top: 30px; bottom: 30px; border-left: 1px solid var(--hairline); }
+  .plane-spine li { position: relative; display: grid; grid-template-columns: 29px 1fr auto; align-items: center; gap: 13px; min-height: 64px; }
+  .spine-mark { z-index: 1; display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--honey); border-radius: 50%; background: var(--panel); color: var(--honey-strong); font: 700 .72rem/1 "JetBrains Mono", monospace; }
+  .spine-concept .spine-mark { border-style: dashed; color: var(--ink-2); border-color: var(--ink-3); }
+  .plane-spine b { display: block; font-size: .94rem; }
+  .plane-spine small { display: block; margin-top: 2px; color: var(--ink-3); font-size: .71rem; }
+  .plane-spine em { color: var(--hairline); font: normal .65rem/1 "JetBrains Mono", monospace; }
+  .console-foot { border-top: 1px solid var(--hairline); }
+  .console-foot b { color: var(--ink-2); font-size: .67rem; font-weight: 500; letter-spacing: 0; text-transform: none; }
+  .live-indicator { margin-left: auto; color: var(--green); font-size: .66rem; }
+  .hero-readout { display: flex; gap: 0; margin-top: 57px; border: 1px solid var(--hairline); border-width: 1px 0; }
+  .hero-readout span { display: grid; gap: 5px; flex: 1; padding: 17px 18px 16px 0; }
+  .hero-readout small, .micro-label { color: var(--ink-3); font: 600 .62rem/1.35 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .1em; }
+  .hero-readout b { font-size: .91rem; font-weight: 600; }
+  .plane-section, .evidence-section, .future-section, .source-section { display: grid; grid-template-columns: 185px minmax(0, 1fr); gap: clamp(26px, 5vw, 72px); padding: 55px 0 67px; border-top: 1px solid var(--hairline); }
+  .section-marker { display: flex; align-items: center; align-self: start; gap: 11px; padding-top: 6px; color: var(--ink-3); }
+  .section-marker > span { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--hairline); border-radius: 50%; color: var(--honey-strong); font: 600 .66rem/1 "JetBrains Mono", monospace; }
+  .section-marker > i { width: 20px; border-top: 1px solid var(--hairline); }
+  .section-marker small { font: 600 .58rem/1.35 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .08em; }
+  .section-content { min-width: 0; }
+  .section-heading { display: flex; align-items: start; justify-content: space-between; gap: 20px; margin-bottom: 15px; }
+  .kicker { margin: 0 0 10px; color: var(--honey-strong); font: 600 .66rem/1.4 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .12em; }
+  .section-heading h2, .source-content h2 { margin: 0; font-size: clamp(1.75rem, 3.5vw, 3rem); line-height: 1.08; letter-spacing: -.035em; text-wrap: balance; }
+  .tag { display: inline-flex; align-items: center; flex: none; min-height: 27px; padding: 5px 9px; border: 1px solid var(--hairline); border-radius: 4px; color: var(--ink-2); font: 600 .59rem/1.2 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .045em; text-transform: uppercase; }
+  .shipped-tag { border-color: color-mix(in srgb, var(--green) 35%, transparent); color: var(--green); }
+  .direction-tag { border-color: color-mix(in srgb, var(--honey) 38%, transparent); color: var(--honey-strong); }
+  .future-tag { border-style: dashed; color: var(--ink-3); }
+  .section-intro { max-width: 78ch; margin: 0 0 27px; color: var(--ink-2); font-size: .94rem; }
+  .state-flow { display: grid; gap: 17px; list-style: none; margin: 0; padding: 0; }
+  .flow-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .flow-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .state-node { position: relative; display: flex; min-width: 0; min-height: 113px; flex-direction: column; align-items: start; justify-content: center; padding: 15px 16px; border: 1px solid var(--hairline); border-radius: 5px; background: linear-gradient(145deg, color-mix(in srgb, var(--ink) 3%, transparent), transparent 65%), var(--panel); }
+  .state-node:not(:last-child)::after { position: absolute; z-index: 1; top: 50%; right: -14px; content: "→"; color: var(--honey-strong); font: 500 1rem/1 "JetBrains Mono", monospace; transform: translate(50%, -50%); }
+  .node-index { margin-bottom: 11px; color: var(--ink-3); font: 600 .58rem/1 "JetBrains Mono", monospace; letter-spacing: .1em; }
+  .state-node b { font-size: .86rem; line-height: 1.25; }
+  .state-node small { display: block; margin-top: 7px; color: var(--ink-3); font-size: .68rem; line-height: 1.45; }
+  .idea-section .state-node { border-style: dashed; }
+  .branch-note { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 4px; margin-top: 17px; padding: 12px 15px; border-left: 2px solid var(--honey); background: color-mix(in srgb, var(--honey) 045%, transparent); color: var(--ink-2); font-size: .78rem; }
+  .branch-arrow { color: var(--honey-strong); font: 700 .9rem/1.7 "JetBrains Mono", monospace; }
+  .branch-note p { margin: 0; }
+  .branch-note b { color: var(--ink); }
+  .branch-note code { color: var(--honey-strong); background: var(--honey-wash); }
+  .gate-rail { display: flex; align-items: center; gap: 14px; margin-top: 20px; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--honey) 25%, transparent); border-radius: 5px; background: var(--lane); }
+  .gate-label { display: grid; gap: 5px; min-width: 140px; color: var(--honey-strong); font: 700 .62rem/1.2 "JetBrains Mono", monospace; letter-spacing: .07em; }
+  .gate-label::before { content: "⬡"; font-size: .9rem; }
+  .gate-label small { color: var(--ink-3); font: 400 .67rem/1.3 system-ui, sans-serif; letter-spacing: 0; }
+  .gate-connector { color: var(--node-stroke); }
+  .ready-state { display: grid; gap: 5px; margin-left: auto; color: var(--green); font-size: .76rem; }
+  .ready-state small { color: var(--ink-3); font-size: .66rem; }
+  .ready-state code { color: var(--green); background: var(--green-wash); }
+  .branch-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 14px; }
+  .branch-card { padding: 16px 18px; border: 1px solid var(--hairline); border-radius: 5px; background: var(--panel); }
+  .branch-title { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; color: var(--honey-strong); font: 650 .64rem/1.3 "JetBrains Mono", monospace; letter-spacing: .07em; }
+  .branch-title i { color: var(--ink-3); font: normal .66rem/1.3 system-ui, sans-serif; letter-spacing: 0; }
+  .branch-card p { margin: 10px 0; color: var(--ink-2); font-size: .76rem; }
+  .outcomes { display: flex; flex-wrap: wrap; gap: 8px 17px; color: var(--ink-3); font-size: .68rem; }
+  .outcomes b { color: var(--green); }
+  .outcomes span + span b { color: var(--red); }
+  .handoff-label { display: flex; align-items: center; gap: 12px; margin: 23px 0 12px; color: var(--ink-3); font: 600 .6rem/1.2 "JetBrains Mono", monospace; letter-spacing: .08em; }
+  .handoff-label i { flex: 1; border-top: 1px dashed var(--hairline); }
+  .handoff-label small { font: 400 .67rem/1.3 system-ui, sans-serif; letter-spacing: 0; }
+  .landing-node { border-color: color-mix(in srgb, var(--green) 25%, transparent); background: linear-gradient(145deg, color-mix(in srgb, var(--green) 035%, transparent), transparent 70%), var(--panel); }
+  .landing-node:first-child { border-color: var(--hairline); }
+  .landing-node .node-index { color: var(--green); }
+  .landing-node:not(:last-child)::after { color: var(--green); }
+  .loop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; margin-top: 14px; }
+  .loop-card { display: grid; grid-template-columns: minmax(105px, .33fr) 1fr; gap: 10px; padding: 13px 15px; border: 1px solid color-mix(in srgb, var(--red) 28%, transparent); border-left: 3px solid var(--red); border-radius: 4px; background: var(--red-wash); }
+  .loop-card b { color: var(--red); font: 700 .6rem/1.5 "JetBrains Mono", monospace; letter-spacing: .06em; }
+  .loop-card span { color: var(--ink-2); font-size: .72rem; }
+  .replan-loop { border-color: color-mix(in srgb, var(--honey) 25%, transparent); border-left-color: var(--honey); background: var(--honey-wash); }
+  .replan-loop b { color: var(--honey-strong); }
+  .rule-note { display: flex; gap: 11px; align-items: start; margin: 20px 0 0; color: var(--ink-2); font-size: .78rem; }
+  .rule-glyph { color: var(--honey-strong); font-size: 1rem; }
+  .rule-note code { color: var(--ink); background: var(--panel-2); }
+  .release-section .section-marker > span { border-color: var(--honey); }
+  .risk-node { border-color: color-mix(in srgb, var(--red) 40%, transparent); background: linear-gradient(145deg, color-mix(in srgb, var(--red) 7%, transparent), transparent 75%), var(--panel); }
+  .risk-node .node-index, .risk-node b { color: var(--red); }
+  .risk-node:not(:last-child)::after { color: var(--honey-strong); }
+  .green-node { border-color: color-mix(in srgb, var(--green) 55%, transparent); background: var(--green-wash); }
+  .green-node .node-index, .green-node b { color: var(--green); }
+  .release-detail { display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 0; margin-top: 18px; border: 1px solid var(--hairline); border-radius: 5px; background: var(--panel); }
+  .release-detail > div { display: grid; align-content: start; gap: 7px; min-height: 103px; padding: 15px 17px; }
+  .release-detail > div + div { border-left: 1px solid var(--hairline); }
+  .release-detail b { color: var(--ink-2); font-size: .69rem; }
+  .release-detail code { width: fit-content; color: var(--honey-strong); background: var(--honey-wash); }
+  .release-detail small, .point-of-no-return span { color: var(--ink-3); font-size: .66rem; line-height: 1.45; }
+  .point-of-no-return { background: color-mix(in srgb, var(--red) 4%, transparent); }
+  .point-of-no-return b { color: var(--red); }
+  .evidence-section { border-top-color: color-mix(in srgb, var(--honey) 42%, transparent); }
+  .evidence-marker > span { border-color: var(--honey); }
+  .evidence-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+  .evidence-card { padding: 19px 20px 17px; border: 1px solid var(--hairline); border-radius: 5px; background: linear-gradient(150deg, color-mix(in srgb, var(--honey) 4%, transparent), transparent 75%), var(--panel); }
+  .evidence-card .micro-label { margin: 0 0 10px; color: var(--honey-strong); }
+  .evidence-card h3, .broker-copy h3 { margin: 0; font-size: 1.06rem; letter-spacing: -.02em; }
+  .evidence-card p:not(.micro-label) { margin: 10px 0 16px; color: var(--ink-2); font-size: .76rem; }
+  .key-chip { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--ink-3); font: 600 .56rem/1.4 "JetBrains Mono", monospace; letter-spacing: .04em; }
+  .key-chip b { color: var(--honey-strong); }
+  .conservative-callout { display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; margin: 15px 0 19px; padding: 12px 15px; border: 1px solid color-mix(in srgb, var(--honey) 29%, transparent); border-radius: 5px; background: var(--honey-wash); }
+  .callout-icon { display: grid; place-items: center; width: 20px; height: 20px; border: 1px solid var(--honey-strong); border-radius: 50%; color: var(--honey-strong); font: 700 .74rem/1 "JetBrains Mono", monospace; }
+  .conservative-callout p { margin: 0; color: var(--ink-2); font-size: .74rem; }
+  .conservative-callout b { color: var(--ink); }
+  .conservative-callout code { color: var(--honey-strong); background: var(--code-bg); }
+  .proof-pipeline { padding: 18px; border: 1px solid var(--hairline); border-radius: 5px; background: var(--code-bg); }
+  .pipeline-head { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .pipeline-head b { color: var(--ink-2); font: 650 .62rem/1.3 "JetBrains Mono", monospace; letter-spacing: .08em; }
+  .pipeline-head small { color: var(--ink-3); font: 400 .65rem/1.3 "JetBrains Mono", monospace; }
+  .proof-node { min-height: 104px; background: var(--panel); }
+  .proof-node .node-index { color: var(--honey-strong); }
+  .slot-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 18px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--hairline); }
+  .slot-facts span { color: var(--ink-3); font-size: .63rem; }
+  .slot-facts b { display: block; margin-bottom: 4px; color: var(--ink-2); font: 600 .58rem/1.25 "JetBrains Mono", monospace; }
+  .slot-facts code { color: var(--honey-strong); background: var(--panel-2); font-size: .61rem; }
+  .broker-proposal { display: grid; grid-template-columns: 118px minmax(0,1fr); gap: 20px; margin-top: 15px; padding: 20px; border: 1px dashed var(--hairline); border-radius: 5px; background: color-mix(in srgb, var(--ink) 2%, transparent); }
+  .broker-stamp { display: grid; align-content: start; justify-items: start; gap: 5px; padding: 10px 12px; border: 1px solid var(--hairline); border-radius: 4px; color: var(--ink-3); font: 600 .57rem/1.2 "JetBrains Mono", monospace; letter-spacing: .08em; }
+  .broker-stamp b { color: var(--ink-2); font-size: .76rem; }
+  .broker-stamp small { font-size: .55rem; letter-spacing: 0; }
+  .broker-copy .micro-label { margin: 0 0 8px; }
+  .broker-copy p:not(.micro-label) { max-width: 86ch; margin: 9px 0 13px; color: var(--ink-2); font-size: .75rem; }
+  .broker-points { display: flex; flex-wrap: wrap; gap: 7px; }
+  .broker-points span { padding: 5px 8px; border: 1px solid var(--hairline); border-radius: 3px; color: var(--ink-3); font-size: .61rem; }
+  .future-section { border-top-style: dashed; }
+  .future-marker > span { border-style: dashed; color: var(--ink-3); }
+  .future-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 25px; }
+  .future-card { padding: 20px; border: 1px dashed var(--hairline); border-radius: 5px; background: color-mix(in srgb, var(--ink) 1%, transparent); }
+  .future-title { display: flex; align-items: center; gap: 12px; }
+  .future-title > span { color: var(--ink-3); font: 600 .63rem/1 "JetBrains Mono", monospace; }
+  .future-title h3 { margin: 0; font-size: 1.08rem; }
+  .future-card p { min-height: 48px; margin: 13px 0 17px; color: var(--ink-3); font-size: .74rem; }
+  .empty-rail { display: flex; align-items: center; gap: 6px; height: 22px; color: var(--ink-3); }
+  .empty-rail i { width: 35px; height: 5px; border: 1px dashed var(--hairline); border-radius: 5px; }
+  .empty-rail b { margin-left: 5px; font: 600 .55rem/1 "JetBrains Mono", monospace; letter-spacing: .08em; }
+  .source-section { padding-bottom: 30px; }
+  .source-marker > span { border-color: var(--honey); }
+  .source-content { display: grid; grid-template-columns: .8fr 1.2fr; gap: 20px 45px; }
+  .source-content h2 { max-width: 12ch; font-size: clamp(1.65rem, 3vw, 2.3rem); }
+  .source-content > ul { display: grid; grid-template-columns: 1fr 1fr; gap: 0 25px; list-style: none; margin: 0; padding: 0; }
+  .source-content li { border-bottom: 1px solid var(--hairline); }
+  .source-content li a { display: flex; justify-content: space-between; gap: 15px; padding: 9px 0; font-size: .71rem; text-decoration: none; }
+  .source-content li a:hover { color: var(--ink); }
+  .source-foot { grid-column: 1 / -1; margin: 0; color: var(--ink-3); font-size: .68rem; }
+  .source-foot code { color: var(--honey-strong); background: var(--honey-wash); }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 33px; }
+    .map-console { max-width: 620px; }
+    .plane-section, .evidence-section, .future-section, .source-section { grid-template-columns: 1fr; gap: 15px; padding: 42px 0 50px; }
+    .section-marker { padding: 0; }
+    .section-marker > i { display: none; }
+    .flow-5 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+    .flow-5 .state-node:nth-child(3)::after { display: none; }
+    .proof-pipeline .flow-5 { grid-template-columns: repeat(5, minmax(0,1fr)); }
+    .proof-pipeline .flow-5 .state-node:nth-child(3)::after { display: block; }
+  }
+  @media (max-width: 640px) {
+    .system-map { width: min(100% - 34px, var(--map-max)); padding-top: 24px; }
+    .map-hero { padding: 15px 0 38px; }
+    .map-hero .eyebrow { font-size: .59rem; letter-spacing: .1em; }
+    .map-hero h1 { font-size: clamp(2.55rem, 13vw, 4.3rem); }
+    .status-legend { gap: 9px 13px; font-size: .67rem; }
+    .hero-readout { display: grid; grid-template-columns: 1fr 1fr; margin-top: 38px; }
+    .hero-readout span { padding: 13px 8px 13px 0; }
+    .hero-readout span:last-child { grid-column: 1 / -1; border-top: 1px solid var(--hairline); }
+    .hero-readout b { font-size: .78rem; }
+    .section-heading { display: grid; }
+    .section-heading h2 { font-size: 1.9rem; }
+    .tag { width: fit-content; }
+    .flow-4, .flow-5, .proof-pipeline .flow-5 { grid-template-columns: 1fr; gap: 10px; }
+    .state-node { min-height: 82px; padding: 13px 14px; }
+    .state-node:not(:last-child)::after { top: auto; right: 50%; bottom: -12px; content: "↓"; transform: translate(50%, 50%); }
+    .flow-5 .state-node:nth-child(3)::after, .proof-pipeline .flow-5 .state-node:nth-child(3)::after { display: block; }
+    .gate-rail { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .gate-connector { text-align: center; transform: rotate(90deg); }
+    .ready-state { grid-column: 1 / -1; margin: 3px 0 0; padding-top: 11px; border-top: 1px solid var(--hairline); }
+    .branch-grid, .loop-grid, .evidence-compare, .future-grid { grid-template-columns: 1fr; }
+    .loop-card { grid-template-columns: 1fr; gap: 4px; }
+    .handoff-label { align-items: start; flex-wrap: wrap; }
+    .handoff-label i { flex-basis: 45px; margin-top: 8px; }
+    .handoff-label small { flex-basis: 100%; margin-left: 0; }
+    .release-detail { grid-template-columns: 1fr; }
+    .release-detail > div { min-height: auto; }
+    .release-detail > div + div { border-top: 1px solid var(--hairline); border-left: 0; }
+    .slot-facts { grid-template-columns: 1fr 1fr; }
+    .broker-proposal { grid-template-columns: 1fr; gap: 15px; padding: 15px; }
+    .broker-stamp { grid-template-columns: auto auto 1fr; align-items: center; gap: 10px; width: fit-content; }
+    .broker-stamp small { justify-self: end; }
+    .future-card p { min-height: 0; }
+    .source-content { grid-template-columns: 1fr; }
+    .source-content > ul { grid-template-columns: 1fr; }
+    .source-foot { grid-column: 1; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .system-map a, .system-map .state-node { transition: border-color .16s ease, background-color .16s ease; }
+    .system-map a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  }
+</style>

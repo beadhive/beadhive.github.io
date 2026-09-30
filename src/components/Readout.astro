@@ -1,0 +1,23 @@
+---
+// Factory readout: a one-line telemetry strip under the nav on field-guide
+// pages. Version pins + the site's maturity legend, in console voice.
+// Shown only when the review switch `readout=on` (CSS-gated) until decided.
+interface Props { active?: string }
+const { active } = Astro.props;
+const GUIDE = new Set(['beads', 'process', 'planes', 'roles', 'fleet', 'frame-model', 'data']);
+---
+{active && GUIDE.has(active) && (
+  <div class="readout-wrap">
+    <div class="breakout readout">
+      <span><b>bh</b> 0.20.1</span>
+      <span><b>bd</b> 1.3.0</span>
+      <span><b>dolt</b> 2.3.5 <i>pinned</i></span>
+      <span class="live">main · attested green</span>
+      <span class="readout-legend">
+        <span class="status shipped">shipped</span>
+        <span class="status direction">direction</span>
+        <span class="status proposed">proposed</span>
+      </span>
+    </div>
+  </div>
+)}
