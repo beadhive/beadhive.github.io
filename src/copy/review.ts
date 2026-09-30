@@ -6,7 +6,8 @@
 // localStorage so it survives navigation.
 //
 // Decided 2026-09-29: nav grouped, dark Mission Control, light cool grey, all
-// four factory components on. Hero + "the problem" still open.
+// factory components on except the readout strip (off). Hero + "the problem"
+// still open. Version numbers never appear on the site: they live in the repo.
 //
 // To publish: set REVIEW_MODE = false, then delete the losing variants and the
 // data-attribute CSS that carried them (grep for the flag name). Do not ship
@@ -85,7 +86,7 @@ export const FLAGS: ReviewFlag[] = [
   },
   {
     key: 'readout', label: 'Factory readout strip',
-    options: [{ value: 'on', label: 'on' }, { value: 'off', label: 'off' }],
-    default: 'on',
+    options: [{ value: 'off', label: 'off' }, { value: 'on', label: 'on' }],
+    default: 'off',
   },
 ];
