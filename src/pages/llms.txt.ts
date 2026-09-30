@@ -88,7 +88,7 @@ export const GET: APIRoute = () => {
     '',
     '## Install',
     '',
-    '- [INSTALL.md](https://github.com/beadhive/beadhive/blob/main/INSTALL.md): fresh machine to a working `bh` (Nix-managed toolchain: bd 1.3.0, Dolt 2.3.5, gh, git-workspace; then `uv tool install --force beadhive[otel]`)',
+    '- [INSTALL.md](https://github.com/beadhive/beadhive/blob/main/INSTALL.md): fresh machine to a working `bh` (the Nix-managed toolchain pins bd, Dolt, gh and git-workspace; then `uv tool install --force beadhive[otel]`)',
     '- [docs/ONBOARDING.md](https://github.com/beadhive/beadhive/blob/main/docs/ONBOARDING.md): end-to-end, to a configured workspace with registered hives',
     '',
     '## Optional',

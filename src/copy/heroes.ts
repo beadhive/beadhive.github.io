@@ -88,7 +88,7 @@ const orgbehind: Hero = {
   siteDescription,
 };
 
-/** NEW (v0.20.1 pass) — speed-matching in the title, the record + gates in the lede. */
+/** NEW (2026-09 pass) — speed-matching in the title, the record + gates in the lede. */
 const pace: Hero = {
   eyebrow: 'Beadhive',
   title: 'Engineering at the pace of the code',
@@ -99,7 +99,7 @@ const pace: Hero = {
   siteDescription,
 };
 
-/** NEW (v0.20.1 pass) — the whole line in the title, now that release ships. */
+/** NEW (2026-09 pass) — the whole line in the title, now that release ships. */
 const line: Hero = {
   eyebrow: 'Beadhive',
   title: 'From idea to a proven release, on one line',

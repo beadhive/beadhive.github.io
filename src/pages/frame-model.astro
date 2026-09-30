@@ -54,6 +54,17 @@ const sources = [
 ---
 
 <Layout active="frame-model" title={meta.title} description={meta.description}>
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#identity">Host role is not a seat</a>
+    <a class="head" href="#loops">The dispatcher loops</a>
+    <a class="head" href="#topologies">Compute shapes</a>
+    <a class="head" href="#enrollment">Frame provisioning</a>
+    <a class="head" href="#install">Toolchain + delivery</a>
+    <a class="head" href="#sources">Sources</a>
+  </nav>
+  <div class="pagemain">
 <div class="frame-map">
   <header class="frame-hero">
     <div class="frame-hero-grid">
@@ -189,12 +200,12 @@ const sources = [
     </div>
     <div class="install-grid">
       <article class="install-terminal">
-        <div class="terminal-top"><i></i><i></i><i></i><span>LOCAL VERSIONS · VERIFIED</span></div>
-        <code><b>$ bd version</b><br />1.3.0<br /><br /><b>$ dolt version</b><br />2.3.5</code>
+        <div class="terminal-top"><i></i><i></i><i></i><span>WHERE THE PINS LIVE</span></div>
+        <code><b>$ bh setup check</b><br />bd · dolt · gh · git-workspace<br /><br /><b>flake.nix</b> → <a href="https://github.com/beadhive/beadhive/blob/main/flake.nix">pinned versions ↗</a></code>
       </article>
       <div class="install-copy">
         <p><strong>Current Beadhive install:</strong> the managed Nix route pins the driver toolchain, then <code>uv tool install --force 'beadhive[otel]'</code> installs the Python <code>bh</code> CLI; <code>bh setup check</code> verifies the tools it drives. The PyPI/uv route installs <code>bh</code> only and leaves <code>bd</code>, Dolt, GitHub CLI, and git-workspace to the operator.</p>
-        <p><strong>Beads 1.3.0</strong> provides the per-hive bead store and the optional <code>bd serve</code> API. Since Beadhive 0.8.0 a hive's data lives on one shared local Dolt SQL server per host that <code>bd</code> starts for you; the managed toolchain and the Frame draft both pin that Dolt at <strong>2.3.5</strong>. The older per-hive <em>embedded</em> mode is legacy, and its documented floor for the <code>bd dolt pull</code> hang is embedded Dolt 2.2.0 or newer — "Dolt 2.x" alone is too broad. (2.3.5 is the pin, not the newest Dolt release.)</p>
+        <p><strong>Beads</strong> provides the per-hive bead store and the optional <code>bd serve</code> API. A hive's data lives on one shared local Dolt SQL server per host that <code>bd</code> starts for you; the managed toolchain and the Frame draft pin the same Dolt release, and the pin is deliberately not the newest Dolt. The older per-hive <em>embedded</em> mode is legacy and has its own documented minimum Dolt version for the <code>bd dolt pull</code> hang — "any Dolt 2.x" is too broad. The exact pins live in the repo's <a href="https://github.com/beadhive/beadhive/blob/main/flake.nix">flake</a> and <a href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">INSTALL.md</a>, never here.</p>
         <p><code>bh dolt up</code> starts a separate, optional <em>central</em> Dolt service; it is not required for ordinary local operation. The Frame proposal's future <code>dolt-server</code> HQ mode is another distinct fleet control-plane option.</p>
         <div class="build-flow"><span>pinned source + lock</span><b>→</b><span>builder signs closure / image</span><b>→</b><span>artifact store by digest</span><b>→</b><span>frame activates</span></div>
         <p class="limitation"><b>Implementation gap:</b> Beadhive's current flake is toolchain-only. It has no NixOS module, OCI outputs, or Nix-built <code>bh</code>; the Nix-built <code>bh</code> package is the first hard blocker for a proper NixOS frame.</p>
@@ -206,6 +217,8 @@ const sources = [
     <div><p class="frame-kicker">SOURCE NOTES</p><h2 class="display">Draft status stays visible.</h2><p>The September 29 homelab document is WIP revision 5. Its D1–D16 decisions await review; the frame and homelab rollout work has not been filed or applied. Use it as the updated topology source, not the older onboarding diagrams.</p></div>
     <ul>{sources.map((item) => <li><a href={item.href}>{item.label} ↗</a></li>)}</ul>
   </section>
+</div>
+  </div>
 </div>
 
 <style>
@@ -301,6 +314,7 @@ const sources = [
   .build-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 18px 0; padding: 14px; border: 1px solid var(--hairline); background: var(--panel); }.build-flow span { color: var(--ink); font: 600 .62rem "JetBrains Mono", ui-monospace, monospace; }.build-flow b { color: var(--honey); }
   .install-copy p.limitation { padding: 13px; border-left: 2px solid var(--red); background: var(--red-wash); color: var(--ink-2); font-size: .73rem; }.limitation b { color: var(--red); }
   .frame-sources { display: grid; grid-template-columns: 1fr .8fr; gap: 30px; margin-top: 82px; padding: 27px 0 0; border-top: 1px solid var(--hairline); }.frame-sources h2 { font-size: 1.8rem; }.frame-sources p { max-width: 680px; color: var(--ink-2); font-size: .77rem; line-height: 1.65; }.frame-sources ul { margin: 0; padding: 0; list-style: none; }.frame-sources li { padding: 10px 0; border-bottom: 1px solid var(--hairline); font-size: .77rem; }
+  @media (min-width: 1280px) { .frame-map { padding-left: 0; padding-right: 0; } }
   @media (max-width: 850px) {
     .frame-hero-grid, .identity-grid, .install-grid, .frame-sources { grid-template-columns: 1fr; }
     .frame-stats { grid-template-columns: 1fr; }.frame-stats span { border-right: 0; border-bottom: 1px solid var(--hairline); }.frame-stats span:last-child { border-bottom: 0; }

@@ -64,6 +64,18 @@ const references = [
 ---
 
 <Layout active="planes" title={meta.title} description={meta.description}>
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#ideation">Ideation</a>
+    <a class="head" href="#planning">Planning</a>
+    <a class="head" href="#development">Development</a>
+    <a class="head" href="#release">Release</a>
+    <a class="head" href="#attestation">Validation + attestation</a>
+    <a class="head" href="#future">Next planes</a>
+    <a class="head" href="#sources">Sources</a>
+  </nav>
+  <div class="pagemain">
 <div class="system-map">
   <header class="map-hero">
     <div class="hero-grid">
@@ -98,8 +110,8 @@ const references = [
         <div><p class="kicker">IDEATION PLANE</p><h2 id="ideation-title" class="display">Turn signals into a useful question.</h2></div>
         <span class="tag direction-tag">Future plane · intake ships today</span>
       </div>
-      <p class="section-intro">Beadhive has report intake and planner adoption — the
-        <a href="/fleet/#hq-intake">triage verbs</a> live on the Fleet page — while a distinct
+      <p class="section-intro">Beadhive has report intake and planner adoption — the <a href="/fleet/#hq-intake">triage
+        verbs</a> live on the Fleet page — while a distinct
         ideation plane is still a future concept. This transition shows the current entry points
         without claiming that candidate discovery is automated.</p>
       <ol class="state-flow flow-4" aria-label="Current intake path and proposed ideation handoff">
@@ -312,12 +324,15 @@ const references = [
     </div>
   </section>
 </div>
+  </div>
+</div>
 </Layout>
 
 <style is:global>
   .system-map {
     --map-max: 92rem;
-    width: min(var(--map-max), 94vw);
+    width: 100%;
+    max-width: var(--map-max);
     margin: 0 auto;
     padding: 38px 0 96px;
   }
