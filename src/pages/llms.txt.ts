@@ -95,14 +95,14 @@ export const GET: APIRoute = () => {
     // A one-line summary, not the homepage's meta description — that reappears
     // verbatim in the Field guide list below, and saying it twice wastes the
     // first thing a reader sees.
-    '> An open-source agentic software factory that ships software, not slop — it runs the',
-    '> engineering process at the speed agents write code.',
+    '> An open-source bead-machine — a software factory that runs on beads — that ships',
+    '> software, not slop: the engineering process at the speed agents write code.',
     '',
-    'Beadhive runs a software factory across the whole lifecycle: agents hold most of the',
-    'seats, humans hold the ones that matter, and what production teaches is meant to come',
-    'back round into the next plan. Work is tracked as beads — a git-embedded issue graph',
-    'with real dependency edges — so "what should be worked on next" is computed rather',
-    'than guessed. `bh` is the CLI; there is no server to run.',
+    'The bead-machine runs the whole lifecycle: agents hold most of the seats, humans hold',
+    'the ones that matter, and what production teaches is meant to come back round into the',
+    'next plan. Beads are the unit of work — a git-embedded issue graph with real dependency',
+    'edges — so "what should be worked on next" is computed rather than guessed. `bh` is the',
+    'CLI; there is no server to run.',
     '',
     '## Field guide',
     '',

@@ -6,8 +6,8 @@
 // localStorage so it survives navigation.
 //
 // Decided 2026-09-29: nav grouped, dark Mission Control, light cool grey, all
-// factory components on except the readout strip (off). Hero + "the problem"
-// still open. Version numbers never appear on the site: they live in the repo.
+// factory components on except the readout strip (off). "The problem" still
+// open; the hero was settled 2026-10-08 (bh-infra-twpm) and its flag removed. Version numbers never appear on the site: they live in the repo.
 //
 // To publish: set REVIEW_MODE = false, then delete the losing variants and the
 // data-attribute CSS that carried them (grep for the flag name). Do not ship
@@ -25,17 +25,6 @@ export interface ReviewFlag {
 }
 
 export const FLAGS: ReviewFlag[] = [
-  {
-    key: 'hero', label: 'Home hero',
-    options: [
-      { value: 'noslop', label: 'A · ships software, not slop (current)' },
-      { value: 'outrun', label: 'B · code outruns the process' },
-      { value: 'pace', label: 'C · engineering at the pace of code (new)' },
-      { value: 'line', label: 'D · the line behind the builder (new)' },
-    ],
-    default: 'noslop',
-    note: '<title> and the OG card stay on A until settled.',
-  },
   {
     key: 'why', label: 'Home “the problem”',
     options: [

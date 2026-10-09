@@ -1,11 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Mark from '../components/Mark.astro';
-import { hero, heroes } from '../copy/heroes.ts';
-import { REVIEW_MODE } from '../copy/review.ts';
-// Review: every hero variant renders; data-hero on <html> shows one. When
-// REVIEW_MODE is off only the chosen `hero` renders.
-const heroVariants = REVIEW_MODE ? Object.entries(heroes) : [['current', hero]] as const;
+import { hero } from '../copy/heroes.ts';
 
 // Exported so /llms.txt can enumerate this page. Sourced from the hero rather
 // than restated, so the homepage still has exactly one description of itself.
@@ -43,12 +39,8 @@ const chev = (x: number, laneY: number) => {
   <div class="wrap">
     <Mark tier="core" size={54} class="hero-mark" />
     <div class="brandline display">{hero.eyebrow}</div>
-    {heroVariants.map(([key, h]) => (
-      <div class="hero-variant" data-variant={key}>
-        <h1 class="display">{h.title}</h1>
-        <p class="lede">{h.lede}</p>
-      </div>
-    ))}
+    <h1 class="display">{hero.title}</h1>
+    <p class="lede">{hero.lede}</p>
     <div class="herobar">
       <a class="btn btn-primary" href="/start/">Ship something real</a>
       <a class="btn btn-ghost" href="/process/">See how the factory works</a>
@@ -345,18 +337,9 @@ const chev = (x: number, laneY: number) => {
 </Layout>
 
 <style is:global>
-  /* Review variants: each hero / "problem" version renders; the review switch
-     (data-hero, data-why on <html>) shows one. Delete with the switchboard. */
-  .hero-variant { display: none; }
-  :root:not([data-hero]) .hero-variant[data-variant="noslop"],
-  :root:not([data-hero]) .hero-variant[data-variant="current"],
-  :root[data-hero="noslop"] .hero-variant[data-variant="noslop"],
-  :root[data-hero="outrun"] .hero-variant[data-variant="outrun"],
-  :root[data-hero="keepup"] .hero-variant[data-variant="keepup"],
-  :root[data-hero="orgbehind"] .hero-variant[data-variant="orgbehind"],
-  :root[data-hero="pace"] .hero-variant[data-variant="pace"],
-  :root[data-hero="line"] .hero-variant[data-variant="line"],
-  .hero-variant[data-variant="current"] { display: block; }
+  /* Review variant: both "problem" versions render; the review switch
+     (data-why on <html>) shows one. Delete with the switchboard. The hero
+     variants were settled and removed 2026-10-08 (bh-infra-twpm). */
   .why-v2 { display: none; }
   :root[data-why="v2"] .why-v1 { display: none; }
   :root[data-why="v2"] .why-v2 { display: block; }
