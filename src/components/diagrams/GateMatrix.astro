@@ -1,0 +1,110 @@
+---
+// Seven validation checkpoints along the land path, and what each strictness
+// mode asks of them. Source: docs/WORK.md "Validation modes" + "push-main";
+// docs/design/attested-green-adr.md Decision 4 (exact-tree reuse at landing).
+//
+// Two orthogonal mechanisms are deliberately kept apart in the drawing:
+// strictness decides WHETHER a boundary demands a gate; tree-keyed evidence
+// decides whether that gate must actually RUN. The matrix is the first; the
+// footer box is the second.
+const COLS = [
+  { x: 330,  name: 'submit',     where: 'bead branch · handoff' },
+  { x: 460,  name: 'merge',      where: 'bead → container' },
+  { x: 590,  name: 'merge-main', where: 'ad-hoc bead → main' },
+  { x: 720,  name: 'union',      where: 'batch branch' },
+  { x: 850,  name: 'molecule',   where: 'container → main' },
+  { x: 980,  name: 'postland',   where: 'main tip after land' },
+  { x: 1110, name: 'push-main',  where: 'git push hook' },
+];
+// run = gate required · cond = only if main moved · skip = not run · lookup = ledger first
+type Cell = 'run' | 'cond' | 'skip' | 'lookup';
+const ROWS: { y: number; name: string; sub: string; cells: Cell[] }[] = [
+  { y: 212, name: 'relaxed',      sub: 'default · combination at main boundaries',
+    cells: ['run', 'skip', 'run', 'run', 'run', 'cond', 'lookup'] },
+  { y: 282, name: 'conservative', sub: 'the tip after every merge',
+    cells: ['run', 'run', 'run', 'run', 'run', 'run', 'lookup'] },
+  { y: 352, name: 'loose',        sub: 'trust the submits · warn if main moved',
+    cells: ['run', 'skip', 'skip', 'run', 'skip', 'skip', 'lookup'] },
+];
+const WORD: Record<Cell, string> = { run: 'gate runs', cond: 'if main moved', skip: 'skipped', lookup: 'verdict lookup' };
+const hex = (cx: number, cy: number, r = 36) =>
+  `${cx - r},${cy} ${cx - r / 2},${cy - r * 0.866} ${cx + r / 2},${cy - r * 0.866} ${cx + r},${cy} ${cx + r / 2},${cy + r * 0.866} ${cx - r / 2},${cy + r * 0.866}`;
+---
+<figure id="fig-gate-matrix">
+  <div class="diagram">
+    <svg viewBox="0 0 1160 500" role="img"
+      aria-label="Matrix of seven validation checkpoints — submit, merge, merge-main, union, molecule, postland, push-main — against three strictness modes. Relaxed runs the gate at submit, merge-main, union and molecule, re-tests post-land only if main moved, and consults the verdict ledger at push. Conservative runs every gate. Loose runs only submit and union and consults the ledger at push. A footer notes that any required gate resolves as a lookup when the exact tree already has a fresh green verdict.">
+      <defs>
+        <marker id="gm-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+        <clipPath id="gm-half"><rect x="-10" y="-10" width="10" height="20"/></clipPath>
+      </defs>
+
+      <text class="d-kicker" x="24" y="28">THE LAND PATH — EVERY CHECKPOINT A BEAD CAN MEET</text>
+
+      <!-- checkpoint row -->
+      <line class="d-sep-strong" x1="294" y1="78" x2="1146" y2="78"/>
+      {COLS.map((c, i) => (
+        <g>
+          <polygon class="gatehex" points={hex(c.x, 78)} />
+          <text class="glabel" x={c.x} y="82">{c.name}</text>
+          <text class="d-mute" x={c.x} y="122" text-anchor="middle">{c.where}</text>
+          {i < COLS.length - 1 && <line class="flow" x1={c.x + 40} y1="78" x2={COLS[i + 1].x - 40} y2="78" marker-end="url(#gm-arrow)"/>}
+        </g>
+      ))}
+      <text class="d-mute" x="24" y="82">a bead meets 5 or 6 of these:</text><text class="d-mute" x="24" y="98">merge → container inside a</text><text class="d-mute" x="24" y="114">molecule, or merge-main when</text><text class="d-mute" x="24" y="130">it has no molecule at all</text>
+
+      <!-- matrix -->
+      <text class="d-kicker" x="24" y="178">work.validation</text>
+      <line class="d-sep" x1="24" y1="186" x2="1136" y2="186"/>
+      {ROWS.map((r) => (
+        <g>
+          <text class="d-code-h" x="24" y={r.y + 4}>{r.name}</text>
+          <text class="d-mute" x="24" y={r.y + 20}>{r.sub}</text>
+          <line class="d-sep" x1="24" y1={r.y + 36} x2="1136" y2={r.y + 36}/>
+          {r.cells.map((cell, i) => {
+            const x = COLS[i].x;
+            return (
+              <g>
+                {cell === 'run'    && <circle class="d-dot-run" cx={x} cy={r.y} r="9"/>}
+                {cell === 'lookup' && <g><circle class="d-dot-reuse" cx={x} cy={r.y} r="9"/><circle cx={x} cy={r.y} r="3.5" fill="var(--green)"/></g>}
+                {cell === 'cond'   && <g><circle cx={x} cy={r.y} r="9" fill="none" stroke="var(--ink-3)" stroke-width="2"/><path d={`M ${x} ${r.y - 9} A 9 9 0 0 1 ${x} ${r.y + 9} Z`} fill="var(--ink-3)"/></g>}
+                {cell === 'skip'   && <circle class="d-dot-skip" cx={x} cy={r.y} r="9"/>}
+                <text class="d-mute" x={x} y={r.y + 25} text-anchor="middle">{WORD[cell]}</text>
+              </g>
+            );
+          })}
+        </g>
+      ))}
+
+      <!-- footer: the two rules that hold in every mode -->
+      <rect class="d-box" x="24" y="404" width="548" height="80" rx="6"/>
+      <text class="d-title" x="38" y="424">If a re-validation goes red</text>
+      <text class="d-mute" x="38" y="442">safe-to-rewrite branch (private container, unpushed main): the tip is reset while the</text>
+      <text class="d-mute" x="38" y="457">merge slot is still held, so no broken tip is ever observable; the bead bounces.</text>
+      <text class="d-mute" x="38" y="472">shared, pushed branch: never rewritten — loud escalation and a forward fix.</text>
+
+      <rect class="d-box-g" x="588" y="404" width="548" height="80" rx="6"/>
+      <text class="d-title" x="602" y="424">Any required gate may resolve as a lookup</text>
+      <text class="d-mute" x="602" y="442">It skips the run when the exact tree already holds a fresh green verdict for that command,</text>
+      <text class="d-mute" x="602" y="457">keyed (tree, cmd_hash). Strictness says whether a gate is owed;</text>
+      <text class="d-mute" x="602" y="472">tree-keyed evidence says whether it has to run.</text>
+    </svg>
+  </div>
+  <div class="legend display">
+    <span><span class="sw" style="background:var(--honey); width:12px; height:12px; border-radius:50%"></span>gate required</span>
+    <span><span class="sw" style="width:12px; height:12px; border-radius:50%; border:2px solid var(--green); background:none"></span>verdict lookup first — full gate inline on any miss</span>
+    <span><span class="sw" style="width:12px; height:12px; border-radius:50%; background:linear-gradient(90deg, transparent 50%, var(--ink-3) 50%); border:2px solid var(--ink-3)"></span>only if <code>main</code> moved underneath</span>
+    <span><span class="sw" style="width:12px; height:12px; border-radius:50%; border:1.5px dashed var(--ink-3); background:none"></span>skipped</span>
+  </div>
+  <figcaption>Every bead is validated in isolation at <b>submit</b> in every mode; the modes only
+  govern how often the <em>combination</em> is re-tested. <code>relaxed</code> pays at the two
+  main-boundary gates (<code>molecule</code>, <code>merge-main</code>) plus a staleness backstop
+  when <code>main</code> moved under the land; <code>conservative</code> also re-tests the container
+  after each bead merge; <code>loose</code> trusts the submits. <code>push-main</code> is the one
+  checkpoint a git hook resolves: it asks for a fresh verdict on the exact tree being pushed and
+  runs the full gate itself on any miss, stale entry, red record, or missing <code>bh</code> — no
+  path treats an absent attestation as a pass. Per-boundary commands are overridable
+  (<code>work.validate.&lt;phase&gt;</code>), so the fast tier runs everywhere and the full tier
+  only where <code>main</code> is touched.</figcaption>
+</figure>

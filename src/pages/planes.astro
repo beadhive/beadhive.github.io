@@ -1,5 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import SpikeTree from '../components/diagrams/SpikeTree.astro';
+import PlanShapes from '../components/diagrams/PlanShapes.astro';
+import AttestKeys from '../components/diagrams/AttestKeys.astro';
+import ValidationSlots from '../components/diagrams/ValidationSlots.astro';
 
 export const meta = {
   order: 4.5,
@@ -167,6 +171,10 @@ const references = [
           <p>A spike verdict or mid-work discovery returns one molecule to planning. Backlog-wide reconciliation is groom, not replan.</p>
         </article>
       </div>
+      <h3 class="display" id="planning-shapes">The shapes a planner files</h3>
+      <PlanShapes />
+      <h3 class="display" id="planning-spikes">The spike loop as a tree</h3>
+      <SpikeTree />
     </div>
   </section>
 
@@ -253,6 +261,10 @@ const references = [
           <span><b>Green proof</b> one full, clean confirming run</span>
         </div>
       </div>
+      <h3 class="display" id="attestation-keys">Attest key slots, and when a verdict carries</h3>
+      <AttestKeys />
+      <h3 class="display" id="attestation-slots">Validation slots on one host</h3>
+      <ValidationSlots />
       <article class="broker-proposal">
         <div class="broker-stamp"><span>DESIGN</span><b>PROPOSAL</b><small>2026-09-26</small></div>
         <div class="broker-copy">

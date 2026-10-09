@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import FramesHq from '../components/diagrams/FramesHq.astro';
 
 export const meta = {
   order: 4.6,
@@ -170,6 +171,7 @@ const sources = [
       </div>
       <p class="cluster-caption">Different hives may run on different active Frames. A second Frame attached to the same hive is standby/failover under the proposal, not parallel same-hive capacity.</p>
     </div>
+    <FramesHq />
     <div class="shape-strip"><span>VM / Proxmox</span><span>Cloud VM / EC2 · VPS</span><span>Compose</span><span>Kubernetes Pod</span><span>Managed sandbox</span><span>Existing Linux host</span></div>
     <p class="loop-footnote">Frame shapes are proposed adapters, not a shipping support matrix. The draft chooses NixOS for VM/cloud VM shapes, OCI images from the same flake for container/pod/sandbox shapes, and Debian + Nix via System Manager with Ansible fallback for host convergence.</p>
   </section>

@@ -1,0 +1,125 @@
+---
+// The guarded release bump and the two gates around publication: the release
+// gate that proves the bump tree before anything leaves, and the pre-push hook
+// that lets a proven tree through in milliseconds. Source: docs/design/
+// attested-green-adr.md ("push-main", "Release orchestration"), the Process
+// page's bump list, docs/WORK.md "push-main".
+---
+<figure id="fig-release-gate">
+  <div class="diagram">
+    <svg viewBox="0 0 1160 540" role="img"
+      aria-label="Release gate diagram. Top flow: the main tip already carries a green verdict from landing; bh release preflight reads that verdict and refuses to continue without one; cz bump creates a new unattested tree and a local tag; bh release attest runs the push-main gate on exactly that tree; bh release await blocks, green permits and red refuses while the undo is still local; then one atomic push moves main and the tag together. A vertical line marks the tag reaching the remote as the point of no return. Middle: the pre-push hook looks up the exact tree's verdict and skips the gate on a hit, running the full gate inline on any miss. Bottom: bh release recover measures the remote with ls-remote and decides between four outcomes: tag published so roll forward, nothing published so undo locally, main landed without its tag so finish the push, or remote unreadable so do nothing.">
+      <defs>
+        <marker id="rg-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+        <marker id="rg-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+        <marker id="rg-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/></marker>
+        <marker id="rg-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/></marker>
+      </defs>
+
+      <text class="d-kicker" x="24" y="28">THE GUARDED BUMP — GREEN IS PROVEN BEFORE THE LAST REVERSIBLE MOMENT, NEVER INSIDE THE PUSH</text>
+
+      <!-- point of no return -->
+      <line x1="986" y1="40" x2="986" y2="214" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="6 5"/>
+      <text class="d-code-r" x="992" y="54">remote</text>
+      <text class="d-mute" x="992" y="68" style="font-size:9.5px">the tag on the remote</text>
+      <text class="d-mute" x="992" y="80" style="font-size:9.5px">is the point of no return</text>
+
+      <!-- top flow -->
+      {[
+        { x: 24,  w: 150, cls: 'd-box-g', t: 'main tip · tree T',      c: 'verdict from the land',    s: ['molecule / merge-main', 'already proved T green'] },
+        { x: 194, w: 160, cls: 'd-chip',  t: 'bh release preflight',   c: 'reads the verdict for T', s: ['REFUSES the bump without', 'one — never runs the gate'] },
+        { x: 374, w: 156, cls: 'd-box-r', t: 'cz bump',                c: 'tree T′ + local tag',   s: ['pyproject · changelog · lock:', 'UNATTESTED by construction'] },
+        { x: 550, w: 160, cls: 'd-chip',  t: 'bh release attest',      c: 'push-main gate on T′',    s: ['fires now, detached;', 'writes T′ verdict'] },
+        { x: 730, w: 160, cls: 'd-chip',  t: 'bh release await',       c: 'blocks on the verdict',   s: ['GREEN ⇒ go', 'RED ⇒ refuse, undo locally'] },
+      ].map((n, i, all) => (
+        <g>
+          <rect class={n.cls} x={n.x} y="96" width={n.w} height="78" rx="7"/>
+          <text class="d-title" x={n.x + 12} y="116" style="font-size:12px">{n.t}</text>
+          <text class="d-code" x={n.x + 12} y="132">{n.c}</text>
+          <text class="d-mute" x={n.x + 12} y="148">{n.s[0]}</text>
+          <text class="d-mute" x={n.x + 12} y="162">{n.s[1]}</text>
+          {i < all.length - 1 && <line class="flow" x1={n.x + n.w} y1="135" x2={all[i + 1].x - 2} y2="135" marker-end="url(#rg-n)"/>}
+        </g>
+      ))}
+      <path class="flow-g" d="M 890 135 H 1000" marker-end="url(#rg-g)"/>
+      <rect class="d-box-g" x="1004" y="96" width="132" height="78" rx="7"/>
+      <text class="d-title" x="1016" y="116" style="font-size:12px">atomic push</text>
+      <text class="d-code" x="1016" y="132">git push --atomic</text>
+      <text class="d-mute" x="1016" y="148">both refs or neither;</text>
+      <text class="d-mute" x="1016" y="162">roll forward from here</text>
+
+      <!-- red refuse loop -->
+      <path class="flow-r" d="M 810 174 C 810 206, 480 206, 452 178" marker-end="url(#rg-r)"/>
+      <text class="alabel-r" x="636" y="220" text-anchor="middle">red: nothing has left — the local bump and tag are still undoable to a clean slate</text>
+
+      <!-- pre-push hook -->
+      <line class="d-sep" x1="24" y1="226" x2="960" y2="226"/>
+      <text class="d-kicker" x="24" y="250">THE PRE-PUSH HOOK — ONE VERB, ONE-DIRECTIONAL SAFETY</text>
+      <rect class="d-chip" x="24" y="262" width="150" height="40" rx="6"/>
+      <text class="d-code" x="36" y="280">git push origin main</text>
+      <text class="d-mute" x="36" y="294">lefthook pre-push</text>
+      <path class="flow" d="M 174 282 H 206" marker-end="url(#rg-n)"/>
+      <rect class="d-box-h" x="210" y="262" width="218" height="40" rx="6"/>
+      <text class="d-code-h" x="222" y="280">bh hive hook push-main</text>
+      <text class="d-mute" x="222" y="294">fresh green for the EXACT tree + command?</text>
+      <path class="flow-g" d="M 428 274 C 460 274, 470 270, 500 270" marker-end="url(#rg-g)"/>
+      <rect class="d-box-g" x="504" y="254" width="236" height="32" rx="6"/>
+      <text class="d-code-g" x="516" y="274">exit 0 · hit → push proceeds (~ms)</text>
+      <path class="flow-r" d="M 428 290 C 460 290, 470 302, 500 302" marker-end="url(#rg-r)"/>
+      <rect class="d-box-r" x="504" y="290" width="236" height="32" rx="6"/>
+      <text class="d-code-r" x="516" y="310">anything else → full gate inline</text>
+      <text class="d-mute" x="756" y="268">miss · stale · red · malformed · unconfigured · a different</text>
+      <text class="d-mute" x="756" y="282">command · no hive · no bh on PATH · any exception:</text>
+      <text class="d-mute" x="756" y="296">the gate runs, exactly as before the hook existed.</text>
+      <text class="d-mute" x="756" y="310">No path treats a missing attestation as a pass.</text>
+
+      <!-- recover -->
+      <line class="d-sep" x1="24" y1="334" x2="1136" y2="334"/>
+      <text class="d-kicker" x="24" y="358">AFTER A FAILED PUSH — bh release recover DECIDES ON ONE MEASURED FACT</text>
+      <rect class="d-box" x="24" y="370" width="220" height="150" rx="8"/>
+      <text class="d-title" x="38" y="392">git ls-remote</text>
+      <text class="d-mute" x="38" y="408">against the actual remote —</text>
+      <text class="d-mute" x="38" y="422">never a local tracking ref,</text>
+      <text class="d-mute" x="38" y="436">never an assumption.</text>
+      <text class="d-mute" x="38" y="458">Returns a code, not a boolean,</text>
+      <text class="d-mute" x="38" y="472">because the fourth answer is</text>
+      <text class="d-mute" x="38" y="486">"I could not tell" and that</text>
+      <text class="d-mute" x="38" y="500">must never become an undo.</text>
+
+      {[
+        { y: 370, cls: 'd-box-g', t: 'tag published',               a: 'roll forward — never delete; published history is never rewritten', m: 'rg-g', cl: 'flow-g' },
+        { y: 410, cls: 'd-chip',  t: 'tag absent, bump not on the remote', a: 'the undo is safe — locally reset the bump and tag to a clean slate', m: 'rg-n', cl: 'flow' },
+        { y: 450, cls: 'd-box-h', t: 'main landed without its tag',  a: 'a half-done release — finish it, push the tag; do not undo. Unreachable via the atomic push, measured for anyway', m: 'rg-h', cl: 'flow-h' },
+        { y: 490, cls: 'd-box-r', t: 'could not read the remote',    a: 'conclude nothing — a history rewrite on a network blip is the one outcome worse than doing nothing', m: 'rg-r', cl: 'flow-r' },
+      ].map((o) => (
+        <g>
+          <path class={o.cl} d={`M 244 ${o.y + 16} H 280`} marker-end={`url(#${o.m})`}/>
+          <rect class={o.cls} x="284" y={o.y} width="852" height="32" rx="6"/>
+          <text class="d-title" x="296" y={o.y + 20} style="font-size:12px">{o.t}</text>
+          <text class="d-mute" x="600" y={o.y + 20}>{o.a}</text>
+        </g>
+      ))}
+    </svg>
+  </div>
+  <div class="legend display">
+    <span><span class="sw" style="background:var(--green)"></span>proven green / permitted</span>
+    <span><span class="sw" style="background:var(--red)"></span>refused / unproven</span>
+    <span><span class="sw" style="background:var(--honey)"></span>the lookup</span>
+  </div>
+  <figcaption>Merging is not releasing, and the release gate runs on the tree the bump
+  <em>creates</em>, not the one that was green before it. The ordering is the design: the bump is
+  the last safely reversible moment, so <b>preflight</b> demands existing proof for the current tree
+  and refuses to establish it late; <b>attest</b> then proves the bump tree itself; <b>await</b> holds
+  the push until that verdict is green, while a red one still leaves everything local and undoable.
+  One atomic push moves <code>main</code> and the tag together, and the tag reaching the remote is
+  the boundary between undo and roll-forward. The pre-push hook is the same idea applied where a
+  slow gate hurts most: a <code>--no-ff</code> land onto an unmoved <code>main</code> yields a tree
+  byte-identical to the one the land already tested, so the push has nothing left to prove — and
+  every other outcome degrades to the full gate, never to an ungated push. What lands
+  <em>before</em> the bump is ordered by the advisory <code>bh release order</code> and, opt-in, a
+  <code>release-hold:</code> gate that only a releaser can clear on a breaking change.</figcaption>
+</figure>

@@ -1,0 +1,134 @@
+---
+// The spike loop as a tree of molecules. The shipped shape is the two-molecule
+// loop (docs/PLANNING-PLANE.md "Spike loop", docs/design/planning-seat-ux-and-
+// spike-loop.md): a spike molecule settles a GO/NO-GO question before any
+// implementation bead exists. GO re-enters planning; NO-GO records an ADR.
+// The third branch — a NO-GO that narrowly missed, re-spiked one level down —
+// is drawn as direction (dashed + chip): it is the same loop applied to a
+// narrower question, not a new verb.
+const hex = (cx: number, cy: number, r = 28) =>
+  `${cx - r},${cy} ${cx - r / 2},${cy - r * 0.866} ${cx + r / 2},${cy - r * 0.866} ${cx + r},${cy} ${cx + r / 2},${cy + r * 0.866} ${cx - r / 2},${cy + r * 0.866}`;
+---
+<figure id="fig-spike-tree">
+  <div class="diagram">
+    <svg viewBox="0 0 1160 540" role="img"
+      aria-label="Tree diagram of the spike loop. Planning reaches a feasibility question. If settled, an implementation molecule is filed, passes the kickoff gate and is dispatched. If open, a spike molecule is filed: spike beads whose artifacts feed one decision bead. The integration plane executes the spikes and the decision bead closes with a verdict. GO re-enters planning via replan and files the implementation molecule, linked back to the spike epic. NO-GO records an ADR and closes with nothing orphaned. A dashed third branch, marked direction, shows a near-miss NO-GO re-spiked as a narrower second-level spike that re-enters the same loop.">
+      <defs>
+        <marker id="sp-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+        <marker id="sp-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+        <marker id="sp-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/></marker>
+        <marker id="sp-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/></marker>
+      </defs>
+
+      <!-- planning -->
+      <rect class="lane-p" x="16" y="16" width="300" height="508" rx="10"/>
+      <text class="lane-label" x="32" y="38">PLANNING</text>
+      <rect class="node" x="40" y="120" width="130" height="40"/>
+      <text class="nlabel" x="105" y="138">architecture</text>
+      <text class="nsub" x="105" y="152">decisions · trade-offs</text>
+      <path class="flow" d="M 170 140 H 194" marker-end="url(#sp-n)"/>
+      <polygon class="node" points="200,140 250,104 300,140 250,176" style="rx:0"/>
+      <text class="nlabel" x="250" y="136" style="font-size:11px">feasibility</text>
+      <text class="nlabel" x="250" y="150" style="font-size:11px">settled?</text>
+
+      <!-- YES → implementation molecule -->
+      <path class="flow-g" d="M 250 104 V 70 H 356" marker-end="url(#sp-g)"/>
+      <text class="alabel-g" x="262" y="92">yes</text>
+      <rect class="node" x="360" y="50" width="190" height="40"/>
+      <text class="nlabel" x="455" y="68">implementation molecule</text>
+      <text class="nsub" x="455" y="82">bh plan file</text>
+      <path class="flow" d="M 550 70 H 586" marker-end="url(#sp-n)"/>
+      <polygon class="gatehex" points={hex(620, 70)}/>
+      <text class="glabel" x="620" y="68">KICKOFF</text>
+      <text class="gsub" x="620" y="81">bh plan approve</text>
+      <path class="flow" d="M 648 70 H 684" marker-end="url(#sp-n)"/>
+      <rect class="node" x="688" y="50" width="150" height="40"/>
+      <text class="nlabel" x="763" y="68">dispatch</text>
+      <text class="nsub" x="763" y="82">roots in bd ready</text>
+
+      <!-- NO → spike molecule -->
+      <path class="flow-h" d="M 250 176 V 230 H 356" marker-end="url(#sp-h)"/>
+      <text class="alabel-h" x="258" y="206">no: unsettled</text>
+
+      <rect class="d-box-h" x="360" y="196" width="300" height="118" rx="8"/>
+      <text class="d-title" x="374" y="216">spike molecule</text>
+      <text class="d-code-h" x="374" y="231">epic tag:spike · bh-sp</text>
+      <rect class="node" x="374" y="244" width="124" height="28"/>
+      <text class="nlabel" x="436" y="262" style="font-size:11px">spike S1 · bh-sp.1</text>
+      <rect class="node" x="374" y="280" width="124" height="28"/>
+      <text class="nlabel" x="436" y="298" style="font-size:11px">spike S2 · bh-sp.2</text>
+      <path class="flow" d="M 498 258 C 516 258, 516 276, 530 278" marker-end="url(#sp-n)"/>
+      <path class="flow" d="M 498 294 C 516 294, 516 286, 530 284" marker-end="url(#sp-n)"/>
+      <rect class="node" x="526" y="262" width="124" height="40"/>
+      <text class="nlabel" x="588" y="278" style="font-size:11px">decision bead</text>
+      <text class="nsub" x="588" y="292">deps: every spike</text>
+      <text class="d-mute" x="374" y="330">each spike owes docs/spikes/&lt;id&gt;.md: Question · Method · Evidence · Verdict · Recommendation</text>
+
+      <!-- execution -->
+      <path class="flow" d="M 660 255 H 680" marker-end="url(#sp-n)"/>
+      <rect class="node" x="684" y="236" width="190" height="40"/>
+      <text class="nlabel" x="779" y="252" style="font-size:11px">integration plane runs it</text>
+      <text class="nsub" x="779" y="266">normal dispatch · one worktree per spike</text>
+      <path class="flow" d="M 874 256 H 894" marker-end="url(#sp-n)"/>
+      <polygon class="node" points="898,256 958,216 1018,256 958,296"/>
+      <text class="nlabel" x="958" y="252" style="font-size:11px">verdict</text>
+      <text class="nsub" x="958" y="266">close reason</text>
+      <text class="d-mute" x="779" y="300" text-anchor="middle">bh work submit → review gate → a human reads</text>
+
+      <!-- GO -->
+      <path class="flow-g" d="M 958 216 V 156 H 804" marker-end="url(#sp-g)"/>
+      <text class="alabel-g" x="968" y="190">GO</text>
+      <rect class="node" x="610" y="136" width="190" height="40"/>
+      <text class="nlabel" x="705" y="152">/bh:replan &lt;spike-epic&gt;</text>
+      <text class="nsub" x="705" y="166">carry the evidence into architecture</text>
+      <path class="flow-g" d="M 610 156 C 560 156, 530 110, 456 92" marker-end="url(#sp-g)"/>
+      <text class="alabel-g" x="380" y="186">files the implementation molecule · external_ref → the spike epic</text>
+
+      <!-- NO-GO -->
+      <path class="flow-r" d="M 958 296 V 356 H 900" marker-end="url(#sp-r)"/>
+      <text class="alabel-r" x="968" y="332">NO-GO</text>
+      <rect class="node-end" x="676" y="336" width="224" height="40"/>
+      <text class="nlabel" x="788" y="352">ADR in docs/design · close</text>
+      <text class="nsub" x="788" y="366">nothing orphaned — nothing was filed early</text>
+
+      <!-- near miss → second-level spike (direction) -->
+      <path class="flow-h dashed" d="M 1018 256 H 1060 V 436 H 900" marker-end="url(#sp-h)"/>
+      <text class="alabel-h" x="1066" y="350">NO-GO,</text>
+      <text class="alabel-h" x="1066" y="363">close to GO</text>
+      <rect class="d-box-dir" x="560" y="412" width="336" height="76" rx="8"/>
+      <text class="d-title" x="574" y="432">second-level spike · bh-sp.3</text>
+      <text class="d-mute" x="574" y="448">the narrower question the first verdict exposed, filed as a child</text>
+      <text class="d-mute" x="574" y="462">of the spike epic — same beads, same gate, one tier down</text>
+      <rect class="d-chip-dir" x="574" y="470" width="130" height="14" rx="7"/>
+      <text class="d-mute" x="639" y="481" text-anchor="middle" style="font-size:9.5px">direction · convention only</text>
+      <path class="flow-h dashed" d="M 560 450 H 332 V 300 H 356" marker-end="url(#sp-h)"/>
+      <text class="alabel-h" x="344" y="440">re-enters the same loop</text>
+
+      <text class="d-mute" x="32" y="470">two-molecule loop:</text>
+      <text class="d-mute" x="32" y="484">nothing exists in the tracker</text>
+      <text class="d-mute" x="32" y="498">that current evidence</text>
+      <text class="d-mute" x="32" y="512">doesn't support</text>
+    </svg>
+  </div>
+  <div class="legend display">
+    <span><span class="sw" style="background:var(--green)"></span>GO</span>
+    <span><span class="sw" style="background:var(--red)"></span>NO-GO</span>
+    <span><span class="sw" style="background:var(--honey)"></span>open question / replan</span>
+    <span><span class="sw hex"></span>gate</span>
+    <span><span class="sw dash"></span>direction, not a verb</span>
+  </div>
+  <figcaption>A spike molecule is an ordinary molecule with two labels: its spike beads
+  (<code>tag:spike</code>) each owe a verdict document and no product code, and one decision bead
+  (<code>tag:decision</code>) depends on all of them, so it becomes ready only when every artifact
+  is in. The verdict rides the close reason. <b>GO</b> re-enters planning through the one re-entry
+  door, <code>replan</code>, and the implementation molecule links back to the spike for provenance;
+  <b>NO-GO</b> records the decision and closes — no implementation bead was ever filed, so none
+  is orphaned. A verdict that lands close to the bar is still a NO-GO; the honest response is a
+  narrower second-level spike under the same epic, which is the same loop applied again rather than
+  a third outcome. Several ready spike epics can run as one unattended wave, each in its own
+  worktree, stopping at the review gate for a human to read the verdicts together.</figcaption>
+</figure>
