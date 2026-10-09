@@ -1,6 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import LoopHex from '../components/LoopHex.astro';
+import BranchTree from '../components/diagrams/BranchTree.astro';
+import GateMatrix from '../components/diagrams/GateMatrix.astro';
+import ReleaseGate from '../components/diagrams/ReleaseGate.astro';
 
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
@@ -61,7 +64,9 @@ export const meta = {
     <a class="head" href="#ring">The ring</a>
     <a class="head" href="#planes-strip">The four planes</a>
     <a class="head" href="#pipeline">The pipeline</a>
+    <a class="sub" href="#pipeline-tree">The branch tree</a>
     <a class="sub" href="#pipeline-green">What keeps the line green</a>
+    <a class="sub" href="#pipeline-gates">Gates × strictness</a>
     <a class="head" href="#release">Merge order is planned</a>
     <a class="sub" href="#release-bump">The guarded bump</a>
   </nav>
@@ -345,6 +350,14 @@ export const meta = {
     </figure>
 
     <div class="wrap" style="padding:0">
+      <h3 class="display" id="pipeline-tree">The branch tree a molecule leaves behind</h3>
+      <p>The pipeline above is the state machine; this is what it does to <code>git</code>. One
+      workstream, one epic under it, three ways a bead can reach the container, and the two
+      <code>finish</code> lands that carry the result up a tier at a time.</p>
+    </div>
+    <BranchTree />
+
+    <div class="wrap" style="padding:0">
       <h3 class="display" id="pipeline-green">What keeps the line green</h3>
       <ul>
         <li><b>Serialized merges.</b> Merge is a separate seat (the merger) gated by
@@ -369,7 +382,17 @@ export const meta = {
         cap of 5, no conflicting model preferences, one review gate. A batch fails and bounces as a unit; per-bead
         commits stay bisectable inside the bubble.</li>
       </ul>
+    </div>
 
+    <div class="wrap" style="padding:0">
+      <h3 class="display" id="pipeline-gates">Gate phases × strictness</h3>
+      <p>Seven places a tree can be asked to prove itself between a developer's worktree and the
+      remote. <code>work.validation</code> picks which of them are owed; the tree-keyed ledger
+      decides whether an owed gate must actually run.</p>
+    </div>
+    <GateMatrix />
+
+    <div class="wrap" style="padding:0">
       <div class="note"><b>Where the ideas come from.</b> <span class="status direction">direction</span>
       The pipeline starts at <em>ideate</em>, which quietly assumes someone showed up with an
       idea — capping the whole factory at one person's imagination on a given afternoon. What
@@ -432,6 +455,11 @@ bh release await       # block until GREEN, then push main + tag atomically
 bh release recover     # after a failed push: measure the remote before deciding</code></pre>
     <p>The tag reaching the remote is the point of no return. Before it, recovery can undo
     locally; after it, roll forward — published history is never rewritten.</p>
+  </div>
+  <div class="breakout">
+    <ReleaseGate />
+  </div>
+  <div class="wrap">
     <div class="note"><b>Verbs ship; the seat is roadmap.</b> <span class="status direction">direction</span>
     The commands above run today. The <em>releaser</em> seat that owns them in the org chart —
     changelog authorship, the release plane as a staffed stage — is still marked roadmap in the

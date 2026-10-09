@@ -1,0 +1,137 @@
+---
+// Attest keys: the validation gate split into named slots, and the exact
+// conditions under which a slot's green verdict transfers from one tree to
+// another. Source: docs/ATTEST-KEYS.md; docs/design/attested-green-adr.md
+// (Decisions 1-4, Amendment 1: per-key states, the five fail-closed rules).
+//
+// Four git situations across the top, the same five key slots under each.
+// A reader should be able to point at a column and say which keys run.
+const KEYS = ['docs', 'unit', 'stateful', 'integration', 'demos'];
+type K = 'reuse' | 'run' | 'carry' | 'never';
+const SIT: { x: number; title: string; sub: string; tree: string; keys: K[]; why: string[] }[] = [
+  { x: 24,  title: 'A · identical tree',          sub: '--no-ff land onto an unmoved base',
+    tree: 'T0 ≡ T1', keys: ['reuse', 'reuse', 'reuse', 'reuse', 'reuse'],
+    why: ['same bytes, same command hash:', 'every verdict is an exact-tree hit', '(current, fresh within work.ledger_ttl)'] },
+  { x: 302, title: 'B · docs-only change',        sub: 'impact receipt proves the closure',
+    tree: 'T0 → T1', keys: ['run', 'carry', 'carry', 'carry', 'carry'],
+    why: ['changed paths → owning units →', 'transitive dependents → keys. docs runs;', 'the rest carry from T0, age preserved'] },
+  { x: 580, title: 'C · moved main · rebase · unowned', sub: 'justfile, lockfile, BUILD, resolver error',
+    tree: 'T0 → T2', keys: ['run', 'run', 'run', 'run', 'run'],
+    why: ['closure cannot be proven or a global', 'input changed: fail closed to every key', '(native-full — also the default backend)'] },
+  { x: 858, title: 'D · reads git metadata',      sub: 'git describe, tags, commit counts',
+    tree: 'any', keys: ['never', 'never', 'never', 'never', 'never'],
+    why: ['no file inputs a graph can prove:', 'this class never carries; work.always_run', 'runs even on an exact-tree hit'] },
+];
+const COLW = 254;
+const GLYPH: Record<K, { word: string }> = {
+  reuse: { word: 'exact-tree reuse' }, run: { word: 'runs' }, carry: { word: 'carried from T0' }, never: { word: 'never carries' },
+};
+---
+<figure id="fig-attest-keys">
+  <div class="diagram">
+    <svg viewBox="0 0 1160 600" role="img"
+      aria-label="Attest keys diagram. The validation gate is split into named key slots: docs, unit, stateful, integration, demos. Four git situations are compared. A: identical tree, every key reuses its exact-tree verdict. B: docs-only change proven by an impact receipt, the docs key runs and the other keys carry their green verdict from the source tree. C: main moved, a rebase, an unowned path, or a global build input changed, every key runs. D: a key that reads git metadata never carries. A footer shows per-key states current, carried, absent and the policy that required keys block on absent or red while optional keys block only on red, and that carries never chain.">
+      <defs>
+        <marker id="ak-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+        <marker id="ak-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+        <marker id="ak-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/></marker>
+      </defs>
+
+      <!-- the gate as a key catalog -->
+      <text class="d-kicker" x="24" y="28">ONE GATE, NAMED SLOTS — work.attest.keys</text>
+      {KEYS.map((k, i) => (
+        <g>
+          <rect class="d-box-h" x={24 + i * 152} y="40" width="144" height="40" rx="6"/>
+          <text class="d-title" x={96 + i * 152} y="57" text-anchor="middle">{k}</text>
+          <text class="d-code" x={96 + i * 152} y="72" text-anchor="middle" style="font-size:9.5px">just attest-{k}</text>
+        </g>
+      ))}
+      <text class="d-mute" x="784" y="56">each key: an opaque command, a selector the build graph</text>
+      <text class="d-mute" x="784" y="70">understands, and a policy — required (default) or optional</text>
+
+      <!-- four situations -->
+      <line class="d-sep" x1="24" y1="100" x2="1136" y2="100"/>
+      {SIT.map((s, si) => (
+        <g>
+          <text class="d-title" x={s.x} y="126">{s.title}</text>
+          <text class="d-mute" x={s.x} y="142">{s.sub}</text>
+          <!-- tiny tree pair -->
+          <circle class={si === 0 ? 'd-commit-g' : 'd-commit'} cx={s.x + 14} cy="170" r="7"/>
+          <text class="d-code" x={s.x + 28} y="174">T0</text>
+          {si !== 0 && <g>
+            <line class="flow" x1={s.x + 52} y1="170" x2={s.x + 96} y2="170" marker-end="url(#ak-n)"/>
+            <circle class="d-commit" cx={s.x + 110} cy="170" r="7"/>
+            <text class="d-code" x={s.x + 124} y="174">{si === 2 ? 'T2' : 'T1'}</text>
+          </g>}
+          {si === 0 && <text class="d-code-g" x={s.x + 56} y="174">= T1 (tree hash equal)</text>}
+          {si === 1 && <text class="d-code" x={s.x + 150} y="174">receipt: digest</text>}
+          {si === 2 && <text class="d-code-r" x={s.x + 150} y="174">no receipt</text>}
+          {si === 3 && <text class="d-code" x={s.x + 150} y="174">history ≠ content</text>}
+          <!-- key rows -->
+          {s.keys.map((k, ki) => {
+            const y = 204 + ki * 34;
+            return (
+              <g>
+                <rect class="d-chip" x={s.x} y={y - 13} width={COLW} height="26" rx="5"/>
+                <text class="d-code" x={s.x + 10} y={y + 4}>{KEYS[ki]}</text>
+                {k === 'run'   && <circle class="d-dot-run" cx={s.x + 112} cy={y} r="7"/>}
+                {k === 'reuse' && <g><circle class="d-dot-reuse" cx={s.x + 112} cy={y} r="7"/><circle cx={s.x + 112} cy={y} r="2.5" fill="var(--green)"/></g>}
+                {k === 'carry' && <g><circle class="d-dot-reuse" cx={s.x + 112} cy={y} r="7"/><path d={`M ${s.x + 106} ${y} h 12`} stroke="var(--green)" stroke-width="2"/></g>}
+                {k === 'never' && <g><circle cx={s.x + 112} cy={y} r="7" fill="none" stroke="var(--red)" stroke-width="2"/><path d={`M ${s.x + 107} ${y - 5} l 10 10 M ${s.x + 117} ${y - 5} l -10 10`} stroke="var(--red)" stroke-width="1.8"/></g>}
+                <text class="d-mute" x={s.x + 128} y={y + 4}>{GLYPH[k].word}</text>
+              </g>
+            );
+          })}
+          {s.why.map((w, wi) => <text class="d-mute" x={s.x} y={386 + wi * 14}>{w}</text>)}
+        </g>
+      ))}
+
+      <!-- footer: states, policy, no chaining -->
+      <line class="d-sep" x1="24" y1="440" x2="1136" y2="440"/>
+      <text class="d-kicker" x="24" y="464">PER-KEY STATE</text>
+      <text class="d-code-g" x="24" y="484">current</text><text class="d-mute" x="92" y="484">K ran on this exact tree — a fresh (tree, cmd_hash) record, green or red</text>
+      <text class="d-code-g" x="24" y="502">carried</text><text class="d-mute" x="92" y="502">K did not run here; a green current verdict on T0 was carried by a receipt — timestamp stays T0's</text>
+      <text class="d-code-r" x="24" y="520">absent</text><text class="d-mute" x="92" y="520">invalidated and not yet run · never ran · or returned the explicit unknown exit 75</text>
+
+      <text class="d-kicker" x="24" y="552">POLICY</text>
+      <text class="d-mute" x="92" y="552">required: current green ✓ · carried ✓ · absent ✗ block · red ✗ block</text>
+      <text class="d-mute" x="92" y="568">optional: current green ✓ · carried ✓ · absent ✓ · red ✗ block — optional never ignores a real failure</text>
+
+      <!-- carries never chain -->
+      <rect class="d-box" x="700" y="452" width="436" height="128" rx="8"/>
+      <text class="d-title" x="714" y="474">carries never chain</text>
+      <circle class="d-commit-g" cx="730" cy="506" r="7"/><text class="d-code" x="722" y="530">T0 ran</text>
+      <path class="flow-g" d="M 744 506 H 806" marker-end="url(#ak-g)"/>
+      <circle class="d-commit" cx="820" cy="506" r="7"/><text class="d-code" x="808" y="530">T1 carried</text>
+      <path class="flow-r dashed" d="M 834 506 H 896" marker-end="url(#ak-r)"/>
+      <circle class="d-commit" cx="910" cy="506" r="7"/><text class="d-code" x="902" y="530">T2 ✗</text>
+      <path class="flow-g" d="M 730 544 C 760 566, 880 566, 910 544" marker-end="url(#ak-g)"/>
+      <text class="d-mute" x="820" y="576" text-anchor="middle" style="font-size:9.5px">one receipt T0 → T2</text>
+      <text class="d-mute" x="940" y="498">a carried verdict is never</text>
+      <text class="d-mute" x="940" y="512">a source. To reach T2 the</text>
+      <text class="d-mute" x="940" y="526">resolver diffs T0 against T2</text>
+      <text class="d-mute" x="940" y="540">directly; if T0 aged out</text>
+      <text class="d-mute" x="940" y="554">there is nothing to carry.</text>
+      <text class="d-mute" x="940" y="568">Only green carries.</text>
+    </svg>
+  </div>
+  <div class="legend display">
+    <span><span class="sw" style="background:var(--honey); width:12px; height:12px; border-radius:50%"></span>key runs on this tree</span>
+    <span><span class="sw" style="width:12px; height:12px; border-radius:50%; border:2px solid var(--green); background:none"></span>verdict reused (exact tree) or carried (receipt)</span>
+    <span><span class="sw" style="width:12px; height:12px; border-radius:50%; border:2px solid var(--red); background:none"></span>never transfers</span>
+  </div>
+  <figcaption>A key slot is a verdict with a scope. <b>Exact-tree reuse</b> (A) is the whole-tree
+  case: the same bytes under the same command hash is the same evidence. <b>Carry</b> (B) is
+  narrower and newer: a build-graph receipt proves that <em>everything key K can read</em> is
+  byte-identical between the source tree and this one, so K's green moves across — one key at a
+  time, never the tree's verdict, never another key's. Everything that cannot be proven fails
+  closed to a full run (C): an unowned path, a global build input, a resolver error, an unproven
+  selector. Keys that read git history (D) have no file closure to prove and never carry; the
+  <code>always_run</code> set runs before any hit is honored. The default backend is
+  <code>native-full</code>, which invalidates every key on every change; selective validation is
+  opt-in per hive, and <code>on_unresolved: strict</code> exists only so a developer can see why a
+  selection failed instead of paying for the all-key fallback.</figcaption>
+</figure>

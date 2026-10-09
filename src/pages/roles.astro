@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import SeatsSessions from '../components/diagrams/SeatsSessions.astro';
 
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
@@ -16,6 +17,7 @@ export const meta = {
     <p class="toc-title">On this page</p>
     <a class="head" href="#humans">One process, two kinds of worker</a>
     <a class="head" href="#seats">The planes, one spine</a>
+    <a class="head" href="#sessions">Seats are not sessions</a>
     <a class="head" href="#hosts">Host roles are not seats</a>
     <a class="head" href="#harnesses">Which harness a seat runs under</a>
     <a class="head" href="#next">What's next</a>
@@ -169,6 +171,20 @@ export const meta = {
       </div>
     </div>
 
+  </div>
+</section>
+
+<section id="sessions">
+  <div class="breakout">
+    <div class="wrap" style="padding:0">
+      <div class="eyebrow display">Sessions</div>
+      <h2 class="display">Seats are not sessions</h2>
+      <p>A seat is an identity plus a permission archetype; a session is a running loop. One
+      long-context session under a human's supervision can hold several seats over the course of a
+      bead, and that is the normal small-factory shape — because permissions are stamped per
+      <em>action</em>, not per window, the seats compose sequentially and never as a union.</p>
+    </div>
+    <SeatsSessions />
   </div>
 </section>
 

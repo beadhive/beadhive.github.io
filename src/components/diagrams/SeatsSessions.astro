@@ -1,0 +1,128 @@
+---
+// A seat is an identity + permission archetype; a session is a running loop.
+// The mechanism the page has to show: one long-context session may hold many
+// seats over time, but every bh action re-stamps exactly one seat, so the
+// permissions in force at any instant are that seat's — never the union.
+// Source: docs/design/roles-rbac-matrix.md §3, docs/AGF.md "Role modes",
+// docs/CONFIGURATION.md review_mode / reviewer_cross_seat.
+const ACTIONS = [
+  { x: 118, cmd: 'bh work start <epic>',   as: '--as disp/bri',  seat: 'dispatcher' },
+  { x: 268, cmd: 'bh work claim <bead>',   as: '--as dev/bri',   seat: 'developer' },
+  { x: 418, cmd: 'bh work submit <bead>',  as: '--as dev/bri',   seat: 'developer' },
+  { x: 568, cmd: 'bh work approve <bead>', as: '--as rev/alex',  seat: 'reviewer', other: true },
+  { x: 718, cmd: 'bh work merge <bead>',   as: '--as merge/bri', seat: 'merger' },
+];
+const SEATS = [
+  { id: 'disp/',   name: 'dispatcher', skills: 'dispatcher + work', tools: 'Task · Bash · Read — no Edit' },
+  { id: 'dev/',    name: 'developer',  skills: 'developer + work',  tools: 'Edit · Write · Bash — no Task' },
+  { id: 'rev/',    name: 'reviewer',   skills: 'reviewer + work',   tools: 'read-only re: code' },
+  { id: 'merge/',  name: 'merger',     skills: 'merger + work',     tools: 'Bash · Read — no Edit' },
+];
+---
+<figure id="fig-seats-sessions">
+  <div class="diagram">
+    <svg viewBox="0 0 1160 520" role="img"
+      aria-label="Two ways to staff the same five actions. Top: one supervised long-context session runs start, claim, submit, approve and merge, each stamped with a single seat via --as, so only that seat's permissions are in force at each step; the approve step is stamped by a different person because self-approval is blocked. Bottom: fanout mode, where a dispatcher session spawns separate developer and reviewer sessions that each hold exactly one seat for their whole life. A side card defines a seat as an identity prefix plus a preloaded skill plus a tool ceiling.">
+      <defs>
+        <marker id="ss-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+        <marker id="ss-arrow-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/></marker>
+      </defs>
+
+      <!-- ===== A: one session, many seats ===== -->
+      <text class="d-kicker" x="24" y="28">A · SUPERVISED — ONE LONG-CONTEXT SESSION, MANY SEATS, ONE SEAT PER ACTION</text>
+      <rect class="d-box" x="24" y="40" width="820" height="206" rx="8"/>
+      <text class="d-title" x="40" y="62">one session · a human is watching · identity: supervised (your keys, your git config)</text>
+      <!-- eye: the live human -->
+      <path class="d-human" d="M 800 56 q 14 -12 28 0 q -14 12 -28 0 z"/>
+      <circle class="d-human" cx="814" cy="56" r="3"/>
+
+      <!-- timeline -->
+      <line class="flow" x1="48" y1="126" x2="806" y2="126" marker-end="url(#ss-arrow)"/>
+      {ACTIONS.map((a) => (
+        <g>
+          <rect class={a.other ? 'd-box-h' : 'd-chip'} x={a.x - 70} y="92" width="140" height="54" rx="6"/>
+          <text class="d-code" x={a.x} y="112" text-anchor="middle">{a.cmd}</text>
+          <text class="d-code-h" x={a.x} y="130" text-anchor="middle">{a.as}</text>
+          <text class="d-mute" x={a.x} y="166" text-anchor="middle">in force: {a.seat} only</text>
+          <rect x={a.x - 52} y="174" width="104" height="6" rx="3" fill={a.other ? 'var(--honey)' : 'var(--ink-3)'} opacity=".7"/>
+        </g>
+      ))}
+      <text class="d-mute" x="40" y="206">permissions never accumulate: the union of seats is never in force, even though one context window carried all of them</text>
+      <text class="d-mute" x="40" y="222">approve is stamped by a different <tspan class="d-code-h">person</tspan> — dev/bri and rev/bri are one person in two hats, and a type:human gate refuses self-approval (reviewer_cross_seat: hard)</text>
+      <text class="d-mute" x="40" y="238">a collapsed dispatcher @ batch session is this shape: it implements, self-reviews under review_mode: self only where a human is watching, and merges, one seat per verb</text>
+
+      <!-- ===== seat card ===== -->
+      <rect class="d-box" x="864" y="40" width="272" height="206" rx="8"/>
+      <text class="d-title" x="878" y="62">what a seat is</text>
+      <text class="d-mute" x="878" y="78">identity prefix + preloaded skill + tool ceiling</text>
+      <line class="d-sep" x1="878" y1="86" x2="1122" y2="86"/>
+      {SEATS.map((s, i) => (
+        <g>
+          <text class="d-code-h" x="878" y={104 + i * 36}>{s.id}</text>
+          <text class="d-title" x="930" y={104 + i * 36} style="font-size:12px">{s.name}</text>
+          <text class="d-mute" x="1010" y={104 + i * 36}>skills: {s.skills}</text>
+          <text class="d-mute" x="878" y={118 + i * 36}>tools: {s.tools}</text>
+        </g>
+      ))}
+
+      <!-- ===== B: fanout, one seat per session ===== -->
+      <text class="d-kicker" x="24" y="290">B · FANOUT — ONE SEAT PER SESSION, FOR ITS WHOLE LIFE</text>
+
+      <rect class="d-box-h" x="24" y="304" width="250" height="150" rx="8"/>
+      <text class="d-title" x="40" y="326">dispatcher session</text>
+      <text class="d-code-h" x="40" y="344">disp/nova · identity: agent</text>
+      <text class="d-mute" x="40" y="362">skills: dispatcher + work</text>
+      <text class="d-mute" x="40" y="378">tools: Task, Bash, Read — never Edit</text>
+      <text class="d-mute" x="40" y="394">routes one bead per Task; watches gates;</text>
+      <text class="d-mute" x="40" y="410">serializes merges. Fanout never implements.</text>
+      <text class="d-mute" x="40" y="440">work.dispatch.mode: fanout (default)</text>
+
+      {[
+        { y: 304, who: 'dev/ada', wt: 'wt/bead/issue/bh-ws.2.1', note: 'own worktree · own signing key' },
+        { y: 384, who: 'dev/bo',  wt: 'wt/bead/issue/bh-ws.2.2', note: 'own worktree · own signing key' },
+      ].map((d) => (
+        <g>
+          <path class="flow-h" d={`M 274 ${d.y + 30} C 310 ${d.y + 30}, 320 ${d.y + 32}, 356 ${d.y + 32}`} marker-end="url(#ss-arrow-h)"/>
+          <text class="d-mute" x="314" y={d.y + 22} text-anchor="middle">Task</text>
+          <rect class="d-chip" x="360" y={d.y} width="270" height="66" rx="8"/>
+          <text class="d-title" x="374" y={d.y + 20}>developer session</text>
+          <text class="d-code-h" x="374" y={d.y + 38}>{d.who} · {d.wt}</text>
+          <text class="d-mute" x="374" y={d.y + 54}>{d.note} · exactly one seat</text>
+        </g>
+      ))}
+
+      <path class="flow-h" d="M 630 336 C 660 336, 680 348, 714 348" marker-end="url(#ss-arrow-h)"/>
+      <text class="d-mute" x="672" y="330" text-anchor="middle">submit</text>
+      <rect class="d-chip" x="718" y="312" width="250" height="72" rx="8"/>
+      <text class="d-title" x="732" y="332">reviewer session</text>
+      <text class="d-code-h" x="732" y="350">rev/ · fresh context</text>
+      <text class="d-mute" x="732" y="366">review_mode: fresh — a second Task,</text>
+      <text class="d-mute" x="732" y="380">so it needs dispatch depth 2</text>
+
+      <!-- rules -->
+      <rect class="d-box" x="988" y="304" width="148" height="150" rx="8"/>
+      <text class="d-title" x="1002" y="326">the rules</text>
+      <text class="d-mute" x="1002" y="346">· multi-seat session,</text>
+      <text class="d-mute" x="1002" y="360">  single seat per action</text>
+      <text class="d-mute" x="1002" y="380">· author ≠ approver,</text>
+      <text class="d-mute" x="1002" y="394">  compared by person</text>
+      <text class="d-mute" x="1002" y="414">· tools: is a hard ceiling</text>
+      <text class="d-mute" x="1002" y="428">  under claude; advisory:</text>
+      <text class="d-mute" x="1002" y="442">  don't stack too many seats</text>
+
+      <text class="d-mute" x="360" y="492">A seat never cares which kind of worker fills it: a person typing the verbs, a sub-agent Task, or a main loop launched with bh role &lt;seat&gt;.</text>
+      <text class="d-mute" x="360" y="508">Every action is stamped either way — the audit trail reads the same whether one session or five produced it.</text>
+    </svg>
+  </div>
+  <figcaption>Seats compose <em>sequentially</em>, not additively. A supervised operator can drive a
+  whole bead through dispatcher, developer, reviewer and merger seats in one long context window
+  without separate permission sets, because <code>--as &lt;seat&gt;/&lt;name&gt;</code> re-stamps every
+  verb and the gate machinery checks the stamp, not the window. The two limits that remain are
+  deliberate: the self-approval block compares <em>people</em>, so a different human (or a fresh
+  reviewer session) has to clear a <code>type:human</code> gate; and conflict-of-interest pairings
+  are advised, not enforced, to split across sessions. The role skill a seat needs rides in on its
+  agent definition's <code>skills:</code> frontmatter, with <code>work</code> for every seat that
+  drives a bead lifecycle.</figcaption>
+</figure>

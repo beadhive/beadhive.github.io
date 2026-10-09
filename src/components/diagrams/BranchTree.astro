@@ -1,0 +1,141 @@
+---
+// The N-tier branch tree one molecule produces. Rows are branches, time runs
+// left to right. The point is the recursive rule: every container is both a
+// dispatcher seat and the integration line its children fork from and land
+// on, so a leaf lands on its epic, an epic on its workstream, a workstream on
+// main — one rule, applied at every tier (docs/AGF.md "Container branches").
+//
+// Row geometry is data so the rows stay on a grid; everything else is placed
+// against these constants.
+const ROW = { leafA: 72, leafB: 132, batch: 192, epic: 272, ws: 362, main: 452 };
+const X0 = 250;   // where the graph starts (left of it: row labels)
+const X1 = 1140;  // right edge
+---
+<figure id="fig-branch-tree">
+  <div class="diagram">
+    <svg viewBox="0 0 1160 556" role="img"
+      aria-label="Git branch diagram of one workstream: main forks a workstream container branch, which forks an epic container; two leaf issue branches and one shared batch branch fork off the epic and merge back into it serially; the epic finishes onto the workstream as one no-fast-forward bubble, and the workstream finishes onto main the same way.">
+      <defs>
+        <marker id="bt-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+        <marker id="bt-arrow-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+      </defs>
+
+      <text class="d-kicker" x={X1} y="28" text-anchor="end">TIME →</text>
+
+      <!-- row guides -->
+      {Object.values(ROW).map((y) => <line class="d-sep" x1={X0} y1={y} x2={X1} y2={y} />)}
+
+      <!-- ===== row labels ===== -->
+      <g>
+        <text class="d-code" x="24" y={ROW.leafA - 4}>wt/bead/issue/bh-ws.2.1</text>
+        <text class="d-mute" x="24" y={ROW.leafA + 12}>leaf · developer dev/alice</text>
+
+        <text class="d-code" x="24" y={ROW.leafB - 4}>wt/bead/issue/bh-ws.2.2</text>
+        <text class="d-mute" x="24" y={ROW.leafB + 12}>leaf · developer dev/bob</text>
+
+        <text class="d-code" x="24" y={ROW.batch - 4}>wt/batch/same-file</text>
+        <text class="d-mute" x="24" y={ROW.batch + 12}>beads .3 .4 .5 · dispatcher @ batch</text>
+
+        <text class="d-code-h" x="24" y={ROW.epic - 4}>wt/bead/epic/bh-ws.2</text>
+        <text class="d-mute" x="24" y={ROW.epic + 12}>epic container · disp/ seat worktree</text>
+
+        <text class="d-code-h" x="24" y={ROW.ws - 4}>wt/bead/epic/bh-ws</text>
+        <text class="d-mute" x="24" y={ROW.ws + 12}>workstream = epic of epics · disp/</text>
+
+        <text class="d-code-g" x="24" y={ROW.main - 4}>main</text>
+        <text class="d-mute" x="24" y={ROW.main + 12}>integration branch · always green</text>
+      </g>
+
+      <!-- ===== main ===== -->
+      <path class="d-br-g" d={`M ${X0} ${ROW.main} H ${X1 - 10}`} marker-end="url(#bt-arrow)"/>
+      <circle class="d-commit-g" cx="280" cy={ROW.main} r="6"/>
+      <!-- fork main -> workstream -->
+      <path class="d-br-faint" d={`M 320 ${ROW.main} C 340 ${ROW.main}, 340 ${ROW.ws}, 360 ${ROW.ws}`}/>
+      <circle class="d-commit" cx="320" cy={ROW.main} r="4"/>
+
+      <!-- ===== workstream container ===== -->
+      <path class="d-br-h" d={`M 360 ${ROW.ws} H 1040`}/>
+      <circle class="d-commit-h" cx="360" cy={ROW.ws} r="6"/>
+      <text class="d-code" x="372" y={ROW.ws + 24}>bh work start bh-ws --as disp/</text>
+      <!-- fork ws -> epic -->
+      <path class="d-br-faint" d={`M 400 ${ROW.ws} C 420 ${ROW.ws}, 420 ${ROW.epic}, 440 ${ROW.epic}`}/>
+      <circle class="d-commit" cx="400" cy={ROW.ws} r="4"/>
+
+      <!-- ===== epic container ===== -->
+      <path class="d-br-h" d={`M 440 ${ROW.epic} H 940`}/>
+      <circle class="d-commit-h" cx="440" cy={ROW.epic} r="6"/>
+      <text class="d-mute" x="452" y={ROW.epic + 24}>start bh-ws.2 — forks off its integration_base</text>
+
+      <!-- ===== leaf A ===== -->
+      <path class="d-br-faint" d={`M 480 ${ROW.epic} C 500 ${ROW.epic}, 500 ${ROW.leafA}, 520 ${ROW.leafA}`}/>
+      <circle class="d-commit" cx="480" cy={ROW.epic} r="4"/>
+      <path class="d-br" d={`M 520 ${ROW.leafA} H 640`}/>
+      <circle class="d-commit" cx="550" cy={ROW.leafA} r="5"/>
+      <circle class="d-commit" cx="590" cy={ROW.leafA} r="5"/>
+      <circle class="d-commit" cx="630" cy={ROW.leafA} r="5"/>
+      <text class="d-mute" x="520" y={ROW.leafA - 12}>claim → implement → refine → check → submit</text>
+      <!-- merge A -> epic -->
+      <path class="d-br" d={`M 640 ${ROW.leafA} C 660 ${ROW.leafA}, 660 ${ROW.epic}, 680 ${ROW.epic}`}/>
+      <circle class="d-commit-h" cx="680" cy={ROW.epic} r="6"/>
+      <text class="d-code-h" x="692" y={ROW.epic - 18}>merge --no-ff</text>
+
+      <!-- ===== leaf B (forks after A landed) ===== -->
+      <path class="d-br-faint" d={`M 700 ${ROW.epic} C 720 ${ROW.epic}, 720 ${ROW.leafB}, 740 ${ROW.leafB}`}/>
+      <circle class="d-commit" cx="700" cy={ROW.epic} r="4"/>
+      <path class="d-br" d={`M 740 ${ROW.leafB} H 840`}/>
+      <circle class="d-commit" cx="770" cy={ROW.leafB} r="5"/>
+      <circle class="d-commit" cx="810" cy={ROW.leafB} r="5"/>
+      <text class="d-mute" x="740" y={ROW.leafB - 12}>forks after .1 landed → sees its work</text>
+      <path class="d-br" d={`M 840 ${ROW.leafB} C 860 ${ROW.leafB}, 860 ${ROW.epic}, 880 ${ROW.epic}`}/>
+      <circle class="d-commit-h" cx="880" cy={ROW.epic} r="6"/>
+
+      <!-- ===== batch (parallel with B, shares the fork point) ===== -->
+      <path class="d-br-faint" d={`M 700 ${ROW.epic} C 720 ${ROW.epic}, 720 ${ROW.batch}, 740 ${ROW.batch}`}/>
+      <path class="d-br" d={`M 740 ${ROW.batch} H 860`}/>
+      <circle class="d-commit" cx="770" cy={ROW.batch} r="5"/>
+      <circle class="d-commit" cx="800" cy={ROW.batch} r="5"/>
+      <circle class="d-commit" cx="830" cy={ROW.batch} r="5"/>
+      <text class="d-code" x="740" y={ROW.batch + 24}>one commit per bead · submit --group · merge --group</text>
+      <path class="d-br" d={`M 860 ${ROW.batch} C 880 ${ROW.batch}, 880 ${ROW.epic}, 910 ${ROW.epic}`}/>
+      <circle class="d-commit-h" cx="910" cy={ROW.epic} r="6"/>
+      <text class="d-mute" x="848" y={ROW.epic + 42} text-anchor="middle">parallel work, serial merge — one merge slot</text>
+
+      <!-- ===== epic finish -> workstream ===== -->
+      <path class="d-br-h" d={`M 940 ${ROW.epic} C 960 ${ROW.epic}, 960 ${ROW.ws}, 980 ${ROW.ws}`}/>
+      <circle class="d-commit-h" cx="980" cy={ROW.ws} r="7"/>
+      <text class="d-code-h" x="1000" y={ROW.ws - 40}>finish bh-ws.2</text>
+      <text class="d-mute" x="1000" y={ROW.ws - 26}>one no-ff bubble, one tier up;</text>
+      <text class="d-mute" x="1000" y={ROW.ws - 12}>the seat worktree is torn down</text>
+
+      <!-- ===== workstream finish -> main ===== -->
+      <path class="d-br-h" d={`M 1040 ${ROW.ws} C 1060 ${ROW.ws}, 1060 ${ROW.main}, 1090 ${ROW.main}`}/>
+      <circle class="d-commit-g" cx="1090" cy={ROW.main} r="7"/>
+      <text class="d-code-g" x="1000" y={ROW.main - 14}>finish bh-ws → main</text>
+      <text class="d-mute" x="1000" y={ROW.main + 30}>same rule, last tier:</text>
+      <text class="d-mute" x="1000" y={ROW.main + 44}>fixed forward, never rewritten</text>
+
+      <!-- integration_base climb callout -->
+      <g>
+        <rect class="d-box" x="252" y="510" width="884" height="34" rx="6"/>
+        <text class="d-code" x="266" y="531">integration_base climb: bh-ws.2.1 → bh-ws.2 → bh-ws → main · the dotted id is the tier · nearest started container wins</text>
+      </g>
+    </svg>
+  </div>
+  <div class="legend display">
+    <span><span class="sw" style="background:var(--green)"></span>integration branch</span>
+    <span><span class="sw" style="background:var(--honey)"></span>container branch — a dispatcher seat at any tier</span>
+    <span><span class="sw" style="background:var(--ink-2)"></span>leaf / batch branch — a developer or collapsed seat</span>
+    <span><span class="sw dash"></span>fork (claim / start)</span>
+  </div>
+  <figcaption>Two namespaces, one rule. Every container lives at
+  <code>wt/bead/epic/&lt;id&gt;</code> and every leaf at <code>wt/bead/issue/&lt;id&gt;</code>;
+  a bead forks from — and <code>bh work merge</code> lands on — the nearest started container
+  above it, falling back to <code>main</code>. A <b>batch</b> is the one exception to
+  one-bead-per-worktree: cohesive beads share <code>wt/batch/&lt;group&gt;</code> and complete as a
+  unit. An intermediate, unpushed container can still roll back losslessly if a re-validation
+  fails; only the final land onto <code>main</code> is fixed forward. A second epic under the same
+  workstream (<code>bh-ws.3</code>) runs the identical loop on its own container, dispatched to a
+  nested dispatcher.</figcaption>
+</figure>

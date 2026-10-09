@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import IntakeRouting from '../components/diagrams/IntakeRouting.astro';
 
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
@@ -170,6 +171,7 @@ export const meta = {
         which adopts it into a gated molecule instead of letting it sit as an oversized ticket.</li>
       </ul>
     </div>
+    <IntakeRouting />
   </div>
 </section>
 <section id="hosts">

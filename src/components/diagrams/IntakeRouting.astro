@@ -1,0 +1,146 @@
+---
+// Where a report lands versus where an escalation lands, and who disposes of
+// each. Shipped: bh report (a known hive), imports, bh escalate (to HQ), the
+// three queues, the four dispositions, the director as terminal router.
+// Direction: resolving a tool's report channel automatically so a known
+// target files straight into its hive and only the unknown case escalates.
+// Source: infra CLAUDE.md intake + escalation chain, docs/HQ.md (intake
+// naming), docs/REPORT-CHANNEL.md, docs/PLANNING-PLANE.md (adopt).
+---
+<figure id="fig-intake-routing">
+  <div class="diagram">
+    <svg viewBox="0 0 1160 540" role="img"
+      aria-label="Routing diagram. Sources on the left: bh report into a known hive, GitHub issue import and legacy import all land in that hive's untriaged intake queue; bh escalate lands in HQ's own intake queue. Every hive queue is aggregated by bh sync into the fleet-wide hub inbox the director reads. Dispositions on the right: accept clears work into the backlog, reject closes with a reporter-visible reason, reroute re-files into another hive or holds for the director, promote hands to the planner who adopts it into a gated molecule. A dashed direction branch shows a report-channel descriptor resolving a tool's target so a known target files directly and only an unknown one escalates.">
+      <defs>
+        <marker id="ir-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+        <marker id="ir-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/></marker>
+        <marker id="ir-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+        <marker id="ir-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--red)"/></marker>
+      </defs>
+
+      <text class="d-kicker" x="24" y="28">SOURCES</text>
+      <text class="d-kicker" x="400" y="28">QUEUES — intake:untriaged · origin:&lt;channel&gt;</text>
+      <text class="d-kicker" x="800" y="28">DISPOSITION — typed verbs, never ad-hoc labels</text>
+
+      <!-- known-target sources -->
+      <rect class="d-box-h" x="24" y="44" width="300" height="60" rx="6"/>
+      <text class="d-code-h" x="38" y="64">bh report &lt;hive&gt; "&lt;title&gt;"</text>
+      <text class="d-mute" x="38" y="80">target is KNOWN: a hive you own — including from another</text>
+      <text class="d-mute" x="38" y="94">hive, how one repo tells another it is broken · origin:report</text>
+
+      <rect class="d-chip" x="24" y="116" width="300" height="40" rx="6"/>
+      <text class="d-code" x="38" y="134">GitHub issue import</text>
+      <text class="d-mute" x="38" y="148">channel derived from source_system · origin:github</text>
+
+      <rect class="d-chip" x="24" y="168" width="300" height="40" rx="6"/>
+      <text class="d-code" x="38" y="186">legacy import</text>
+      <text class="d-mute" x="38" y="200">origin:import · same queue, same triage</text>
+
+      <!-- unknown-target source -->
+      <rect class="d-box-r" x="24" y="258" width="300" height="76" rx="6"/>
+      <text class="d-code-r" x="38" y="278">bh escalate "&lt;what&gt; with &lt;tool&gt;"</text>
+      <text class="d-mute" x="38" y="294">target is UNKNOWN: a bh / bd / tool bug mid-work.</text>
+      <text class="d-mute" x="38" y="308">One line, fire-and-forget, keep working —</text>
+      <text class="d-mute" x="38" y="322">the developer never routes or investigates · origin:escalation</text>
+
+      <!-- direction: report-channel resolution -->
+      <rect class="d-box-dir" x="24" y="368" width="300" height="148" rx="6"/>
+      <rect class="d-chip-dir" x="236" y="376" width="80" height="14" rx="7"/>
+      <text class="d-mute" x="276" y="387" text-anchor="middle" style="font-size:9.5px">direction</text>
+      <text class="d-title" x="38" y="392">auto-routing by report channel</text>
+      <text class="d-mute" x="38" y="410">a tool declares where its issues go:</text>
+      <text class="d-code" x="38" y="426">&lt;tool&gt; report-target --json</text>
+      <text class="d-code" x="38" y="440">/.well-known/report-channel.json</text>
+      <text class="d-code" x="38" y="454">MCP serverInfo._meta</text>
+      <text class="d-mute" x="38" y="472">descriptor spec ships; nothing reads it yet.</text>
+      <text class="d-mute" x="38" y="486">resolved → file as a report into that hive;</text>
+      <text class="d-mute" x="38" y="500">unresolved → escalate to HQ as today</text>
+      <path class="flow-h dashed" d="M 324 410 C 360 410, 360 74, 390 74" marker-end="url(#ir-h)"/>
+      <path class="flow-r dashed" d="M 324 490 C 360 490, 360 300, 390 300" marker-end="url(#ir-r)"/>
+
+      <!-- per-hive queue -->
+      <path class="flow" d="M 324 74 H 396" marker-end="url(#ir-n)"/>
+      <path class="flow" d="M 324 136 C 360 136, 360 100, 396 92" marker-end="url(#ir-n)"/>
+      <path class="flow" d="M 324 188 C 360 188, 360 112, 396 104" marker-end="url(#ir-n)"/>
+      <rect class="d-box" x="400" y="44" width="330" height="96" rx="8"/>
+      <text class="d-title" x="414" y="64">per-hive queue · bh work intake</text>
+      <text class="d-mute" x="414" y="80">the dispatcher fields its own hive's queue</text>
+      <text class="d-mute" x="414" y="94">bd find-duplicates runs on entry and again at triage,</text>
+      <text class="d-mute" x="414" y="108">so a colliding request surfaces instead of burying it</text>
+      <text class="d-code" x="414" y="128">bh work intake --source report|github|import</text>
+
+      <!-- fleet inbox -->
+      <path class="flow" d="M 565 140 V 168" marker-end="url(#ir-n)"/>
+      <text class="d-mute" x="576" y="160">bh sync aggregates every hive (read side)</text>
+      <rect class="d-box" x="400" y="172" width="330" height="60" rx="8"/>
+      <text class="d-title" x="414" y="192">fleet-wide inbox · bh hub intake</text>
+      <text class="d-mute" x="414" y="208">the director's view across all hives — the hub is derived</text>
+      <text class="d-mute" x="414" y="222">and rebuildable; it holds no truth of its own</text>
+
+      <!-- HQ queue -->
+      <path class="flow-r" d="M 324 296 H 396" marker-end="url(#ir-r)"/>
+      <rect class="d-box" x="400" y="262" width="330" height="72" rx="8"/>
+      <text class="d-title" x="414" y="282">HQ's own queue · bh hq intake</text>
+      <text class="d-mute" x="414" y="298">escalations land as hq- beads in the authoritative store;</text>
+      <text class="d-mute" x="414" y="312">the director is the terminal router — no auto-routing yet</text>
+      <text class="d-mute" x="414" y="326">prints a pointer to the fleet inbox so nobody is stranded</text>
+
+      <!-- dispositions -->
+      <path class="flow" d="M 730 92 C 760 92, 770 80, 796 80" marker-end="url(#ir-n)"/>
+      <path class="flow" d="M 730 202 C 760 202, 770 200, 796 200" marker-end="url(#ir-n)"/>
+      <path class="flow-r" d="M 730 298 C 760 298, 770 300, 796 300" marker-end="url(#ir-r)"/>
+      <text class="d-mute" x="742" y="70">dispatcher</text>
+      <text class="d-mute" x="742" y="190">director</text>
+      <text class="d-mute" x="742" y="290">director</text>
+
+      <rect class="d-box-g" x="800" y="44" width="336" height="60" rx="6"/>
+      <text class="d-code-g" x="814" y="64">bh work accept &lt;id&gt; [--type T] [--priority P]</text>
+      <text class="d-mute" x="814" y="80">real work: intake cleared → backlog → the ordinary</text>
+      <text class="d-mute" x="814" y="94">ready / dispatch loop · intake:accepted</text>
+
+      <rect class="d-chip" x="800" y="116" width="336" height="48" rx="6"/>
+      <text class="d-code" x="814" y="136">bh work reject &lt;id&gt; --reason "…"</text>
+      <text class="d-mute" x="814" y="152">closed with a reason the reporter can read · intake:rejected</text>
+
+      <rect class="d-chip" x="800" y="176" width="336" height="76" rx="6"/>
+      <text class="d-code" x="814" y="196">bh work reroute &lt;id&gt; --to &lt;hive&gt;</text>
+      <text class="d-mute" x="814" y="212">mis-filed: lands in that hive's queue · intake:rerouted</text>
+      <text class="d-code" x="814" y="230">bh work reroute &lt;id&gt; --super &lt;seat&gt;</text>
+      <text class="d-mute" x="814" y="246">genuinely ambiguous: stays in the fleet inbox for a second look</text>
+
+      <rect class="d-box-h" x="800" y="264" width="336" height="70" rx="6"/>
+      <text class="d-code-h" x="814" y="284">bh work promote &lt;id&gt;</text>
+      <text class="d-mute" x="814" y="300">too big to accept as a ticket · intake:promoted — the adopt</text>
+      <text class="d-mute" x="814" y="314">queue key. The planner runs bh plan adopt &lt;id&gt; and seeds</text>
+      <text class="d-mute" x="814" y="328">a molecule frame; the report rides the epic as its child</text>
+
+      <!-- provenance facets -->
+      <rect class="d-box" x="400" y="368" width="736" height="148" rx="8"/>
+      <text class="d-title" x="414" y="390">three facets, kept orthogonal</text>
+      <text class="d-code-h" x="414" y="412">intake</text><text class="d-mute" x="480" y="412">the queue state: untriaged → accepted | rejected | rerouted | promoted (closed dimension, bd set-state)</text>
+      <text class="d-code-h" x="414" y="432">origin</text><text class="d-mute" x="480" y="432">the channel it entered through: report · github · import · escalation — a durable provenance tag</text>
+      <text class="d-code-h" x="414" y="452">source_system</text><text class="d-mute" x="520" y="452">+ external_ref — the native system-of-record coupling, set only at import, never overloaded by a native report</text>
+      <text class="d-mute" x="414" y="478">reporter identity is bd --actor, never a label. One queue for every channel means one triage, one duplicate scan,</text>
+      <text class="d-mute" x="414" y="492">one set of verbs — a cross-hive report, an imported GitHub issue and an escalation all look the same to the seat</text>
+      <text class="d-mute" x="414" y="506">disposing of them; only the queue they sit in, and therefore who sees them first, differs.</text>
+    </svg>
+  </div>
+  <div class="legend display">
+    <span><span class="sw" style="background:var(--ink-3)"></span>report path — target known</span>
+    <span><span class="sw" style="background:var(--red)"></span>escalation path — target unknown</span>
+    <span><span class="sw" style="background:var(--honey)"></span>hand-off to planning</span>
+    <span><span class="sw dash"></span>direction</span>
+  </div>
+  <figcaption>The split is by <em>what the filer knows</em>. A <b>report</b> names its hive, so it
+  lands in that hive's queue and the hive's own dispatcher triages it; the fleet inbox is only an
+  aggregate read of every such queue. An <b>escalation</b> names nothing but the symptom — it
+  goes to HQ's own store and waits for the director, who is the one terminal router and resolves it
+  with the same four verbs. Nothing routes itself today. The report-channel descriptor is the piece
+  that would let a tool say where its issues belong, so that a known target files directly and only
+  the genuinely unknown case climbs to HQ; the descriptor is specified and validated, and the
+  consumer that would read it is deliberately a later bead.</figcaption>
+</figure>

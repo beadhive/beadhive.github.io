@@ -915,3 +915,42 @@
   .reviewbar label > span { color: var(--ink); font-weight: 600; }
   .reviewbar select, .reviewbar input { width: 100%; font: inherit; font-size: 11px; color: var(--ink); background: var(--code-bg); border: 1px solid var(--hairline); border-radius: 5px; padding: 3px 6px; }
   .reviewbar small { display: block; color: var(--ink-3); font-size: 10px; }
+
+  /* ---------- diagram components (src/components/diagrams/*) ----------
+     Shared vocabulary so every mechanism diagram reads as one system. Lines
+     are branches, circles are commits/records, hexagons are gates. Anything
+     unshipped is dashed AND carries a "direction" chip — never one without
+     the other (docs/design/content-promotion-adr.md, Amendment 1). */
+  .diagram .d-display { font-family: "Futura","Avenir Next",system-ui,sans-serif; }
+  .diagram .d-mono { font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+  .d-title { fill: var(--ink); font-size: 13px; font-weight: 700; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
+  .d-kicker { fill: var(--honey-strong); font-size: 10px; font-weight: 700; letter-spacing: .14em;
+              font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+  .d-mute { fill: var(--ink-3); font-size: 10.5px; font-family: "Futura","Avenir Next",system-ui,sans-serif; }
+  .d-code { fill: var(--ink-2); font-size: 10.5px; font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+  .d-code-h { fill: var(--honey-strong); font-size: 10.5px; font-weight: 600; font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+  .d-code-g { fill: var(--green); font-size: 10.5px; font-weight: 600; font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+  .d-code-r { fill: var(--red); font-size: 10.5px; font-weight: 600; font-family: ui-monospace,"SF Mono",Menlo,monospace; }
+  .d-box { fill: var(--panel-2); stroke: var(--hairline); stroke-width: 1; }
+  .d-box-h { fill: var(--honey-wash); stroke: var(--honey); stroke-width: 1.2; }
+  .d-box-g { fill: var(--green-wash); stroke: var(--green); stroke-width: 1.2; }
+  .d-box-r { fill: var(--red-wash); stroke: var(--red); stroke-width: 1.2; }
+  .d-box-dir { fill: none; stroke: var(--ink-3); stroke-width: 1.2; stroke-dasharray: 4 4; }
+  .d-chip { fill: var(--panel); stroke: var(--hairline); stroke-width: 1; }
+  .d-chip-dir { fill: var(--panel); stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 3 3; }
+  .d-br { stroke: var(--ink-2); stroke-width: 2; fill: none; }
+  .d-br-h { stroke: var(--honey); stroke-width: 2.4; fill: none; }
+  .d-br-g { stroke: var(--green); stroke-width: 3; fill: none; }
+  .d-br-faint { stroke: var(--node-stroke); stroke-width: 1.4; fill: none; stroke-dasharray: 3 5; }
+  .d-commit { fill: var(--node); stroke: var(--ink-2); stroke-width: 1.8; }
+  .d-commit-h { fill: var(--node); stroke: var(--honey); stroke-width: 2.2; }
+  .d-commit-g { fill: var(--green); stroke: var(--green); stroke-width: 2; }
+  .d-commit-r { fill: var(--red-wash); stroke: var(--red); stroke-width: 2; }
+  .d-sep { stroke: var(--hairline); stroke-width: 1; }
+  .d-sep-strong { stroke: var(--node-stroke); stroke-width: 1.2; }
+  .d-dot-run { fill: var(--honey); }
+  .d-dot-reuse { fill: none; stroke: var(--green); stroke-width: 2.2; }
+  .d-dot-cond { fill: var(--ink-3); }
+  .d-dot-skip { fill: none; stroke: var(--ink-3); stroke-width: 1.4; stroke-dasharray: 2 2; }
+  .d-human { fill: none; stroke: var(--honey-strong); stroke-width: 1.6; }
+  .sw.dash { height: 0; background: none; border-top: 2px dashed var(--ink-3); }
