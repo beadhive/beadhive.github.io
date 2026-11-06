@@ -262,15 +262,16 @@ const [npX, npY] = at(240, R + 28);
         <h2 class="display">Bring the planning you already have</h2>
         <p>Most repos already hold planning: decision records, design notes, a
         <code>.planning/</code> directory. Good information in the wrong format — an agent can read a file tree, but it
-        can't ask what's blocked or what's ready. <b>Backfill</b> proposes that history and those
-        documents as beads, and every proposal stops for you to confirm, reclassify, or throw
-        away.</p>
+        can't ask what's blocked or what's ready. <b>Backfill</b> links that history and those
+        documents to beads — commits and decision docs to the beads they belong to, a planning
+        tree proposed as beads — and writes nothing until you have previewed the plan and
+        applied it yourself. Docs it can't match by rule wait for you to confirm.</p>
       </div>
       <div class="step-side">
         <div class="term">
 <pre><code><span class="p">$</span> bh hive onboard --claude   <span class="c"># or --opencode</span>
 <span class="p">$</span> claude
-<span class="p">&gt;</span> /bh:backfill               <span class="c"># propose history + docs as beads</span>
+<span class="p">&gt;</span> /bh:backfill               <span class="c"># link history + docs to beads, preview first</span>
 <span class="c"># reconciled, never blind-imported</span></code></pre>
         </div>
       </div>
