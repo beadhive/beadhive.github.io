@@ -128,6 +128,16 @@ const [npX, npY] = at(240, R + 28);
         <code>bd</code> starts for you — and nothing written into your repo until you ask for
         it. Installing <code>bh</code> alone from PyPI works too, but leaves the four tools it
         drives for you to manage.</p>
+        {/* The extras are a NOTE, not part of the install block: INSTALL.md's
+            managed path (the source of truth src/copy/install.ts follows) does
+            not carry them, so they must not be spliced into that command. */}
+        <p>Two optional extras exist, and installing one enables nothing:
+        <code>beadhive[github]</code> adds the GitHub tracker plugin's one dependency,
+        <code>beadhive[xtdb]</code> the XTDB history store's. Each plugin stays off until you
+        turn it on, and <code>bh plugin tracker-github status</code> / <code>doctor</code> (and the
+        <code>beadlog-xtdb</code> pair) tell you whether it is ready — see
+        <a href="https://github.com/beadhive/beadhive/blob/main/docs/CONFIGURATION.md">CONFIGURATION.md</a>
+        and <a href="https://github.com/beadhive/beadhive/blob/main/docs/UPGRADING.md">UPGRADING.md</a>.</p>
       </div>
       <div class="step-side">
         {/* THE CTA IS THE MESSAGE, and it is the whole default surface. The brief

@@ -120,10 +120,10 @@
       <text class="d-mute" x="778" y="400">a verdict from another host is a trust claim, not a cache:</text>
       <text class="d-mute" x="778" y="414">it needs signing (ADR Decision 6 — out of scope in v1)</text>
 
-      <rect class="d-chip-dir" x="764" y="438" width="364" height="54" rx="6"/>
-      <text class="d-title" x="778" y="458">validation broker — proposal</text>
-      <text class="d-mute" x="778" y="474">resource-aware queue: declared CPU / memory / named pools,</text>
-      <text class="d-mute" x="778" y="486">priority and measured runtime; pueue vs HyperQueue bake-off</text>
+      <rect class="d-box-g" x="764" y="438" width="364" height="54" rx="6"/>
+      <text class="d-title" x="778" y="458">validation broker — shipped, opt-in</text>
+      <text class="d-mute" x="778" y="474">bh-native: admits keys against a CPU / memory / pool budget,</text>
+      <text class="d-mute" x="778" y="486">runs them side by side; default stays slots; adapters are direction</text>
     </svg>
   </div>
   <figcaption>Admission is a host question, not a hive question: one counting semaphore covers
@@ -135,5 +135,8 @@
   external runner return a typed verdict, and because that verdict is just another attestation
   under the same key, the gates and the pre-push hook would need no new code path. What is not
   built is the handoff itself, and what is not decided is how a verdict earned on another machine
-  is trusted.</figcaption>
+  is trusted. The validation broker in the corner is shipped and opt-in: a bh-native, in-process
+  engine that admits a gate's keys against a CPU, memory and named-pool budget and runs them side
+  by side; the default is still one gate at a time per host, and a durable broker service and
+  external runner adapters are direction.</figcaption>
 </figure>
