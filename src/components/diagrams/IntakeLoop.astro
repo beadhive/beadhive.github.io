@@ -1,0 +1,156 @@
+---
+// The supervised loop for a GitHub-bound report, end to end: pulled in
+// read-only, held, triaged with the ordinary verbs, linked to the work that
+// addresses it, and kept informed through an outbox where every post is a
+// draft until an operator approves the exact rendered bytes. Everything in
+// the hive lane is opt-in (off by default); the only writes toward GitHub are
+// a comment and a change to Beadhive-owned labels, and they cross the
+// boundary only on a per-record, single-use operator grant.
+// Sibling of IntakeRouting (where a report lands); this one is what happens
+// to it afterwards. Source: docs/CONFIGURATION.md (intake.external,
+// plugins.tracker-github), docs/UPGRADING.md, docs/design/external-intake-
+// module-adr.md, docs/INTAKE-TEMPLATES.md.
+---
+<figure id="fig-intake-loop">
+  <div class="diagram">
+    <svg viewBox="0 0 1160 600" role="img"
+      aria-label="Two lanes. Top lane, GitHub, the reporter's side: an issue, its comment thread, and the repository's bh: labels. Bottom lane, the hive's internal store, off by default: pull (bh work import or bh work discover, read-only) lands a held, untriaged report; triage disposes of it with accept, reject, reroute, promote, or asks the reporter a question with needs-info and wakes it when a human replies; track links the report to the work that addresses it, or attaches reproduction work with investigate, which fires no milestone; the outbox turns milestones, replies and label changes into drafts that are rendered, leak-checked and digested. Between the lanes a dashed operator-approval boundary: a draft crosses up to GitHub only when an operator seat approves its digest, minting a single-use grant per operation; agents cannot approve, and bh makes no LLM call. A side loop shows review-gated batch triage: review packets, an analyst proposal, a verifier verdict, deterministic checks, and an operator-run apply of reviewed proposals only.">
+      <defs>
+        <marker id="il-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+        <marker id="il-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/></marker>
+        <marker id="il-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+      </defs>
+
+      <!-- GitHub lane -->
+      <text class="d-kicker" x="24" y="24">GITHUB — THE REPORTER'S SIDE · read-only toward the issue until an operator approves a write</text>
+      <rect class="d-box" x="24" y="36" width="1112" height="84" rx="8"/>
+      <rect class="d-chip" x="40" y="50" width="250" height="56" rx="6"/>
+      <text class="d-title" x="54" y="70">the issue</text>
+      <text class="d-mute" x="54" y="86">opened by anyone · optional issue form carries</text>
+      <text class="d-mute" x="54" y="100">a template marker the triage checklist reads</text>
+
+      <rect class="d-chip" x="310" y="50" width="250" height="56" rx="6"/>
+      <text class="d-title" x="324" y="70">the comment thread</text>
+      <text class="d-mute" x="324" y="86">the reporter's replies, and our own posted</text>
+      <text class="d-mute" x="324" y="100">messages, which bh recognises as its own</text>
+
+      <rect class="d-chip" x="580" y="50" width="250" height="56" rx="6"/>
+      <text class="d-title" x="594" y="70">owned labels · bh:&lt;dimension&gt;/&lt;value&gt;</text>
+      <text class="d-mute" x="594" y="86">one prefix Beadhive owns; labels outside it are</text>
+      <text class="d-mute" x="594" y="100">never added, removed or reported on</text>
+
+      <rect class="d-chip" x="850" y="50" width="270" height="56" rx="6"/>
+      <text class="d-title" x="864" y="70">what can ever be written</text>
+      <text class="d-code" x="864" y="86">a comment · a change to owned labels</text>
+      <text class="d-mute" x="864" y="100">no open, close, edit or transfer of an issue</text>
+
+      <!-- approval boundary -->
+      <path class="flow-h dashed" d="M 24 158 H 1136"/>
+      <rect class="d-box-h" x="350" y="140" width="490" height="36" rx="18"/>
+      <polygon class="d-human" points="372,146 384,152 384,164 372,170 360,164 360,152"/>
+      <text class="d-title" x="394" y="155">OPERATOR APPROVAL BOUNDARY</text>
+      <text class="d-mute" x="394" y="169">single-use grant per operation · agents, timers, config, flags cannot approve</text>
+
+      <!-- crossings -->
+      <path class="flow-g" d="M 60 120 V 212" marker-end="url(#il-g)"/>
+      <text class="d-mute" x="70" y="194">pull · read-only</text>
+      <path class="flow-g" d="M 325 120 V 212" marker-end="url(#il-g)"/>
+      <text class="d-mute" x="335" y="194">thread ingest · read-only</text>
+      <path class="flow-h" d="M 880 216 V 124" marker-end="url(#il-h)"/>
+      <text class="d-mute" x="890" y="194">labels · approved batch</text>
+      <path class="flow-h" d="M 1085 216 V 124" marker-end="url(#il-h)"/>
+      <text class="d-mute" x="1075" y="208" text-anchor="end">send · approved digest only</text>
+
+      <!-- hive lane -->
+      <text class="d-kicker" x="24" y="240">THE HIVE — INTERNAL STORE · opt-in: every stage below is off by default and has its own switch</text>
+      <rect class="d-box" x="24" y="252" width="1112" height="330" rx="8"/>
+
+      <!-- stage 1: pull -->
+      <rect class="d-box-g" x="40" y="268" width="250" height="120" rx="6"/>
+      <text class="d-code-g" x="54" y="288">bh work import &lt;issue-url&gt;</text>
+      <text class="d-code-g" x="54" y="304">bh work discover [--full]</text>
+      <text class="d-mute" x="54" y="322">one issue, or a checkpointed poll of the</text>
+      <text class="d-mute" x="54" y="336">repository; a re-run changes nothing</text>
+      <text class="d-mute" x="54" y="354">lands a HELD report · intake:untriaged</text>
+      <text class="d-mute" x="54" y="368">origin:github · never dispatched as work</text>
+      <text class="d-mute" x="54" y="382">closed issues import like open ones</text>
+
+      <!-- stage 2: triage -->
+      <path class="flow" d="M 290 328 H 306" marker-end="url(#il-n)"/>
+      <rect class="d-box" x="310" y="268" width="250" height="120" rx="6"/>
+      <text class="d-title" x="324" y="288">triage · the same four verbs</text>
+      <text class="d-code" x="324" y="304">accept · reject · reroute · promote</text>
+      <text class="d-mute" x="324" y="320">plus, for a GitHub-bound report:</text>
+      <text class="d-code" x="324" y="336">bh work needs-info --ask "…"</text>
+      <text class="d-code" x="324" y="350">bh work wake</text>
+      <text class="d-mute" x="324" y="366">waits out of the queue; a human reply</text>
+      <text class="d-mute" x="324" y="380">in the ingested thread wakes it</text>
+
+      <!-- stage 3: track -->
+      <path class="flow" d="M 560 328 H 576" marker-end="url(#il-n)"/>
+      <rect class="d-box" x="580" y="268" width="250" height="120" rx="6"/>
+      <text class="d-title" x="594" y="288">track · the report is never the work</text>
+      <text class="d-code" x="594" y="304">bh work link &lt;report&gt; --to &lt;work&gt;</text>
+      <text class="d-code" x="594" y="318">bh work accept --work | --new-work</text>
+      <text class="d-mute" x="594" y="334">tracks: several reports → one work bead</text>
+      <text class="d-code" x="594" y="352">bh work investigate &lt;report&gt; …</text>
+      <text class="d-mute" x="594" y="368">investigates: reproduction work; fires</text>
+      <text class="d-mute" x="594" y="382">no milestone, tells the reporter nothing</text>
+
+      <!-- stage 4: outbox -->
+      <path class="flow" d="M 830 328 H 846" marker-end="url(#il-n)"/>
+      <rect class="d-box-h" x="850" y="268" width="270" height="120" rx="6"/>
+      <text class="d-title" x="864" y="288">outbox · every post starts as a draft</text>
+      <text class="d-code" x="864" y="304">draft → show (render + digest)</text>
+      <text class="d-code" x="864" y="318">→ approve --op &lt;kind&gt;:&lt;digest&gt;</text>
+      <text class="d-code" x="864" y="332">→ send · reconcile · discard · retry</text>
+      <text class="d-mute" x="864" y="350">leak check at draft, render and send:</text>
+      <text class="d-mute" x="864" y="364">secrets and foreign labels always block;</text>
+      <text class="d-mute" x="864" y="378">ids, branches, paths need a named --publish</text>
+
+      <!-- what feeds the outbox -->
+      <rect class="d-chip" x="580" y="408" width="250" height="66" rx="6"/>
+      <text class="d-title" x="594" y="428">delivery milestones · drafts only</text>
+      <text class="d-code" x="594" y="444">started · blocked · deprioritised</text>
+      <text class="d-code" x="594" y="458">merged · released (git-verified)</text>
+      <text class="d-mute" x="594" y="470">each one its own switch · fixed public wording</text>
+      <path class="flow-h" d="M 830 440 C 842 440, 842 400, 850 392" marker-end="url(#il-h)"/>
+
+      <rect class="d-chip" x="850" y="408" width="270" height="66" rx="6"/>
+      <text class="d-title" x="864" y="428">label projection · drafts only</text>
+      <text class="d-code" x="864" y="444">labels define → sync → review → approve</text>
+      <text class="d-mute" x="864" y="460">bead state mirrored onto bh: labels; a human</text>
+      <text class="d-mute" x="864" y="472">edit wins until the next milestone</text>
+
+      <!-- batch triage side loop -->
+      <rect class="d-box" x="40" y="408" width="520" height="66" rx="6"/>
+      <text class="d-title" x="54" y="428">review-gated batch triage · bh stores and checks, it never calls a model</text>
+      <text class="d-code" x="54" y="444">triage review → propose → propose --review-of → check → apply --reviewed</text>
+      <text class="d-mute" x="54" y="460">packets carry the full thread and keep duplicate families together; apply is operator-run,</text>
+      <text class="d-mute" x="54" y="472">maps onto the verbs above, so every refusal still holds; replies it produces are drafts</text>
+      <path class="flow dashed" d="M 435 408 V 392" marker-end="url(#il-n)"/>
+
+      <!-- who can do what -->
+      <rect class="d-box" x="40" y="492" width="1080" height="74" rx="6"/>
+      <text class="d-title" x="54" y="512">who can do what</text>
+      <text class="d-code-h" x="54" y="532">bh</text><text class="d-mute" x="120" y="532">pulls, holds, links, renders, leak-checks, digests, verifies a release with read-only git — and drafts. It never posts on its own and never calls an LLM.</text>
+      <text class="d-code-h" x="54" y="546">operator</text><text class="d-mute" x="120" y="546">reads the exact rendered text, approves its digest, sends; runs labels define --approve, labels approve --batch and triage apply.</text>
+      <text class="d-code-h" x="54" y="560">agent seats</text><text class="d-mute" x="120" y="560">dev/ disp/ crew/ coord/ can triage, link and draft; none can approve, and no seat can resolve a held report's hold gate.</text>
+    </svg>
+  </div>
+  <div class="legend display">
+    <span><span class="sw" style="background:var(--green)"></span>read-only toward GitHub</span>
+    <span><span class="sw" style="background:var(--honey)"></span>supervised write — drafted, approved, sent</span>
+    <span><span class="sw" style="background:var(--ink-3)"></span>inside the hive</span>
+    <span><span class="sw hex"></span>operator approval</span>
+  </div>
+  <figcaption>Reads go down, writes go up, and the only way up is through an operator. A GitHub
+  issue becomes a <b>held</b> report that triage disposes of with the ordinary verbs; the work that
+  addresses it is a separate bead the report <em>tracks</em>. Anything the reporter will see —
+  a reply, a question, a status note, a label — is first a draft in the outbox; an operator reads
+  the exact render, approves its digest, and sends it. With every default in place none of this
+  lane is on, and <code>bh report</code>, merge and release behave exactly as before.</figcaption>
+</figure>
