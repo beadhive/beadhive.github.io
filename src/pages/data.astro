@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import DataRemotes from '../components/DataRemotes.astro';
+import DataHistory from '../components/DataHistory.astro';
 
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
@@ -13,9 +14,12 @@ export const meta = {
   label: 'The ladder',
   title: 'Why the data moves in · Beadhive',
   description:
-    'Agents can\'t plan against data they can\'t query. The commitment ladder: sync the ' +
+    'Agents can\'t plan against data they can\'t query. The commitment ladder: pull the ' +
     'tracker, move the docs, record the reviews, hook the telemetry — each rung pays off on ' +
-    'its own, and retiring the old tools is a conclusion you reach, not a demand we make.',
+    'its own, and retiring the old tools is a conclusion you reach, not a demand we make. ' +
+    'Plus what keeps the graph honest and recoverable: backfill behind a preview-first safety ' +
+    'envelope, the BeadLog history archive, the opt-in XTDB store, and backups proven by ' +
+    'restoring them.',
 };
 ---
 <Layout active="data" title={meta.title} description={meta.description}>
@@ -63,12 +67,15 @@ export const meta = {
         real content so the rung numbers survive for screen readers. */}
     <div class="cardgrid runggrid">
       <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>1</span></span> Sync the issue tracker</h4>
-        <p>Bi-directional sync; beads becomes the working copy, your tracker keeps running.</p>
+        <p>A pull, not a mirror: your tracker keeps running and stays the authority for what
+        it holds; beads becomes the copy the agents plan against. Writing back is gated and
+        per-item, never a blanket sync.</p>
         <p><b>Payoff:</b> "what's next" is <em>computed</em> from real dependency edges, and
         the plan survives any agent losing its context.</p></div></div>
       <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>2</span></span> Move the design docs in</h4>
-        <p>Backfill proposes your ADRs, specs and git history as beads — reconciled, never
-        blind-imported.</p>
+        <p>Backfill links your commits and decision docs to the beads they belong to, derives
+        when each stage happened, and can propose beads from a planning tree — reconciled,
+        never blind-imported.</p>
         <p><b>Payoff:</b> planning cites recorded decisions instead of re-litigating them, and
         a decision has an address other work can depend on.</p></div></div>
       <div class="rung"><div class="card"><h4><span class="rungno"><svg viewBox="0 0 30 34" aria-hidden="true"><polygon points="15,2 28,9.5 28,24.5 15,32 2,24.5 2,9.5"/></svg><span>3</span></span> Record reviews in the graph</h4>
@@ -90,10 +97,10 @@ export const meta = {
   <div class="wrap">
     <div class="eyebrow display">No leap required</div>
     <h2 class="display">Nothing is abandoned first</h2>
-    <p>Rung one is a sync, not a migration. Your tracker, your docs, your dashboards all keep
-    working; beads is simply the copy the agents plan against. What happens next is the same
-    thing that happens to any mirrored system: one copy is where the decisions get made and
-    the other goes quietly stale. When you retire the old tool — if you do — it's because
+    <p>Rung one is a pull, not a migration. Your tracker, your docs, your dashboards all keep
+    working; beads is simply the copy the agents plan against, fed from the tracker. What
+    happens next is the same thing that happens to any system with a copy: one is where the
+    decisions get made and the other goes quietly stale. When you retire the old tool — if you do — it's because
     nobody had opened it in a month, not because a landing page told you to.</p>
   </div>
 </section>
@@ -112,6 +119,8 @@ export const meta = {
     <a class="deeplink" href="/fleet/">The fleet view — every hive from one seat</a></p>
   </div>
 </section>
+
+<DataHistory />
 
   </div>
 </div>

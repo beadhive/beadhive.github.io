@@ -1,0 +1,132 @@
+---
+// Bead history and durability — the payoff under rung two of the ladder, not a
+// new rung. Backfill (the safety envelope), the BeadLog archive, the opt-in
+// XTDB store, and native backups proven by restoring them.
+//
+// Register (data.astro): ICP-2 facing, "nothing is abandoned first". Every
+// claim below is sourced from the beadhive docs listed in `sources`; default-
+// off capabilities are named as opt-in, and no version numbers appear.
+const sources = [
+  { label: 'Backfill: passes, plans, the safety envelope', href: 'https://github.com/beadhive/beadhive/blob/main/docs/BACKFILL.md' },
+  { label: 'The XTDB store plugin', href: 'https://github.com/beadhive/beadhive/blob/main/docs/XTDB-STORE.md' },
+  { label: 'Backfill platform ADR', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/backfill-platform-adr.md' },
+  { label: 'BeadLog format ADR', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/beadlog-format-adr.md' },
+  { label: 'Backup retention boundary ADR', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/backup-retention-boundary-adr.md' },
+  { label: 'Upgrading: install extras', href: 'https://github.com/beadhive/beadhive/blob/main/docs/UPGRADING.md' },
+];
+---
+<section id="history">
+  <div class="wrap">
+    <div class="eyebrow display">Under rung two</div>
+    <h2 class="display">What the graph remembers — and what keeps it safe</h2>
+    <p>A bead store holds the <em>current</em> state of each bead. History is what erodes: the
+    tracker's own event log starts well after the first beads existed, and a merge that landed
+    months ago is a fact only git still knows. A graph that can't say <em>when</em> a decision
+    was made, or which commits delivered it, is one the planner can't fully trust. Three things
+    close that gap, and a fourth keeps the whole store recoverable.</p>
+
+    <div class="cardgrid hist-grid">
+      <div class="card"><h4>Backfill <span class="status shipped">shipped</span></h4>
+        <p>Brings a hive's beads in line with its history: links commits to the beads they
+        delivered, links decision docs to the beads they belong to, derives when each lifecycle
+        stage happened, and can propose beads from a planning tree. It keeps <em>when it
+        happened</em> apart from <em>when it was recorded</em>, and marks how sure it is.
+        Run it twice and the second run proposes nothing.</p></div>
+      <div class="card"><h4>BeadLog <span class="status shipped">shipped</span></h4>
+        <p>A portable archive of bead history events — a <code>.bdlg</code> file that carries its
+        own schemas and rebuilds byte-for-byte. The same file is backfill's plan: a pass writes a
+        proposal, reconcile sorts it against what's already there, apply loads it. An early,
+        versioned format, not a standard.</p></div>
+      <div class="card"><h4>XTDB store <span class="status shipped">shipped</span> <b class="optin">opt-in</b></h4>
+        <p>An optional plugin that loads a BeadLog into a database keeping both of those times
+        queryable. You install the extra, enable the plugin, and run the database yourself —
+        <code>bh</code> never starts or stops it. The BeadLog stays the source of truth; losing
+        the XTDB copy costs a reload, never data.</p></div>
+      <div class="card"><h4>Backups <span class="status shipped">shipped</span></h4>
+        <p>A snapshot of the hive's store that is not trusted until it has been restored into a
+        scratch database and its fingerprint matched the live one. You run it; nothing takes
+        snapshots for you on a schedule.</p></div>
+    </div>
+
+    <h3 class="display">The safety envelope, in plain terms</h3>
+    <p>Every backfill pass previews by default and writes nothing until you re-run it with
+    <code>--apply</code> against a plan you have saved and looked at. The apply itself is
+    wrapped, in this order:</p>
+    <ol class="envelope">
+      <li><b>Sealed plan.</b> The plan is hashed when it's written; an edited plan is refused.</li>
+      <li><b>Drift gate.</b> If the hive changed since the plan was made, the apply is refused.</li>
+      <li><b>Loss report.</b> The store says up front what it cannot keep.</li>
+      <li><b>Recovery first.</b> A recovery export of the touched beads is written before the
+      first write, and an audit records every step.</li>
+      <li><b>Proof after.</b> The result must equal the expected post-state, and a second dry run
+      must propose nothing, before the apply is reported done.</li>
+      <li><b>Rollback.</b> On any failure the writes are undone in reverse. Backfill never
+      deletes a bead — undoing a create retires it.</li>
+    </ol>
+    <p>Docs it can't match by rule are left for you to confirm; nothing is created for them.
+    A <b>judge</b> can suggest matches for those leftovers, but it is off by default, you supply
+    the model and the key, and every verdict is recorded and marked for review. That judge is
+    the one place in this area where "<code>bh</code> makes no model call" needs the qualifier:
+    with it off, nothing is called. Keeping linkage current after each merge is likewise
+    available and off by default — bounded, best effort, and unable to fail a merge. A
+    <b>coverage</b> report says how well work is linked, and marks stale figures stale rather
+    than presenting them as current.</p>
+
+    <h3 class="display">The restore-proof</h3>
+    <div class="hist-flow">
+      <div class="term">
+        <div class="term-bar"><span class="term-dot"></span>bh — zsh</div>
+<pre><code><span class="p">$</span> bh backup snapshot                <span class="c"># take one dated set; restore it into scratch; compare</span>
+<span class="p">$</span> bh backup list                    <span class="c"># every set, and whether it was proven</span>
+<span class="p">$</span> bh backup verify --restore-test   <span class="c"># prove a set again, later</span>
+<span class="p">$</span> bh backup restore --dry-run       <span class="c"># preview; a real run needs --confirm &lt;hive&gt;</span></code></pre>
+      </div>
+      <div class="hist-flow-text">
+        <p>A snapshot is one dated set: the issues as JSONL, a native database backup, the
+        registry of remotes, and a manifest. Before success is reported, the native backup is
+        restored into a uniquely named scratch database and its full fingerprint must equal the
+        live store's; a set that was not restored is listed as unverified. The scratch database
+        is dropped afterwards (the database engine keeps a copy it names in the report; nothing
+        is purged behind your back).</p>
+        <p>Restoring over a live hive is never implicit: a preview first, the hive's name typed
+        to confirm, and a safety snapshot of what is about to be replaced — if that snapshot
+        fails, the restore refuses with zero change.</p>
+      </div>
+    </div>
+
+    <div class="note"><b>What stays yours.</b> BeadLog archives hold private bead content and
+    live in a private host directory — never committed, never pushed. The XTDB node listens on
+    loopback only, with a password that lives in your secret broker, never in config. Backfill's
+    switches are host-owned: a fleet push cannot turn the judge, the gap fill, or continuous
+    backfill on.</div>
+
+    <p class="srcs-title">Sources</p>
+    <ul class="srcs">{sources.map((s) => <li><a href={s.href}>{s.label} ↗</a></li>)}</ul>
+  </div>
+</section>
+
+<style>
+  .hist-grid { margin: 22px 0 30px; }
+  .card h4 .optin {
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  h3.display { margin: 28px 0 10px; font-size: 20px; }
+  .envelope { margin: 10px 0 16px; padding-left: 1.3rem; }
+  .envelope li { margin: 6px 0; line-height: 1.6; }
+  .envelope b { color: var(--honey-strong); font-weight: 650; }
+  .hist-flow { display: grid; grid-template-columns: 1fr; gap: 18px; margin: 10px 0 24px; }
+  .hist-flow .term { max-width: none; }
+  .hist-flow-text p + p { margin-top: 10px; }
+  @media (min-width: 1024px) {
+    .hist-flow { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
+  }
+  .srcs-title {
+    margin: 26px 0 6px;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3);
+  }
+  .srcs { margin: 0; padding-left: 1.1rem; font-size: 14px; }
+  .srcs li { margin: 3px 0; }
+</style>
