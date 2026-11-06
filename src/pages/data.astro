@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import DataRemotes from '../components/DataRemotes.astro';
 
 // Exported so /llms.txt can enumerate this page without a second copy of its
 // title and description. A new page with a `meta` export appears there for free.
@@ -22,6 +23,7 @@ export const meta = {
   <nav class="toc" aria-label="On this page">
     <p class="toc-title">On this page</p>
     <a class="head" href="#principle">The principle</a>
+    <a class="head" href="#remotes">Where the bead data lives</a>
     <a class="head" href="#rungs">The rungs</a>
     <a class="head" href="#conclusion">Nothing is abandoned first</a>
     <a class="head" href="#top">Where the ladder tops out</a>
@@ -47,6 +49,8 @@ export const meta = {
     work-graph.</p>
   </div>
 </section>
+
+<DataRemotes />
 
 <section id="rungs">
   <div class="wrap">

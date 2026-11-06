@@ -1,0 +1,202 @@
+---
+// Where a hive's bead data lives: the git default, the opt-in HQ-declared
+// remote, and the opt-in internal/public two-store split with its pull-only
+// public projection. Everything past the default is per-hive opt-in and an
+// operator-approved rollout; nothing here converts a hive by itself.
+//
+// Sources (beadhive/beadhive): docs/TWO-STORES.md, docs/DOLT.md,
+// docs/CONFIGURATION.md (dolt_remote, stores, tracker_sync),
+// docs/design/hq-dolt-remote-descriptor-adr.md, docs/design/two-store-scope-adr.md,
+// docs/design/hq-dolt-remotes-runbook.md, docs/design/github-issue-projection.md,
+// docs/design/remote-migration-transaction-adr.md (direction only).
+const sources = [
+  ['Two stores per repository: the operator guide', 'docs/TWO-STORES.md'],
+  ['Where bead data rides by default', 'docs/DOLT.md'],
+  ['dolt_remote, stores and tracker_sync keys', 'docs/CONFIGURATION.md'],
+  ['Decision: HQ declares the remote, the host authenticates', 'docs/design/hq-dolt-remote-descriptor-adr.md'],
+  ['Decision: an internal store and a public projection', 'docs/design/two-store-scope-adr.md'],
+  ['Runbook: declaring, checking and syncing a remote', 'docs/design/hq-dolt-remotes-runbook.md'],
+  ['The GitHub Issues projection and its limits', 'docs/design/github-issue-projection.md'],
+] as const;
+const upstream = (path: string) => `https://github.com/beadhive/beadhive/blob/main/${path}`;
+---
+<section id="remotes">
+  <div class="breakout">
+    <div class="wrap" style="padding:0">
+    <div class="eyebrow display">The substrate's address</div>
+    <h2 class="display">Where the bead data lives</h2>
+    <p>Before the rungs, the question a CTO asks first: once the lifecycle is in the graph,
+    where is the graph? <b>By default, on the repo's own git remote.</b> A hive's issue history
+    rides <code>refs/dolt/data</code> next to the branches, a fresh clone plus <code>bd bootstrap</code> is a hydrated tracker, and there is nothing hosted. That is a
+    default, not a guarantee: a hive can opt in to a different address, and everything below
+    is that opt-in. A hive that declares nothing behaves exactly as it always has.</p>
+
+    <h3 class="display" id="remotes-declared">A declared remote</h3>
+    <p>A fleet operator can declare, per hive, where its bead data lives: the <b>remote
+    descriptor</b> sits in Factory HQ's fleet config, next to the hive it belongs to. HQ holds
+    the declaration and never the credentials; <code>bd</code> realises the registration inside
+    the store; the host authenticates with its own credential profile, which is never written
+    to fleet config, a repository or a log. The declared remote can be an S3-compatible object
+    store — AWS S3, or any S3-compatible service — when the hive runs the shared Dolt server;
+    a path on disk; or another git remote. Moving a corpus between remotes is driven by the
+    operator by hand: the primitives ship, the one-command relocation does not.</p>
+    <p>Two verbs, deliberately separate. <code>bh hive remote</code> compares the declaration
+    with what the store has registered and is <em>read-only</em>; its one write, <code>--reconcile</code>, installs a missing registration and never moves, replaces or
+    deletes data. <code>bh hive sync remotes</code> is the ordinary pull-then-push. For an
+    object-store remote it reports ahead/behind honestly as <em>unknown</em> rather than faking
+    a count, and refuses before any transfer if the host holds no credential.</p>
+
+    <h3 class="display" id="remotes-two-stores">Two stores: a private graph and a public projection</h3>
+    <p>A hive can also opt in to <b>two stores</b>. The <b>internal store</b> is the hive's
+    existing <code>.beads/</code> — nothing renamed, nothing moved — holding planning, molecules,
+    gates, reports and memories on the declared remote. Beads is the authority there, and it is
+    the only store operational work ever touches. The <b>public store</b> is a <em>projection of GitHub Issues</em>: GitHub stays the system of record, the store is
+    pull-only, and <code>bh</code> never writes to GitHub from it. The guard refuses every push
+    shape against a public store for every seat.</p>
+    <p>The projection carries what a board needs — title, body, state, labels, a type and
+    priority, one assignee — and keeps each issue's GitHub URL as its <code>external_ref</code>. It does <em>not</em> carry comments, milestones, projects or
+    reactions, and a deleted GitHub issue leaves its bead behind. A public issue cannot be
+    claimed, assigned or dispatched; a seat that needs to work on one files or links an
+    internal bead instead. The cross-hive aggregate reads internal stores only.</p>
+    <p>The public store can be published to the code origin's <code>refs/dolt/data</code>, so a
+    plain contributor clone plus <code>bd bootstrap</code> sees the public corpus and nothing
+    private. The push is fast-forward only: if that ref already holds a different history, the
+    push is rejected and the data kept — that is the safety, not a fault to force past.
+    Replacing a ref is a separate, off-by-default compare-and-swap that needs the exact SHA and
+    an explicit confirm, and has no undo-by-restoring, because the old history is the private
+    corpus it just stopped publishing.</p>
+
+<pre><code>bh hive remote github/acme/api                        # read-only: declaration vs registration
+bh hive remote github/acme/api --reconcile            # adds a missing registration; moves no data
+bh hive sync remotes github/acme/api --dry-run        # ordinary pull-then-push, previewed
+bh hive remote sync github/acme/api --store public --pull-only   # GitHub Issues → public store</code></pre>
+
+    <div class="note"><b>Operator-approved, never automatic.</b> Nothing above runs for a hive
+    that has not declared a remote or a <code>stores</code> block. Declaring a remote moves no
+    data. Turning two stores on for a live hive is its own rollout — provision the private
+    remote and per-host credentials, seed or move the internal corpus, decide what happens to the
+    history already on the code origin, upgrade every host first — and none of its steps happens
+    by itself or reverses by re-running a sync. Still <span class="status direction">direction</span>:
+    the automated relocation transaction, public stores in the cross-hive aggregate, a second-host
+    clone of the public store, and a store-native fence for object-store remotes (today the fence
+    is an advisory check there, not an atomic one).</div>
+
+    </div>
+
+    <figure id="fig-data-remotes">
+      <div class="diagram">
+        <svg viewBox="0 0 1160 410" role="img"
+          aria-label="Diagram of where a hive's bead data lives. Left, the default: the code repo's own git remote carries branches and refs/dolt/data, and a contributor clone plus bd bootstrap hydrates a tracker. Middle, opt-in: a remote descriptor in Factory HQ fleet config names a declared remote such as an S3-compatible object store; the host supplies credentials; the private internal store with planning, gates, reports and memories syncs there with bh hive sync remotes, and bh hive remote checks the registration read-only. Right, opt-in: GitHub Issues are pulled one way into a public projection store with bh hive remote sync --pull-only; the guard refuses every push to GitHub; the public store publishes fast-forward only to refs/dolt/data on the code origin, so a contributor sees the public corpus only.">
+          <defs>
+            <marker id="dr-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
+            <marker id="dr-h" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--honey)"/></marker>
+            <marker id="dr-g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/></marker>
+          </defs>
+
+          <!-- lane 1: the default -->
+          <text class="d-kicker" x="24" y="28">DEFAULT — THE REPO'S OWN GIT REMOTE</text>
+          <rect class="d-box" x="24" y="44" width="330" height="96" rx="8"/>
+          <text class="d-title" x="38" y="66">code origin · github/acme/api</text>
+          <text class="d-code" x="38" y="84">main · wt/ branches</text>
+          <text class="d-code" x="38" y="100">refs/dolt/data · issue history</text>
+          <text class="d-mute" x="38" y="116">a ref branches and PRs never see · nothing hosted</text>
+          <text class="d-mute" x="38" y="132">a hive that declares nothing stays here, unchanged</text>
+
+          <path class="flow" d="M 189 140 V 160" marker-end="url(#dr-n)"/>
+          <rect class="d-chip" x="24" y="164" width="330" height="56" rx="6"/>
+          <text class="d-code" x="38" y="184">git clone · bd bootstrap</text>
+          <text class="d-mute" x="38" y="200">the contributor's tracker: the whole corpus by default,</text>
+          <text class="d-mute" x="38" y="212">the public corpus only once a hive splits its stores</text>
+
+          <!-- lane 2: declared remote + internal store -->
+          <line class="d-sep" x1="378" y1="24" x2="378" y2="380"/>
+          <text class="d-kicker" x="402" y="28">OPT-IN — A DECLARED REMOTE</text>
+          <rect class="d-box-h" x="402" y="44" width="330" height="80" rx="8"/>
+          <text class="d-title" x="416" y="66">Factory HQ · fleet config</text>
+          <text class="d-code-h" x="416" y="84">managed_repos[].dolt_remote</text>
+          <text class="d-mute" x="416" y="100">the remote descriptor: a URL and a credential label</text>
+          <text class="d-mute" x="416" y="114">HQ holds the declaration, never a secret</text>
+
+          <path class="flow-h" d="M 430 124 V 158" marker-end="url(#dr-h)"/>
+          <text class="d-mute" x="442" y="138" style="font-size:9.5px">bh hive remote · read-only: declaration vs registration</text>
+          <text class="d-mute" x="442" y="150" style="font-size:9.5px">--reconcile adds a missing registration · moves no data</text>
+
+          <rect class="d-box" x="402" y="162" width="330" height="80" rx="8"/>
+          <text class="d-title" x="416" y="184">declared remote</text>
+          <text class="d-code" x="416" y="202">s3://&lt;bucket&gt;/beads/&lt;provider&gt;/&lt;org&gt;/&lt;repo&gt;</text>
+          <text class="d-mute" x="416" y="218">any S3-compatible object store · shared Dolt server</text>
+          <text class="d-mute" x="416" y="234">or a path on disk · or another git remote</text>
+
+          <path class="flow-h" d="M 430 276 V 242" marker-start="url(#dr-h)" marker-end="url(#dr-h)"/>
+          <text class="d-mute" x="442" y="256" style="font-size:9.5px">bh hive sync remotes · pull, then push</text>
+          <text class="d-mute" x="442" y="268" style="font-size:9.5px">ahead/behind reads "unknown" on an object store</text>
+
+          <rect class="d-box-g" x="402" y="280" width="330" height="96" rx="8"/>
+          <text class="d-title" x="416" y="302">internal store · private · .beads/ as it is</text>
+          <text class="d-mute" x="416" y="320">planning · molecules · gates · reports · memories</text>
+          <text class="d-mute" x="416" y="336">beads is the authority · the only store work touches</text>
+          <text class="d-mute" x="416" y="352">never rides the code origin once a public store exists</text>
+          <text class="d-code" x="416" y="368">credential: host-held · never in fleet config</text>
+
+          <!-- lane 3: public projection -->
+          <line class="d-sep" x1="756" y1="24" x2="756" y2="380"/>
+          <text class="d-kicker" x="780" y="28">OPT-IN — A PUBLIC PROJECTION OF GITHUB ISSUES</text>
+          <rect class="d-box" x="780" y="44" width="356" height="72" rx="8"/>
+          <text class="d-title" x="794" y="66">GitHub Issues · the system of record</text>
+          <text class="d-mute" x="794" y="84">boards, triage, comments — humans keep working here</text>
+          <text class="d-mute" x="794" y="100">written back only by a separate, operator-approved path</text>
+
+          <path class="flow-h" d="M 808 116 V 150" marker-end="url(#dr-h)"/>
+          <text class="d-mute" x="820" y="132" style="font-size:9.5px">bh hive remote sync --store public --pull-only</text>
+          <text class="d-mute" x="820" y="144" style="font-size:9.5px">GitHub wins conflicts · no GitHub write API is called</text>
+
+          <rect class="d-box" x="780" y="154" width="356" height="96" rx="8"/>
+          <text class="d-title" x="794" y="176">public store · a projection, pull-only</text>
+          <text class="d-mute" x="794" y="194">title · body · state · labels · type · priority · one assignee</text>
+          <text class="d-mute" x="794" y="210">external_ref keeps the issue URL · no comments, milestones,</text>
+          <text class="d-mute" x="794" y="226">projects or reactions · read, sync, admin only — never claimed</text>
+          <text class="d-code-r" x="794" y="242">guard: every push shape to GitHub is refused</text>
+
+          <path class="flow-g" d="M 808 250 V 284" marker-end="url(#dr-g)"/>
+          <text class="d-mute" x="820" y="266" style="font-size:9.5px">publish · fast-forward only</text>
+          <text class="d-mute" x="820" y="278" style="font-size:9.5px">a ref holding another history rejects the push</text>
+
+          <rect class="d-chip" x="780" y="288" width="356" height="88" rx="6"/>
+          <text class="d-code" x="794" y="308">code origin · refs/dolt/data</text>
+          <text class="d-mute" x="794" y="326">a contributor's bd bootstrap now sees the public corpus only</text>
+          <text class="d-mute" x="794" y="342">replacing a ref: a separate compare-and-swap, off by default —</text>
+          <text class="d-mute" x="794" y="358">exact SHA + --confirm, no undo by restoring the old SHA</text>
+
+          <text class="d-mute" x="580" y="400" text-anchor="middle">Everything right of the first lane is per-hive opt-in: a hive with no descriptor and no stores block is untouched, and no release turns it on.</text>
+        </svg>
+      </div>
+      <div class="legend display">
+        <span><span class="sw" style="background:var(--honey)"></span>declared remote · pull from GitHub</span>
+        <span><span class="sw" style="background:var(--green)"></span>fast-forward publish</span>
+        <span><span class="sw" style="background:var(--ink-3)"></span>git default</span>
+      </div>
+      <figcaption>Three addresses, one rule each. The <b>default</b> keeps issue history on the
+      code repo's own remote. A <b>declared remote</b> moves the private graph to an address
+      HQ names and the host authenticates to, checked read-only before anything syncs. A <b>public projection</b> is pulled one way from GitHub Issues, never written back, and
+      published fast-forward only — so the code origin ends up carrying the corpus a contributor
+      is meant to see and nothing else.</figcaption>
+    </figure>
+
+    <div class="wrap" style="padding:0">
+    <p class="sources-title display">Sources this section draws on</p>
+    <p class="sources">{sources.map(([label, path]) => (
+      <a class="deeplink" href={upstream(path)}>{label}</a>
+    ))}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  #remotes h3 { margin-top: 26px; }
+  #remotes pre { margin: 18px 0; }
+  .sources-title { margin: 26px 0 6px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .sources { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+</style>

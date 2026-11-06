@@ -17,7 +17,7 @@ export const meta = {
     <a class="head" href="#beads">First, what is beads?</a>
     <a class="sub" href="#beads-efficient">Efficiency for agents</a>
     <a class="sub" href="#beads-workgraph">The work-graph</a>
-    <a class="sub" href="#beads-sync">Bi-directional sync</a>
+    <a class="sub" href="#beads-sync">Sync, one direction at a time</a>
     <a class="head" href="#why">Why beads is the right substrate</a>
   </nav>
   <div class="pagemain">
@@ -34,9 +34,11 @@ export const meta = {
       issue (a <b>bead</b>) is a structured record — type, status, priority, labels, typed
       dependency edges, gates, comments, notes — stored in a versioned SQL database (Dolt) that
       <code>bd</code> serves locally, one shared server per host, started for you, and
-      distributed through git itself. There is no web app to log into and no hosted service:
-      the entire tracker is a local CLI, which is exactly what makes it the right substrate for
-      agents.</p>
+      distributed through git itself by default — or, when an operator declares it, through an
+      S3-compatible object store that keeps a private store off the code origin
+      (<a href="/data/#remotes">where the bead data lives</a>). Either way there is no web app
+      to log into and no hosted service: the entire tracker is a local CLI, which is exactly
+      what makes it the right substrate for agents.</p>
 
       <h3 class="display" id="beads-efficient">Why it's more efficient for agents than a hosted tracker</h3>
       <p>An agent's scarcest resources are <b>context tokens</b> and <b>round-trips</b>. A
@@ -52,7 +54,8 @@ export const meta = {
         merge-slots, and a per-actor audit trail are tracker features, not conventions an
         agent must remember to follow.</li>
         <li><b>Duplicates surface, not bury.</b> <code>bd find-duplicates</code> runs when a
-        report lands and again at triage, so a colliding request never buries the queue. (Beads
+        report is filed with <code>bh report</code> and again when the queue is read, so a
+        colliding request never buries the queue. (Beads
         also ships a memory store; a hive keeps beads <em>issues only</em> and denies it — knowledge
         belongs in the project's own records.)</li>
       </ul>
@@ -67,20 +70,24 @@ export const meta = {
       <code>bd ready</code> / <code>bd blocked</code> compute the frontier and the bottlenecks
       across the entire portfolio at once.</p>
 
-      <h3 class="display" id="beads-sync">Bi-directional sync: humans keep their boards</h3>
-      <p>Beads ships sync integrations for <b>GitHub Issues, GitLab, Jira, Linear, and Azure
-      DevOps</b> — <code>bd github sync</code> / <code>push</code> / <code>pull</code> and
-      friends — so the graph mirrors into the trackers humans already visualize with. A PM
-      triages in Jira or drags cards on a GitHub board; the changes pull back into beads;
-      <code>external_ref</code> preserves provenance in both directions, and JSONL interchange
-      covers export, migration, and viewers. The division of labor falls out naturally:
-      <b>agents traverse the graph, humans watch the boards</b> — one source of truth, two
-      native interfaces.</p>
+      <h3 class="display" id="beads-sync">Sync, one direction at a time: humans keep their boards</h3>
+      <p>Beads itself ships tracker sync integrations; a Beadhive hive uses exactly one of them,
+      and uses it one way. <b>GitHub Issues are pulled</b> into a <em>public store</em> — a
+      projection the hive can opt in to, kept apart from the private graph the seats plan
+      against. GitHub stays the system of record: a PM triages, labels and drags cards on the
+      board they already use, <code>bh hive remote sync --pull-only</code> brings the result
+      in, and a re-pull updates each bead in place with its issue URL kept as <code>external_ref</code>. Nothing flows back out of that store — the guard refuses every
+      push shape for every seat — and comments, milestones, projects and reactions are not
+      imported; what the projection carries is the board's shape: title, body, state, labels, a
+      type and priority, one assignee. Anything a hive does write to GitHub is a separate,
+      supervised path — an operator approves it per item, and it is never a mirror (see <a href="/fleet/#hq-intake">fielding what comes in</a>). The division of labor still
+      falls out naturally: <b>agents traverse the private graph, humans keep their boards</b> —
+      and <a href="/data/#remotes">where each store lives</a> is the operator's call.</p>
     </div>
 
     <figure>
       <div class="diagram">
-      <svg viewBox="0 0 1160 420" role="img" aria-label="Diagram: two hive repos contain bead dependency chains linked by a cross-hive blocking edge and rolled up into a product workstream; agents query the graph with bd ready, blocked, and graph; the graph syncs bi-directionally with GitHub Issues, Jira, Linear, GitLab, and Azure DevOps for humans.">
+      <svg viewBox="0 0 1160 420" role="img" aria-label="Diagram: two hive repos contain bead dependency chains linked by a cross-hive blocking edge and rolled up into a product workstream; agents query the graph with bd ready, blocked, and graph; on the right, GitHub Issues are pulled one way into a public projection store that agents read but never claim, with every push back to GitHub refused and any write-back a separate operator-approved path.">
         <defs>
           <marker id="w-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
@@ -148,43 +155,48 @@ export const meta = {
         <text class="nlabel" x="675" y="255">bd prime</text>
         <text class="nsub" x="675" y="270">full context back in one call</text>
 
-        <!-- sync arrows + trackers -->
+        <!-- one-way pull from GitHub into the public projection store -->
         <text class="lane-label" x="880" y="60">HUMANS KEEP THEIR BOARDS</text>
-        <path class="flow-h" d="M804,96 H876" marker-start="url(#w-h)" marker-end="url(#w-h)"/>
-        <path class="flow-h" d="M804,166 H876" marker-start="url(#w-h)" marker-end="url(#w-h)"/>
-        <path class="flow-h" d="M804,236 H876" marker-start="url(#w-h)" marker-end="url(#w-h)"/>
-        <text class="alabel-h" x="806" y="130">bd github sync</text>
-        <text class="alabel-h" x="806" y="200">bd jira sync</text>
-        <text class="alabel-h" x="806" y="270">push · pull</text>
-
         <rect class="node" x="880" y="76" width="240" height="40" rx="8"/>
         <text class="nlabel" x="1000" y="93">GitHub Issues</text>
-        <text class="nsub" x="1000" y="108">boards, triage, comments</text>
-        <rect class="node" x="880" y="146" width="240" height="40" rx="8"/>
-        <text class="nlabel" x="1000" y="163">Jira</text>
-        <text class="nsub" x="1000" y="178">sprints, roadmaps, PM views</text>
-        <rect class="node" x="880" y="216" width="240" height="40" rx="8"/>
-        <text class="nlabel" x="1000" y="233">Linear · GitLab · Azure DevOps</text>
-        <text class="nsub" x="1000" y="248">same sync surface</text>
+        <text class="nsub" x="1000" y="108">the system of record</text>
 
-        <text class="alabel" x="880" y="290">external_ref keeps provenance both ways;</text>
+        <path class="flow-h" d="M1000,116 V142" marker-end="url(#w-h)"/>
+        <text class="alabel-h" x="1010" y="134">pull-only · GitHub wins</text>
+
+        <rect class="node" x="880" y="146" width="240" height="40" rx="8" style="stroke:var(--honey)"/>
+        <text class="nlabel" x="1000" y="163">public store</text>
+        <text class="nsub" x="1000" y="178">pull-only projection</text>
+
+        <path class="flow-h" d="M876,166 H804" marker-end="url(#w-h)"/>
+        <text class="alabel-h" x="806" y="156">agents read</text>
+
+        <path class="flow-r dashed" d="M804,236 H876" marker-end="url(#w-r)"/>
+        <text class="alabel-r" x="806" y="226">refused</text>
+        <rect class="node" x="880" y="216" width="240" height="40" rx="8" style="stroke-dasharray:5 4"/>
+        <text class="nlabel" x="1000" y="233">writing back to GitHub</text>
+        <text class="nsub" x="1000" y="248">operator-approved, per item</text>
+
+        <text class="alabel" x="880" y="290">external_ref keeps each issue's GitHub URL;</text>
         <text class="alabel" x="880" y="305">JSONL interchange covers export &amp; migration</text>
 
-        <text class="alabel" x="40" y="408">green = ready (unblocked) · red = blocked · the authoritative graph stays in beads — boards are mirrors</text>
+        <text class="alabel" x="40" y="408">green = ready (unblocked) · red = blocked · the private graph is authoritative in beads — the public store is a projection of GitHub</text>
       </svg>
       </div>
       <figcaption>One graph, two native interfaces: <code>web-4</code> is blocked by
       <code>api-9</code> in a different repo — an edge no per-repo board can show, but one
       <code>bd blocked</code> surfaces instantly — and the workstream rolls it all up into a
-      product view. Meanwhile the same beads mirror into GitHub/Jira/Linear so humans plan and
-      visualize where they already live.</figcaption>
+      product view. Meanwhile GitHub Issues are pulled one way into a public store the agents
+      can read, so humans keep planning where they already live and nothing is written back
+      without an operator's say.</figcaption>
     </figure>
 
     <div class="wrap" style="padding:0">
 <pre><code>bd ready --json          # the unblocked frontier, machine-readable
 bd dep add web-4 api-9   # web-4 is blocked by api-9 — a cross-hive edge
 bd graph api-9           # who is waiting on this bead?
-bd github sync           # mirror to / from the humans' board</code></pre>
+# GitHub Issues → public store, one way; nothing written back
+bh hive remote sync github/acme/api --store public --pull-only</code></pre>
     </div>
   </div>
 </section>
@@ -213,10 +225,12 @@ bd github sync           # mirror to / from the humans' board</code></pre>
         on a bead, and every claim/assign is stamped with a per-agent actor
         (<code>bd --actor</code>) so the audit trail says exactly who did what.</p></div>
       <div class="card"><h3><span class="hexdot">⬢</span>Git-native, serverless</h3>
-        <p>Issue history rides <code>refs/dolt/data</code> on the repo's own remote.
-        Nothing hosted, nothing to pay for, nothing to be down: a fresh clone plus
-        <code>bd bootstrap</code> is a fully hydrated tracker. Backup rides wherever the repo
-        is mirrored. Distribution to a fleet of agents is just git.</p></div>
+        <p>By default, issue history rides <code>refs/dolt/data</code> on the repo's own
+        remote. Nothing hosted, nothing to pay for, nothing to be down: a fresh clone plus <code>bd bootstrap</code> is a fully hydrated tracker, and backup rides wherever the
+        repo is mirrored. An operator can instead keep a private store on a declared
+        object-store remote and publish only a public projection to that ref — still nothing
+        hosted (<a href="/data/#remotes">where the bead data lives</a>). Distribution to a
+        fleet of agents is just git.</p></div>
       <div class="card"><h3><span class="hexdot">⬢</span>Gates are machine-readable state</h3>
         <p>Human checkpoints — plan approval, kickoff, review, security — are
         <code>bd gate</code> records, not vibes in a chat thread. The merge path refuses to
