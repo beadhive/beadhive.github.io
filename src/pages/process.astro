@@ -82,9 +82,13 @@ export const meta = {
     local Dolt server and kept out of your tracked tree under <code>.beads/</code> until you
     furnish the hive. Issues carry a short, stable <b>prefix</b>
     (<code>acme-api-1</code>) derived from the stable part of identity (org + repo); the parts
-    that can change (provider, org) live in <b>labels</b>. Issue history publishes to
+    that can change (provider, org) live in <b>labels</b>. By default, issue history publishes to
     <code>refs/dolt/data</code> on the repo's <em>own git remote</em> — a separate ref namespace
-    that never touches branches or PRs, so there is <b>nothing hosted to run</b>. A workspace-level
+    that never touches branches or PRs, so there is <b>nothing hosted to run</b>. That is the
+    default, not the only address: a hive can opt in to a Dolt remote declared in HQ's fleet
+    config — an S3-compatible object store, a path, or another git remote — and to a second,
+    public store that is a pull-only projection of GitHub Issues
+    (<a href="/data/#remotes">where the bead data lives</a>). A workspace-level
     aggregate (the <b>hub</b>) pulls every hive into one read view, so you can ask "what's ready
     to work on anywhere?"; <b>HQ</b> is the separate, authoritative fleet store.</p>
     <p><code>bh</code> is deliberately a thin orchestrator: <code>bd</code> (beads) owns issues,
@@ -110,7 +114,10 @@ export const meta = {
         into clean conventional digests <em>before</em> submit (tiered retention).</p></div>
       <div class="card"><h4><span class="hexdot">⬢</span>Unit of work = a bead</h4>
         <p>Worktree → implement → refine → check → submit → review → merge. One bead, one
-        branch (<code>wt/bead/issue/&lt;id&gt;</code>), one reviewable change.</p></div>
+        branch (<code>wt/bead/issue/&lt;id&gt;</code>), one reviewable change. The branch is the
+        durable artifact: a finished worktree is reclaimed automatically when its bead merges, a
+        live-count cap keeps the host bounded, and anything holding uncommitted work is kept
+        (<a href="https://github.com/beadhive/beadhive/blob/main/docs/WORKTREES.md">worktrees</a>).</p></div>
     </div>
   </div>
 </section>
@@ -377,6 +384,17 @@ export const meta = {
         input closure is unchanged. Unknown impact fails closed to the full run, and a reused key
         is never a claim that the whole tree is green — <a href="/planes/#attestation">how reuse
         works</a>.</li>
+        <li><b>One gate, many keys.</b> <span class="status shipped">shipped · opt-in</span>
+        With <code>work.gate.model: keys</code> every boundary evaluates named attest keys instead
+        of running one command string: a phase profile says which keys a phase owes, any
+        main-reaching phase owes every active key, and the key catalog lives in HQ only — a
+        drift check against the repo's recipes sends any doubt back to the full legacy run. The
+        default stays the legacy command; rollback is one setting.</li>
+        <li><b>Capacity-aware validation.</b> <span class="status shipped">shipped · opt-in</span>
+        A validation broker ships: it can admit a gate's keys against a CPU, memory and
+        named-pool budget and run them side by side in one clean checkout. It is opt-in; the
+        default is still one gate at a time per host. A durable broker service and external
+        runner adapters are direction.</li>
         <li><b>The batch exception.</b> Cohesive linear chains can run as one shared
         <code>wt/batch/&lt;group&gt;</code> worktree, merged once — guarded by cohesion, a size
         cap of 5, no conflicting model preferences, one review gate. A batch fails and bounces as a unit; per-bead
@@ -396,8 +414,9 @@ export const meta = {
       <div class="note"><b>Where the ideas come from.</b> <span class="status direction">direction</span>
       The pipeline starts at <em>ideate</em>, which quietly assumes someone showed up with an
       idea — capping the whole factory at one person's imagination on a given afternoon. What
-      ships upstream of planning today is <a href="/fleet/#hq-intake">intake and triage</a>.
-      The ideation plane is meant to add a loop that doesn't wait for someone to show up: read the repo's own vision and strategy documents, derive candidate
+      ships upstream of planning today is <a href="/fleet/#hq-intake">intake and triage</a> —
+      local reports by default, and, opt-in, <a href="/intake/">GitHub issues pulled in as held
+      reports and answered only through operator-approved drafts</a>. The ideation plane is meant to add a loop that doesn't wait for someone to show up: read the repo's own vision and strategy documents, derive candidate
       topics from how those documents are actually structured rather than from a generic
       checklist, then generate against each topic in parallel — deliberately blind to the
       others, so the batch stays divergent instead of converging on the same three obvious
