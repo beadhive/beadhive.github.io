@@ -6,7 +6,7 @@ export const meta = {
   order: 4.6,
   label: 'Frames',
   title: 'Roles, runtimes & Bead Frames · Beadhive',
-  description: 'A current-state and proposal-aware map of Beadhive roles, dispatcher loops, Bead Frame provisioning, and deployment topologies.',
+  description: 'A current-state and proposal-aware map of Beadhive host roles, dispatcher loops, HQ modes, leases and failover, Bead Frame provisioning, and deployment topologies.',
 };
 
 const hostRoles = [
@@ -36,22 +36,70 @@ const topologies = [
   },
   {
     n: '03', title: 'One cloud VPS', tag: 'Host today · Frame adapter proposed',
-    body: 'The current Linux host-provision path configures executor/transient/viewer roles; `bh host lease adopt` establishes the primary lease for a selected hive. A provider-specific VPS Bead Frame adapter is planned: pinned NixOS image or slower nixos-anywhere path, enrollment, secret bootstrap, admission, then dispatch.',
+    body: 'The current Linux host-provision path installs the seat harness for executor and transient hosts (a viewer is onboarded by `bh setup guide`); `bh host lease adopt` establishes the primary lease for a selected hive. A provider-specific VPS Bead Frame adapter is planned: pinned NixOS image or slower nixos-anywhere path, enrollment, secret bootstrap, admission, then dispatch.',
     status: 'direction',
   },
   {
-    n: '04', title: 'Several Frames · many repos', tag: 'Admission and routing are proposals',
-    body: 'Attach Frames to one or more hives. The draft allows one active Frame per hive; other Frames are drained or parked for failover. A Frame can serve multiple hives, but there is no shipped cross-hive capacity scheduler or same-hive parallel execution.',
-    status: 'proposed',
+    n: '04', title: 'Several Frames · many repos', tag: 'Membership shipped · capacity scheduling is direction',
+    body: 'Attach frames to one or more hives. A hive has at most one primary at a time: a director places it on a frame, and an opt-in failover loop can move it to a standby when the primary goes stale. A frame can serve multiple hives, but there is no shipped cross-hive capacity or budget scheduler and no same-hive parallel execution; routing one active frame per hive at admission time is still a proposal.',
+    status: 'direction',
+  },
+];
+
+// Frame provisioning, step by step. `status` marks which steps ship in bh today
+// (registration, heartbeat, admission, eligibility) and which remain in the
+// frame platform design (allocation, enrollment injection, secret resolution).
+const enrollSteps = [
+  { n: '01', title: 'Plan + apply', body: 'Allocate VM, pod, or sandbox; pin the release digest.', status: 'proposed', tag: 'design' },
+  { n: '02', title: 'Inject enrollment', body: 'Strict non-secret contract plus bootstrap credential reference.', status: 'proposed', tag: 'design' },
+  { n: '03', title: 'Resolve secrets', body: 'fnox maps logical names to the chosen vault; secrets enter tmpfs.', status: 'proposed', tag: 'design' },
+  { n: '04', title: 'Register pending', body: '`bh host provision` registers the host manifest as pending; it reuses or hydrates a Beads store, never reinitialises one, and admits nothing. The frame then publishes signed, bounded heartbeats.', status: 'shipped', tag: 'shipped' },
+  { n: '05', title: 'Attest + admit', body: 'Identity binding, release, capabilities and conformance are checked; an operator admits after three consecutive fresh accepted heartbeats. In a trusted fleet, registration open-admits instead.', status: 'shipped', tag: 'shipped · manual admission' },
+  { n: '06', title: 'Enable dispatch', body: 'Only an admitted, eligible frame may claim for its hive, and eligibility is re-checked at every claim. `bh host eligible` explains each predicate without admitting.', status: 'shipped', tag: 'shipped' },
+];
+
+// Fleet control at concept level. Everything marked opt-in is off until an
+// operator turns it on; nothing here cuts a hive or a fleet over by itself.
+const controlCards = [
+  {
+    kicker: 'HQ MODE', title: 'Where fleet configuration is read.', status: 'shipped', tag: 'git default · dolt-server opt-in',
+    body: '`hq.mode` picks the carrier: `git` (the default) reads a signed configuration file from an HQ repository every frame clones; `dolt-server` reads a committed shared snapshot from a Dolt SQL database, and a frame attaches from host-local trust metadata with no HQ checkout and no HQ GitHub credential. Switching is a reviewed `bh hq migrate` plan-then-confirm, config only. The SQL mode fails closed: an outage denies new intake and never falls back to git or to stale cached authority. HQ\'s own beads and each host\'s hub do not move when the carrier does.',
+  },
+  {
+    kicker: 'MEMBERSHIP + ELIGIBILITY', title: 'Admitted by an operator, re-checked at every claim.', status: 'shipped', tag: 'shipped · operator-driven',
+    body: 'Frame membership lives in host manifests with protected lifecycle states — pending, active, draining, drained, parked, quarantined, retired — that only the operator moves; the frame reports observations and cannot admit itself. Each hive declares a frame policy (isolation, trust zone, architecture, harnesses, session cap); omitting it denies frame intake for that hive. Eligibility is a stack of predicates — authority available, active and uncordoned, identity bound, fresh verified heartbeat, matching release and capabilities, conformance, executor not viewer, capacity, dispatch enabled — and the write boundary re-runs it on every claim.',
+  },
+  {
+    kicker: 'HEARTBEATS + LEASES', title: 'Liveness the frame cannot vouch for itself.', status: 'shipped', tag: 'signed · server-stamped on SQL HQ',
+    body: 'A frame signs a bounded heartbeat with its own SSH key: identity, incarnation, key fingerprint, sequence, release, state, capacity. Freshness is exclusive and capped; a repeated record never renews it. On a Dolt-server HQ, liveness is a pair of per-incarnation rows stamped by the server\'s clock, so a frame\'s clock cannot make it look fresh. The hive lease is separate from bd\'s worker lease and its expiry is advisory — a failover hint, never a write gate. On SQL HQ a past expiry does not free the hive; stale authenticated liveness, a release, a director placement or a quarantined holder does.',
+  },
+  {
+    kicker: 'PLACEMENT + FAILOVER', title: 'A director places; a loop can fail over.', status: 'optin', tag: 'placement operator-only · failover opt-in, off by default',
+    body: 'Placement is which frame should write a hive. On a Dolt-server HQ it is one row per hive, changed only by compare-and-swap on a director credential that frames never hold; on git HQ it is a compare-and-swap ref. Unattended failover is a host-daemon loop, off by default: it moves a hive only after the primary\'s liveness has been stale longer than a per-role window, picks the successor holding the fewest primaries, and never moves a placed hive just to rebalance. An HQ outage blocks handoff, never writes. Capacity and budget scheduling remain deferred.',
+  },
+  {
+    kicker: 'WRITER FENCE + FORWARDING', title: 'Exclusion in the hive\'s own data.', status: 'optin', tag: 'opt-in · one hive at a time',
+    body: 'An operator can cut a hive over to carry its writer fence in its data: "may this frame write?" becomes a local row with no clock and no HQ read, so an established writer keeps writing while HQ is down and a superseded writer\'s push is diverted to an orphan branch for the writer to merge. Nothing cuts a hive over automatically. Separately, the forward write path (off by default on both ends) lets a non-primary executor send claim, create and close to the primary\'s server over per-frame, table-scoped, TLS-required accounts; it narrows and detects, it does not prevent.',
+  },
+  {
+    kicker: 'AUTHORITY + RELEASES', title: 'Signed by default; trusted is a deliberate waiver.', status: 'shipped', tag: 'signed default · trusted opt-in · release ranges opt-in',
+    body: 'Two authority modes. `signed` (default): operator publications carry an operator signature that every frame verifies, with no expiry unless the operator asks for one; revocation stays immediate. `trusted` (opt-in, raised once with the operator key): frames honour authority content but not signatures, a registering frame is open-admitted, and HQ write access becomes effectively admin — for one operator who fully controls the factory. A frame pinned `signed` inside a trusted fleet refuses to work. Release pins are exact by default; an operator can import a signed release catalog and grant a release range so in-range upgrades are an install and a restart, with out-of-range rotations reviewed.',
   },
 ];
 
 const sources = [
-  { label: 'Bead Frame provisioning · published revision 5', href: 'https://claude.ai/artifact/KWuP12oCbrJqJDPgUYSxvW' },
+  { label: 'Frame platform design (beadhive/frame) · design only', href: 'https://github.com/beadhive/frame/blob/main/docs/design/frame-platform.md' },
+  { label: 'Frame fleet membership, HQ modes, lifecycle and eligibility', href: 'https://github.com/beadhive/beadhive/blob/main/docs/FRAME-FLEET-MEMBERSHIP.md' },
+  { label: 'HQ: authority modes, placement and failover', href: 'https://github.com/beadhive/beadhive/blob/main/docs/HQ.md' },
+  { label: 'Forward write path', href: 'https://github.com/beadhive/beadhive/blob/main/docs/FORWARD-WRITE-PATH.md' },
+  { label: 'Host daemon', href: 'https://github.com/beadhive/beadhive/blob/main/docs/HOST-DAEMON.md' },
   { label: 'Runtime tiers and dispatcher loop', href: 'https://github.com/beadhive/beadhive/blob/main/docs/WORK.md#runtime-tiers--workruntime' },
   { label: 'Role and seat RBAC target', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/roles-rbac-matrix.md' },
   { label: 'Hub across multiple hives', href: 'https://github.com/beadhive/beadhive/blob/main/docs/HUB.md' },
 ];
+
+// Author-controlled copy only: turn `code` spans into <code> for the data-driven cards.
+const inlineCode = (text: string) => text.replace(/`([^`]+)`/g, '<code>$1</code>');
 ---
 
 <Layout active="frame-model" title={meta.title} description={meta.description}>
@@ -61,6 +109,7 @@ const sources = [
     <a class="head" href="#identity">Host role is not a seat</a>
     <a class="head" href="#loops">The dispatcher loops</a>
     <a class="head" href="#topologies">Compute shapes</a>
+    <a class="head" href="#control">HQ, leases, failover</a>
     <a class="head" href="#enrollment">Frame provisioning</a>
     <a class="head" href="#install">Toolchain + delivery</a>
     <a class="head" href="#sources">Sources</a>
@@ -75,21 +124,22 @@ const sources = [
         <p class="doc-lede">Separate the identity that owns a machine from the seat that performs an action. Then scale compute around hives, with the current lease rules kept visible.</p>
         <div class="frame-legend">
           <span class="status shipped">shipped</span>
+          <span class="status optin">opt-in · off until an operator turns it on</span>
           <span class="status direction">current seam / intended shape</span>
           <span class="status proposed">provisioning draft</span>
         </div>
       </div>
       <aside class="frame-readout">
-        <div class="readout-title"><span>FRAME CONTRACT</span><b>WIP · REV 5</b></div>
-        <strong>frame.beadhive.ai/<br />v1alpha1</strong>
-        <p>Review proposal dated 2026-09-29. The generic frame repo is still empty; the published design is not a shipped provisioning product.</p>
-        <a href="https://claude.ai/artifact/KWuP12oCbrJqJDPgUYSxvW">Open the published design ↗</a>
+        <div class="readout-title"><span>FRAME CONTRACT</span><b>DESIGN · NOT SHIPPED</b></div>
+        <strong>beadhive/frame</strong>
+        <p>The generic frame repo holds the canonical platform design and a docs gate, but no implementation: it asserts no shipping adapters, schemas or commands and authorises no allocation, enrollment or production dispatch. The membership, heartbeat, admission and eligibility machinery it builds on ships in <code>bh</code> today.</p>
+        <a href="https://github.com/beadhive/frame/blob/main/docs/design/frame-platform.md">Open the platform design ↗</a>
       </aside>
     </div>
     <div class="frame-stats">
-      <span><small>HOST LEASE</small><b>One primary per hive</b></span>
+      <span><small>HOST LEASE</small><b>At most one primary per hive · expiry advisory</b></span>
       <span><small>LOCAL DISPATCH</small><b>Implemented</b></span>
-      <span><small>FLEET SCHEDULER</small><b>Not shipped</b></span>
+      <span><small>FLEET SCHEDULING</small><b>Director placement + opt-in failover · no capacity scheduler</b></span>
     </div>
   </header>
 
@@ -105,7 +155,7 @@ const sources = [
         <div class="role-list">
           {hostRoles.map((item) => <div class="role-row"><b>{item.role}</b><span>{item.purpose}</span><i class="status-chip current">current</i></div>)}
         </div>
-        <p class="panel-note">The lease is per hive and fenced through HQ. A viewer stays useful for reading and filing without becoming the write primary.</p>
+        <p class="panel-note">The lease is per hive and arbitrated through HQ; its expiry is advisory — a liveness hint for failover, never a write gate. A hive an operator has cut over carries its writer fence in its own data instead (opt-in). A viewer stays useful for reading and filing without becoming the write primary.</p>
       </article>
       <article class="info-panel seat-panel">
         <div class="panel-label"><span>INFERENCE SEAT</span><small>WORKFLOW IDENTITY</small></div>
@@ -113,10 +163,10 @@ const sources = [
         <div class="seat-list">
           {workSeats.map((item) => <div class="seat-row"><b>{item.seat}</b><span>{item.scope}</span><small>{item.plane}</small></div>)}
         </div>
-    <p class="panel-note">A session may hold different seats over time, but each <code>bh</code> action is stamped as one seat. The RBAC matrix marks Control, Planning, and Integration operational; its least-privilege reconciliation and some naming changes remain work in progress.</p>
+    <p class="panel-note">A session may hold different seats over time, but each <code>bh</code> action is stamped as one seat. On the wire the prefixes are <code>disp/</code> (dispatcher) and <code>dev/</code> (developer); the RBAC matrix marks Control, Planning, and Integration operational, while its least-privilege reconciliation remains work in progress.</p>
       </article>
     </div>
-    <aside class="change-note"><strong>Role direction</strong><span>The target matrix folds epic-coordinator, epic-coordinator-deep, and foreman into dispatcher modes; “deep” becomes the <code>sub-dispatch:1</code> capability. It renames <code>crew/</code> to <code>dev/</code>. The matrix is a target-state design, so website copy should not imply every rename is already complete.</span></aside>
+    <aside class="change-note"><strong>Role direction</strong><span>The seat renames have landed: <code>epic-coordinator</code> is retired in favour of <code>dispatcher @ batch</code>, <code>crew/</code> became <code>dev/</code>, and the per-seat config key <code>crews</code> became <code>devs</code> with a deprecated alias. What is still target-state is the full least-privilege RBAC matrix itself.</span></aside>
   </section>
 
   <section class="frame-section loop-section" id="loops">
@@ -129,7 +179,7 @@ const sources = [
         <div class="loop-index">A</div><div class="loop-body">
           <div class="loop-title"><h3>Per-hive picker</h3><span class="status-chip current">implemented</span></div>
           <p><code>bh host dispatch run --hive H</code> checks the host lease, reaps finished children, then starts kicked-off epics from <code>bd ready</code> order when capacity is available.</p>
-          <div class="loop-facts"><span><small>DEFAULT CAP</small><b>3 epic loops</b></span><span><small>POLL</small><b>10 seconds</b></span><span><small>SUPERVISOR</small><b>systemd user unit</b></span></div>
+          <div class="loop-facts"><span><small>DEFAULT CAP</small><b>3 epic loops</b></span><span><small>POLL</small><b>10 seconds</b></span><span><small>SUPERVISOR</small><b>systemd user unit (default) · <code>process</code></b></span></div>
         </div>
       </article>
       <div class="loop-connector"><span>one child per molecule</span></div>
@@ -137,7 +187,7 @@ const sources = [
         <div class="loop-index">B</div><div class="loop-body">
           <div class="loop-title"><h3>Per-molecule loop</h3><span class="status-chip current">implemented</span></div>
           <p><code>bh work loop &lt;epic&gt;</code> checks gates, reclaims stale work, renews the host lease while active, heartbeats claims, harvests seats, claims the next bead safely, and spawns the role binary.</p>
-          <div class="loop-facts"><span><small>SEAT CAP</small><b>Configured per epic</b></span><span><small>RECOVERY</small><b>Re-derive from beads</b></span><span><small>PROCESS SAFETY</small><b>Own process group</b></span></div>
+          <div class="loop-facts"><span><small>SEAT CAP</small><b><code>work.dispatch.max_concurrency</code> · default 2, global or per hive</b></span><span><small>RECOVERY</small><b>Re-derive from beads</b></span><span><small>PROCESS SAFETY</small><b>Own process group</b></span></div>
         </div>
       </article>
     </div>
@@ -147,7 +197,7 @@ const sources = [
       <div class="runtime-tier is-live"><b>local</b><span>Poll loop + subprocess supervision. Harness-agnostic default; no extra server.</span><i>Implemented · <code>bh work loop</code></i></div>
       <div class="runtime-tier is-future"><b>temporal</b><span>Workers polling task queues for multi-machine operation.</span><i>Not implemented</i></div>
     </div>
-    <p class="loop-footnote">Lifecycle state stays in Beads: gates, claims, heartbeats, and merge slots. The per-hive picker deliberately does no cross-hive arbitration or budget reasoning. systemd is the only installed dispatch supervisor today; launchd and container backends are named but unimplemented.</p>
+    <p class="loop-footnote">Lifecycle state stays in Beads: gates, claims, heartbeats, and merge slots. The per-hive picker deliberately does no cross-hive arbitration or budget reasoning. systemd is the only dispatch supervisor <code>bh</code> installs; the <code>process</code> backend — which the <code>container</code> and <code>launchd</code> names select — runs the picker in the foreground and leaves restart policy to whatever supervises it (a container init, Kubernetes, launchd). The separate, opt-in host daemon does install a macOS LaunchAgent or a Linux user unit.</p>
   </section>
 
   <section class="frame-section topology-section" id="topologies">
@@ -158,46 +208,58 @@ const sources = [
     <div class="topology-grid">
       {topologies.map((item) => <article class={`topology-card ${item.status}`}>
         <div class="topology-top"><span>{item.n}</span><i class={`status-chip ${item.status}`}>{item.tag}</i></div>
-        <h3>{item.title}</h3><p>{item.body}</p>
+        <h3>{item.title}</h3><p set:html={inlineCode(item.body)} />
       </article>)}
     </div>
-    <div class="frame-cluster" aria-label="One active frame per hive scheduling sketch">
-      <div class="cluster-hub"><small>HQ / REGISTRY</small><b>many repos<br />many hives</b><span>versioned config + lease coordination</span></div>
+    <div class="frame-cluster" aria-label="One primary frame per hive placement sketch">
+      <div class="cluster-hub"><small>HQ / REGISTRY</small><b>many repos<br />many hives</b><span>versioned config + hive placement</span></div>
       <div class="cluster-lines"><i></i><i></i><i></i></div>
       <div class="cluster-frames">
         <article><small>FRAME A · ACTIVE</small><b>Hive: repo-alpha</b><span>executor · eligible</span></article>
         <article><small>FRAME B · ACTIVE</small><b>Hive: repo-beta</b><span>executor · eligible</span></article>
         <article class="standby"><small>FRAME C · DRAINED</small><b>Hive: repo-alpha</b><span>failover capacity · not running work</span></article>
       </div>
-      <p class="cluster-caption">Different hives may run on different active Frames. A second Frame attached to the same hive is standby/failover under the proposal, not parallel same-hive capacity.</p>
+      <p class="cluster-caption">Different hives may run on different active frames. A hive has at most one primary at a time — a director places it, and an opt-in loop can fail it over — so a second frame attached to the same hive is failover standby, not parallel same-hive capacity. Routing that at admission time is still a proposal.</p>
     </div>
     <FramesHq />
     <div class="shape-strip"><span>VM / Proxmox</span><span>Cloud VM / EC2 · VPS</span><span>Compose</span><span>Kubernetes Pod</span><span>Managed sandbox</span><span>Existing Linux host</span></div>
     <p class="loop-footnote">Frame shapes are proposed adapters, not a shipping support matrix. The draft chooses NixOS for VM/cloud VM shapes, OCI images from the same flake for container/pod/sandbox shapes, and Debian + Nix via System Manager with Ansible fallback for host convergence.</p>
   </section>
 
+  <section class="frame-section control-section" id="control">
+    <div class="frame-section-head">
+      <div><p class="frame-kicker">04 / HQ, LEASES, FAILOVER</p><h2 class="display">One fleet. Two ways to carry its configuration.</h2></div>
+      <p>How frames join, prove they are alive, get placed on a hive, and are moved when the primary goes quiet. Opt-in pieces are off until an operator turns them on.</p>
+    </div>
+    <div class="control-grid">
+      {controlCards.map((item) => <article class={`control-card ${item.status}`}>
+        <div class="panel-label"><span>{item.kicker}</span><i class={`status-chip ${item.status}`}>{item.tag}</i></div>
+        <h3>{item.title}</h3><p set:html={inlineCode(item.body)} />
+      </article>)}
+    </div>
+    <p class="loop-footnote">Placement and the writer-fence cutover are operator runbook procedures, not public commands. The product docs record no production cutover to a Dolt-server HQ; this page describes the shipped mechanism, not a deployed topology.</p>
+  </section>
+
   <section class="frame-section onboarding-section" id="enrollment">
     <div class="frame-section-head">
-      <div><p class="frame-kicker">04 / FRAME PROVISIONING</p><h2 class="display">Allocate, enroll, prove, admit.</h2></div>
-      <p>Dispatch stays off until the frame is trusted, healthy, and the product eligibility gates exist.</p>
+      <div><p class="frame-kicker">05 / FRAME PROVISIONING</p><h2 class="display">Allocate, enroll, prove, admit.</h2></div>
+      <p>Dispatch stays off until the frame is admitted and eligible. Registration, heartbeats, admission and eligibility ship; allocation and secret injection are still design.</p>
     </div>
     <ol class="enroll-flow">
-      <li><span>01</span><b>Plan + apply</b><small>Allocate VM, pod, or sandbox; pin the release digest.</small></li>
-      <li><span>02</span><b>Inject enrollment</b><small>Strict non-secret contract plus bootstrap credential reference.</small></li>
-      <li><span>03</span><b>Resolve secrets</b><small>fnox maps logical names to the chosen vault; secrets enter tmpfs.</small></li>
-      <li><span>04</span><b>Register pending</b><small><code>bh host provision</code> then HQ push; report health and signed heartbeat.</small></li>
-      <li><span>05</span><b>Attest + admit</b><small>Check identity, release, capabilities, conformance, and three verified beats.</small></li>
-      <li><span>06</span><b>Enable dispatch</b><small>Only an admitted, eligible frame may claim for its hive.</small></li>
+      {enrollSteps.map((step) => <li class={step.status}>
+        <div class="enroll-top"><span>{step.n}</span><i class={`status-chip ${step.status}`}>{step.tag}</i></div>
+        <b>{step.title}</b><small set:html={inlineCode(step.body)} />
+      </li>)}
     </ol>
     <div class="two-notes">
-      <article><p class="frame-kicker">IDENTITY ATTESTATION</p><h3>Prove the frame before it runs.</h3><p>The draft defaults to manual operator admission. It defines operator, cloud instance identity, Kubernetes service-account, and sandbox API attestors. A frame's SSH key is reused for HQ/hive Git access and commit/heartbeat signing; it is a separate concept from test attest keys.</p></article>
-      <article><p class="frame-kicker">SAFE SHUTDOWN</p><h3>Drain to remote before parking.</h3><p>Stop taking claims, let seats finish to a deadline, push branches and bead state, release leases, and record a clean checkpoint. Live session suspend/resume remains blocked on a gateway contract; a provider memory snapshot does not count as a work checkpoint.</p></article>
+      <article><p class="frame-kicker">IDENTITY ATTESTATION</p><h3>Prove the frame before it runs.</h3><p>Manual operator admission is shipped: an operator admits after three consecutive fresh accepted heartbeats, and a second active incarnation needs an explicit supersede. In a <code>trusted</code> fleet (opt-in) registration open-admits instead. A frame's own SSH key is used for repo access and commit and heartbeat signing, so the operator key never has to live on a frame; it is a separate concept from test attest keys. The draft's cloud instance identity, Kubernetes service-account and sandbox API attestors are still design.</p></article>
+      <article><p class="frame-kicker">SAFE SHUTDOWN</p><h3>Drain to remote before parking.</h3><p><code>cordon</code>, <code>drain</code> (to a deadline), <code>park</code>, <code>resume</code>, <code>quarantine</code> and <code>frame-retire</code> ship as operator lifecycle verbs, each with plan, apply and check. Draining stops new claims and lets seats finish; it never erases or steals an incumbent lease — renewal and release stay on the original rules. Live session suspend/resume remains design; a provider memory snapshot does not count as a work checkpoint.</p></article>
     </div>
   </section>
 
   <section class="frame-section install-section" id="install">
     <div class="frame-section-head">
-      <div><p class="frame-kicker">05 / TOOLCHAIN + DELIVERY</p><h2 class="display">Pin the tools. Deliver an immutable frame.</h2></div>
+      <div><p class="frame-kicker">06 / TOOLCHAIN + DELIVERY</p><h2 class="display">Pin the tools. Deliver an immutable frame.</h2></div>
       <p>Beads and Dolt are part of the runtime chain; a standalone central Dolt service is optional.</p>
     </div>
     <div class="install-grid">
@@ -208,15 +270,15 @@ const sources = [
       <div class="install-copy">
         <p><strong>Current Beadhive install:</strong> the managed Nix route pins the driver toolchain, then <code>uv tool install --force 'beadhive[otel]'</code> installs the Python <code>bh</code> CLI; <code>bh setup check</code> verifies the tools it drives. The PyPI/uv route installs <code>bh</code> only and leaves <code>bd</code>, Dolt, GitHub CLI, and git-workspace to the operator.</p>
         <p><strong>Beads</strong> provides the per-hive bead store and the optional <code>bd serve</code> API. A hive's data lives on one shared local Dolt SQL server per host that <code>bd</code> starts for you; the managed toolchain and the Frame draft pin the same Dolt release, and the pin is deliberately not the newest Dolt. The older per-hive <em>embedded</em> mode is legacy and has its own documented minimum Dolt version for the <code>bd dolt pull</code> hang — "any Dolt 2.x" is too broad. The exact pins live in the repo's <a href="https://github.com/beadhive/beadhive/blob/main/flake.nix">flake</a> and <a href="https://github.com/beadhive/beadhive/blob/main/INSTALL.md">INSTALL.md</a>, never here.</p>
-        <p><code>bh dolt up</code> starts a separate, optional <em>central</em> Dolt service; it is not required for ordinary local operation. The Frame proposal's future <code>dolt-server</code> HQ mode is another distinct fleet control-plane option.</p>
+        <p><code>bh dolt up</code> starts a separate, optional <em>central</em> Dolt service; it is not required for ordinary local operation and is unrelated to <code>hq.mode</code>. The shipped, opt-in <code>dolt-server</code> HQ mode is a different thing — a selector for where fleet configuration is read, covered <a href="#control">above</a>.</p>
         <div class="build-flow"><span>pinned source + lock</span><b>→</b><span>builder signs closure / image</span><b>→</b><span>artifact store by digest</span><b>→</b><span>frame activates</span></div>
-        <p class="limitation"><b>Implementation gap:</b> Beadhive's current flake is toolchain-only. It has no NixOS module, OCI outputs, or Nix-built <code>bh</code>; the Nix-built <code>bh</code> package is the first hard blocker for a proper NixOS frame.</p>
+        <p class="limitation"><b>Implementation gap:</b> the flake now builds a <code>bh</code> package from the lock file, and a NixOS VM check boots a machine with <code>bh</code>, the host daemon, the frame bridge and <code>bd</code>. It still has no NixOS module output and no OCI image outputs; those are the remaining blockers for a proper NixOS or container frame.</p>
       </div>
     </div>
   </section>
 
   <section class="frame-sources" id="sources">
-    <div><p class="frame-kicker">SOURCE NOTES</p><h2 class="display">Draft status stays visible.</h2><p>The September 29 homelab document is WIP revision 5. Its D1–D16 decisions await review; the frame and homelab rollout work has not been filed or applied. Use it as the updated topology source, not the older onboarding diagrams.</p></div>
+    <div><p class="frame-kicker">SOURCE NOTES</p><h2 class="display">Draft status stays visible.</h2><p>The frame platform design lives in the <code>beadhive/frame</code> repo and is design only: it asserts no shipping adapters, schemas or commands and authorises no allocation, credential injection, live enrollment or production dispatch. What ships in <code>bh</code> — membership, heartbeats, admission, lifecycle, eligibility, HQ modes, placement — is documented in the fleet-membership and HQ guides. Use the design as the topology source, not the older onboarding diagrams.</p></div>
     <ul>{sources.map((item) => <li><a href={item.href}>{item.label} ↗</a></li>)}</ul>
   </section>
 </div>
@@ -261,6 +323,13 @@ const sources = [
   .status-chip.current, .status-chip.shipped { color: var(--green); border-color: color-mix(in srgb, var(--green) 34%, transparent); background: var(--green-wash); }
   .status-chip.direction { color: var(--honey-strong); border-color: color-mix(in srgb, var(--honey) 40%, transparent); background: var(--honey-wash); }
   .status-chip.proposed { color: var(--ink-2); border-style: dashed; }
+  .status-chip.optin, .status.optin { color: var(--honey-strong); border-color: color-mix(in srgb, var(--honey) 40%, transparent); background: var(--honey-wash); border-style: dashed; }
+  .control-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .control-card { padding: 21px; border: 1px solid var(--hairline); border-top: 2px solid var(--hairline); background: var(--panel); }
+  .control-card.shipped { border-top-color: var(--green); }.control-card.optin { border-top-color: var(--honey); border-top-style: dashed; }.control-card.direction { border-top-color: var(--honey); }
+  .control-card .panel-label { align-items: start; }.control-card .status-chip { white-space: normal; text-align: right; }
+  .control-card h3 { margin: 18px 0 9px; font-size: 1.12rem; letter-spacing: -.02em; }
+  .control-card p { margin: 0; color: var(--ink-2); font-size: .78rem; line-height: 1.65; }.control-card code { color: var(--honey-strong); font-size: .88em; }
   .seat-row { display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; padding: 10px 0; border-top: 1px solid var(--hairline); }
   .seat-row small { grid-column: 2; color: var(--honey-strong); font: 600 .59rem "JetBrains Mono", ui-monospace, monospace; }
   .panel-note { margin: 17px 0 0; padding-top: 13px; border-top: 1px solid var(--hairline); color: var(--ink-3); font-size: .72rem; line-height: 1.55; }
@@ -304,7 +373,9 @@ const sources = [
   .shape-strip { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }.shape-strip span { padding: 7px 9px; border: 1px solid var(--hairline); color: var(--ink-2); font: 600 .61rem "JetBrains Mono", ui-monospace, monospace; }
   .enroll-flow { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; list-style: none; margin: 0; padding: 0; counter-reset: enroll; }
   .enroll-flow li { position: relative; min-height: 144px; padding: 16px; border: 1px solid var(--hairline); background: var(--panel); }
-  .enroll-flow li > span { display: block; color: var(--honey-strong); font: 600 .62rem "JetBrains Mono", ui-monospace, monospace; }
+  .enroll-top { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+  .enroll-top > span { display: block; color: var(--honey-strong); font: 600 .62rem "JetBrains Mono", ui-monospace, monospace; }
+  .enroll-flow li.proposed { border-style: dashed; }
   .enroll-flow b { display: block; margin: 18px 0 7px; font-size: .9rem; }.enroll-flow small { color: var(--ink-2); font-size: .72rem; line-height: 1.5; }
   .two-notes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 15px; }.two-notes article { padding: 18px; }
   .two-notes h3 { margin: 0; font-size: 1.06rem; }.two-notes p:last-child { margin-bottom: 0; color: var(--ink-2); font-size: .77rem; line-height: 1.65; }
@@ -319,6 +390,7 @@ const sources = [
   @media (min-width: 1280px) { .frame-map { padding-left: 0; padding-right: 0; } }
   @media (max-width: 850px) {
     .frame-hero-grid, .identity-grid, .install-grid, .frame-sources { grid-template-columns: 1fr; }
+    .control-grid { grid-template-columns: 1fr 1fr; }
     .frame-stats { grid-template-columns: 1fr; }.frame-stats span { border-right: 0; border-bottom: 1px solid var(--hairline); }.frame-stats span:last-child { border-bottom: 0; }
     .runtime-row { grid-template-columns: 1fr 1fr; }.runtime-label { grid-column: 1/-1; }
     .frame-cluster { grid-template-columns: 1fr; }.cluster-lines { height: 30px; flex-direction: row; }.cluster-lines i { width: 28%; transform: rotate(90deg); }
@@ -328,7 +400,7 @@ const sources = [
     .frame-section { padding-top: 55px; }.frame-section-head { display: block; }.frame-section-head > p { margin-top: 13px; }
     .frame-stats span { padding: 12px; }.frame-stats b { font-size: .72rem; }.role-row { grid-template-columns: 78px 1fr; padding: 8px 0; }.role-row .status-chip { grid-column: 2; justify-self: start; }
     .change-note { grid-template-columns: 1fr; gap: 6px; }.loop-card { grid-template-columns: 35px 1fr; padding: 14px; gap: 9px; }.loop-index { width: 31px; height: 31px; }
-    .loop-title { align-items: start; flex-direction: column; }.loop-facts { grid-template-columns: 1fr 1fr; }.runtime-row, .topology-grid, .enroll-flow, .two-notes, .cluster-frames { grid-template-columns: 1fr; }.runtime-label { grid-column: auto; }.topology-card { min-height: 0; }.cluster-lines { display: none; }.cluster-caption { grid-column: auto; }.build-flow { align-items: flex-start; flex-direction: column; }.build-flow b { transform: rotate(90deg); margin-left: 10px; }.frame-sources { margin-top: 60px; }
+    .loop-title { align-items: start; flex-direction: column; }.loop-facts { grid-template-columns: 1fr 1fr; }.runtime-row, .topology-grid, .enroll-flow, .two-notes, .cluster-frames, .control-grid { grid-template-columns: 1fr; }.runtime-label { grid-column: auto; }.topology-card { min-height: 0; }.cluster-lines { display: none; }.cluster-caption { grid-column: auto; }.build-flow { align-items: flex-start; flex-direction: column; }.build-flow b { transform: rotate(90deg); margin-left: 10px; }.frame-sources { margin-top: 60px; }
   }
 </style>
 </Layout>

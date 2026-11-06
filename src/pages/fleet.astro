@@ -34,13 +34,15 @@ export const meta = {
       every registered hive — cloned ones by local path, uncloned ones via a blobless
       minimal-clone cache — so <code>bh hub bd ready</code> answers "what's actionable anywhere?"
       even on a machine with <em>no code checked out</em>. The <b>hub</b> is that read-only
-      aggregate; <b>HQ</b> is a different, authoritative store — fleet membership, host
-      manifests, leases, and the escalations filed with <code>bh escalate</code>.</p>
+      aggregate; <b>HQ</b> is a different, authoritative store — fleet configuration and
+      membership, host manifests, which host writes each hive, and the escalations filed with
+      <code>bh escalate</code>. Where that configuration is read from is an explicit choice:
+      a git repository (the default) or, opt-in, a shared Dolt SQL database.</p>
     </div>
 
     <figure>
       <div class="diagram">
-      <svg viewBox="0 0 1160 500" role="img" aria-label="Topology diagram: three hive repos each publish issue data to refs/dolt/data on their own git remote; bh sync aggregates all hives into the HQ store; the Head Office registry is partitioned across the four control seats.">
+      <svg viewBox="0 0 1160 500" role="img" aria-label="Topology diagram: three hive repos each publish issue data to refs/dolt/data on their own git remote by default; bh sync aggregates all hives into the per-host hub; the Head Office registry is partitioned across the four control seats, and HQ reads fleet configuration from a git repository by default or, opt-in, from a shared Dolt SQL database.">
         <defs>
           <marker id="t-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
@@ -94,8 +96,9 @@ export const meta = {
           <text class="nsub" x="348" y="378">refs/heads/*  · code, PRs</text>
           <text class="nsub" x="348" y="392">refs/dolt/data · issue history</text>
         </g>
-        <text class="alabel" x="240" y="440">no central server — issue data rides the repo's own remote,</text>
-        <text class="alabel" x="240" y="454">in a ref namespace branches and PRs never see</text>
+        <text class="alabel" x="240" y="440">default: no central server — issue data rides the repo's own remote,</text>
+        <text class="alabel" x="240" y="454">in a ref namespace branches and PRs never see. A hive can opt in to</text>
+        <text class="alabel" x="240" y="468">a Dolt remote of its own, declared in HQ, instead of the code origin.</text>
 
         <!-- sync funnel -->
         <path class="flow-h" d="M456,114 C 560,120 620,170 668,210" marker-end="url(#t-h)"/>
@@ -124,52 +127,66 @@ export const meta = {
         <text class="nsub" x="1038" y="288">the fleet-wide inbox</text>
 
         <!-- head office -->
-        <rect class="node-end" x="678" y="376" width="458" height="92" rx="10"/>
-        <text class="nlabel" x="907" y="400">Head Office + HQ</text>
-        <text class="nsub" x="907" y="420">~/.beadhive/config.yaml (partitioned registry) · ~/.beadhive/hq (hosts, leases, escalations)</text>
-        <text class="nsub" x="907" y="438">supervisor → policy · director → fleet membership</text>
-        <text class="nsub" x="907" y="452">custodian → hive config + secrets · controller → read-only</text>
+        <rect class="node-end" x="678" y="376" width="458" height="108" rx="10"/>
+        <text class="nlabel" x="907" y="398">Head Office + HQ</text>
+        <text class="nsub" x="907" y="416">~/.beadhive/config.yaml (partitioned registry) · ~/.beadhive/hq (HQ's own beads, escalations)</text>
+        <text class="nsub" x="907" y="432">fleet config: hq.mode git (HQ repo, default) · dolt-server (shared SQL, opt-in)</text>
+        <text class="nsub" x="907" y="450">supervisor → policy · director → fleet membership + hive placement</text>
+        <text class="nsub" x="907" y="466">custodian → hive config + secrets · controller → read-only</text>
         <path class="flow dashed" d="M778,334 L778,374" marker-end="url(#t-n)"/>
       </svg>
       </div>
-      <figcaption>The hub is the read side; HQ is the write side (a git repo with its own bead
-      store, cloned to <code>~/.beadhive/hq</code>). The prefix is permanent and derived from org + repo; the provider — the thing most likely
-      to change — lives in a label, so a host migration is a label edit, not data surgery.</figcaption>
+      <figcaption>The hub is the read side; HQ is the write side. By default (<code>hq.mode: git</code>)
+      fleet configuration is a git repository cloned to <code>~/.beadhive/hq</code>, with host manifests
+      on its branch and the hive lease as a compare-and-swap ref; opt-in (<code>hq.mode: dolt-server</code>)
+      the same configuration is a committed snapshot in a shared Dolt SQL database that frames attach to
+      without an HQ checkout. HQ's own beads stay in a local store either way. The prefix is permanent
+      and derived from org + repo; the provider — the thing most likely to change — lives in a label,
+      so a host migration is a label edit, not data surgery.</figcaption>
     </figure>
 
     <div class="wrap" style="padding:0">
       <h3 class="display" id="hq-sync">Keeping the fleet in sync</h3>
-      <p><code>bh hive sync-remote</code> pushes and pulls one hive's git and Dolt state — or
-      every hive's — and its dry run classifies each as clean, dirty, unpushed, remote-only or
-      blocked. Where local and remote disagree it surfaces the disagreement <em>as data</em>
-      rather than picking a winner quietly — a conflict is something you read and decide, not
-      something a sync resolves silently while you're not looking. <code>bh sync</code> is the
-      fleet-wide read pass: it adds every registered hive to the hub, clone-caching the ones
-      that aren't checked out locally; <code>bh hq push</code> / <code>bh hq status</code> do the
-      same ahead/behind accounting for HQ.</p>
+      <p><code>bh hive sync remotes</code> pulls, then pushes, one hive's Dolt state against its
+      declared remote — or every hive's with <code>--all</code> — and <code>--pull</code>,
+      <code>--push</code> and <code>--dry-run</code> narrow it. Where local and remote disagree it
+      surfaces the disagreement <em>as data</em> rather than picking a winner quietly — a conflict
+      is something you read and decide, not something a sync resolves silently while you're not
+      looking; an object-store remote reports its ahead/behind honestly as unknown rather than
+      faking a count. <code>bh sync</code> is the fleet-wide read pass: it adds every registered
+      hive to the hub, clone-caching the ones that aren't checked out locally.
+      <code>bh hq push</code> / <code>bh hq status</code> do the same ahead/behind accounting for
+      HQ on git mode; on a Dolt-server HQ, <code>bh hq push</code> publishes only HQ's own beads,
+      never the fleet configuration.</p>
 
       <h3 class="display" id="hq-intake">Fielding what comes in</h3>
       <p>Work also arrives from outside the plan. <code>bh report</code> files a bug or request
       into any hive you own — including from a different hive entirely, which is how one repo
       tells another that something it depends on is broken. <code>bh escalate</code> is the
       lighter move: name a tool problem, hand it up, and keep working rather than stopping to
-      route it yourself.</p>
-      <p>Both land in one queue. <code>bh work intake</code> is the per-hive view and
+      route it yourself. The largest inbound path is outside both: GitHub issues on a hive's
+      repo, imported through an opt-in pipeline described on the
+      <a href="/intake/">Intake page</a>.</p>
+      <p>All of it lands in one queue. <code>bh work intake</code> is the per-hive view and
       <code>bh hub intake</code> the fleet-wide inbox (<code>bh hq intake</code> now shows only
-      HQ's own escalations), and the queue is source-agnostic — a
-      cross-hive report, an imported GitHub issue, and a legacy import all triage the same way,
-      with duplicate detection running on entry <em>and</em> again at triage so a colliding
-      request doesn't bury the queue. Four verbs dispose of anything in it:</p>
+      HQ's own escalations), and the queue is source-agnostic — a cross-hive report, an
+      imported GitHub issue, and a legacy import all triage the same way. Duplicates are flagged
+      when the queue is read and clustered in batch triage, and <code>bh report</code> also
+      checks on entry, so a colliding request doesn't bury the queue. Four verbs are always
+      there to dispose of anything in it:</p>
       <ul>
         <li><code>bh work accept</code> — real work: set type and priority, clear it into the
         backlog, where it flows through the ordinary ready/dispatch loop.</li>
-        <li><code>bh work reject</code> — not a bug, or won't do: close it with a reason the
-        reporter can actually read.</li>
+        <li><code>bh work reject</code> — not a bug, or won't do: close it with a recorded
+        reason. For a GitHub issue, any reply the reporter sees is a drafted, operator-approved
+        comment.</li>
         <li><code>bh work reroute</code> — filed against the wrong hive: re-file it into the
         right one, or bounce it up when it's genuinely ambiguous.</li>
         <li><code>bh work promote</code> — too big to simply accept: hand it to the planner,
         which adopts it into a gated molecule instead of letting it sit as an oversized ticket.</li>
       </ul>
+      <p>A report bound to a GitHub issue picks up extra, opt-in verbs for tracking it to work
+      and waiting on the reporter's reply; those live on the <a href="/intake/">Intake page</a>.</p>
     </div>
     <IntakeRouting />
   </div>
@@ -178,12 +195,22 @@ export const meta = {
   <div class="wrap">
     <div class="eyebrow display">Hosts</div>
     <h2 class="display">Who runs a hive</h2>
-    <p>A fleet is <em>read</em> from one seat; it is <em>run</em> by hosts. A host takes a
-    hive's lease through HQ — one primary host per hive, everything else read-only — and its
-    dispatcher loops start kicked-off epics in ready order. The host roles, the lease rules,
-    the two loop scopes, the runtime tiers, and the proposed Frame contract for provisioning
-    and failover are all on the <a href="/frame-model/">Frames page</a>, each with its
-    shipped / proposed status.</p>
+    <p>A fleet is <em>read</em> from one seat; it is <em>run</em> by hosts. A hive has at most
+    one primary host at a time, arbitrated through HQ: a host adopts the hive's lease with
+    <code>bh host lease adopt</code>, and the old primary yields by releasing it, by an explicit
+    adopt, by a director placing the hive elsewhere, or by stale authenticated liveness. Lease
+    expiry on its own is a liveness hint for failover, not a lock — it never gates a write.
+    Multi-host is opt-in: a hive with no lease behaves as it always did, and the rules switch on
+    when a second host adopts it. The primary's dispatcher loops start kicked-off epics in ready
+    order.</p>
+    <p>An execution host — a <em>frame</em> — joins as pending, publishes signed heartbeats, is
+    admitted by an operator, and is re-checked for eligibility at every claim. Where strict write
+    exclusion matters, an operator can cut a hive over to carry its own writer fence in its data,
+    one hive at a time; nothing does that automatically. How a hive moves between hosts (director
+    placement and the opt-in, off-by-default failover loop), the host roles, the two authority
+    modes, the loop scopes, the runtime tiers, and the Frame provisioning draft are all on the
+    <a href="/frame-model/">Frames page</a>, each with its shipped / opt-in / proposed
+    status.</p>
   </div>
 </section>
 <section id="pointers">
@@ -199,7 +226,8 @@ export const meta = {
         <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/PLANNING-PLANE.md"><code>docs/PLANNING-PLANE.md</code></a></td><td>The two gates, fidelity tiers, spike loop, replan vs groom.</td></tr>
         <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/CONTROL-PLANE.md"><code>docs/CONTROL-PLANE.md</code></a></td><td>The four control seats, Head Office partitions, the commissioning loop.</td></tr>
         <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/ASSURANCE.md"><code>docs/ASSURANCE.md</code></a></td><td>The warden, the <code>security:*</code> gate, the verifier lens.</td></tr>
-        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/HUB.md"><code>docs/HUB.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/HQ.md"><code>docs/HQ.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/HIVES.md"><code>docs/HIVES.md</code></a></td><td>The cross-hive aggregate, HQ as the authoritative fleet store, onboarding, hive kinds and identity.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/HUB.md"><code>docs/HUB.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/HQ.md"><code>docs/HQ.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/HIVES.md"><code>docs/HIVES.md</code></a></td><td>The cross-hive aggregate; HQ as the authoritative fleet store, its authority modes, hive placement and failover; onboarding, hive kinds and identity.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/FRAME-FLEET-MEMBERSHIP.md"><code>docs/FRAME-FLEET-MEMBERSHIP.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/HOST-DAEMON.md"><code>docs/HOST-DAEMON.md</code></a></td><td>Frame membership, the <code>git</code> / <code>dolt-server</code> HQ modes, readiness, heartbeats, admission, lifecycle and eligibility; the opt-in host daemon.</td></tr>
         <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/ATTEST-KEYS.md"><code>docs/ATTEST-KEYS.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/DOLT.md"><code>docs/DOLT.md</code></a></td><td>Graph-derived attest keys and evidence reuse; the shared Dolt server and the optional central one.</td></tr>
       </table>
     </div>

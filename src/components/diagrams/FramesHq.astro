@@ -1,16 +1,16 @@
 ---
 // Frames attach to a fleet through HQ. The same frames, the same hives, and
 // the two HQ configuration carriers a fleet can select: hq.mode: git (the
-// shipped default) and hq.mode: dolt-server (a proposed binding, implemented
-// behind a selector; no cutover recorded). Source: docs/HQ.md,
-// docs/FRAME-FLEET-MEMBERSHIP.md, docs/design/frame-dolt-server-hq-mode-adr.md,
+// shipped default) and hq.mode: dolt-server (shipped, opt-in, behind an
+// explicit selector and a reviewed migration; the product docs record no
+// production cutover). Source: docs/HQ.md, docs/FRAME-FLEET-MEMBERSHIP.md,
 // docs/HUB.md. HQ's own beads and the per-host hub are drawn because they are
 // what does NOT change between the modes.
 ---
 <figure id="fig-frames-hq">
   <div class="diagram">
     <svg viewBox="0 0 1160 600" role="img"
-      aria-label="Topology diagram. Top row: two active frames each holding one hive's lease, a drained standby frame, and a laptop in viewer role; each frame signs with its own SSH key and keeps a derived per-host hub. Middle: the hive repositories whose git remotes carry branches and refs/dolt/data. Bottom: two HQ configuration modes side by side. Git mode, shipped default: an HQ git repository holding fleet.yaml, workspace.toml and host manifests on main and HQ beads on refs/dolt/data; frames clone it and publish signed heartbeats and leases through git. Dolt-server mode, proposed: a central Dolt SQL server with a committed configuration snapshot and live lease and report tables that are never committed; frames connect with per-incarnation SQL principals and signed envelopes, a trusted observer verifies, and an outage fails closed with no fallback to git. HQ beads stay on their own Dolt replication in both modes.">
+      aria-label="Topology diagram. Top row: two active frames each holding one hive's lease, a drained standby frame, and a laptop in viewer role; each frame signs with its own SSH key and keeps a derived per-host hub. Middle: the hive repositories whose git remotes carry branches and refs/dolt/data. Bottom: two HQ configuration modes side by side. Git mode, shipped default: an HQ git repository holding the signed fleet configuration and host manifests on main, HQ beads on refs/dolt/data, and the hive lease as a compare-and-swap ref; frames clone it and publish signed heartbeats through git. Dolt-server mode, shipped and opt-in: a shared Dolt SQL database with a committed configuration snapshot, a placement row per hive changed only on a director credential, and per-incarnation session and evidence rows stamped by the server clock; frames attach with per-incarnation SQL accounts from host-local trust metadata and no HQ checkout, and an outage fails closed with no fallback to git. HQ beads stay on their own Dolt replication in both modes.">
       <defs>
         <marker id="fh-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
@@ -19,10 +19,10 @@
       </defs>
 
       <!-- ===== frames ===== -->
-      <text class="d-kicker" x="24" y="28">FRAMES — ONE PRIMARY HOST PER HIVE · SIGNED HEARTBEATS · ELIGIBILITY RE-CHECKED AT EVERY CLAIM</text>
+      <text class="d-kicker" x="24" y="28">FRAMES — AT MOST ONE PRIMARY PER HIVE · SIGNED HEARTBEATS · ELIGIBILITY RE-CHECKED AT EVERY CLAIM</text>
       {[
-        { x: 24,  cls: 'd-box-g', name: 'frame-builder-01', state: 'active · executor', lease: 'lease: github/acme/api', note: 'runs seats for api' },
-        { x: 306, cls: 'd-box-g', name: 'frame-builder-02', state: 'active · executor', lease: 'lease: github/acme/web', note: 'runs seats for web' },
+        { x: 24,  cls: 'd-box-g', name: 'frame-builder-01', state: 'active · executor', lease: 'placed on github/acme/api', note: 'runs seats for api' },
+        { x: 306, cls: 'd-box-g', name: 'frame-builder-02', state: 'active · executor', lease: 'placed on github/acme/web', note: 'runs seats for web' },
         { x: 588, cls: 'd-box-dir', name: 'frame-builder-03', state: 'drained · standby', lease: 'attached to api, no lease', note: 'failover, not parallel capacity' },
         { x: 870, cls: 'd-chip', name: 'laptop', state: 'viewer', lease: 'no lease — reads and files', note: 'bh hub bd ready · bh report' },
       ].map((f) => (
@@ -51,7 +51,7 @@
       ))}
       <path class="flow" d="M 157 136 V 182" marker-end="url(#fh-n)"/>
       <path class="flow" d="M 439 136 V 182" marker-end="url(#fh-n)"/>
-      <text class="d-mute" x="600" y="203">a frame pushes wt/ branches and refs/dolt/data for the hive it leases;</text>
+      <text class="d-mute" x="600" y="203">a frame pushes wt/ branches and refs/dolt/data for the hive it is placed on;</text>
       <text class="d-mute" x="600" y="218">bh sync hydrates every registered hive into each host's disposable hub (read side)</text>
 
       <!-- ===== HQ modes ===== -->
@@ -61,15 +61,17 @@
       <!-- git mode -->
       <rect class="lane-i" x="24" y="280" width="548" height="304" rx="10"/>
       <text class="lane-label" x="40" y="302">hq.mode: git — shipped default</text>
-      <rect class="d-box" x="40" y="316" width="516" height="118" rx="8"/>
+      <rect class="d-box" x="40" y="316" width="516" height="122" rx="8"/>
       <text class="d-title" x="54" y="336">HQ repository · &lt;owner&gt;/beadhive-hq</text>
       <text class="d-code" x="54" y="354">main</text>
-      <text class="d-mute" x="100" y="354">fleet.yaml (signed config carrier v2) · workspace.toml · hosts/&lt;host&gt;.yaml</text>
-      <text class="d-code" x="54" y="372">refs/dolt/data</text>
-      <text class="d-mute" x="150" y="372">HQ-origin beads (hq- prefix): escalations, leases, policy</text>
-      <text class="d-mute" x="54" y="392">frames: bh hq clone → read fleet config · publish manifests, heartbeats and</text>
-      <text class="d-mute" x="54" y="406">lease CAS as signed commits · director / custodian write via bh hq push</text>
-      <text class="d-mute" x="54" y="424">bh hq push never force-pushes; a three-level backup precedes the first wire</text>
+      <text class="d-mute" x="100" y="354">fleet.yaml (signed config carrier) · workspace.toml · hosts/&lt;host&gt;.yaml</text>
+      <text class="d-code" x="54" y="370">refs/dolt/data</text>
+      <text class="d-mute" x="150" y="370">HQ-origin beads (hq- prefix): escalations, policy</text>
+      <text class="d-code" x="54" y="386">refs/bh/lease/&lt;prefix&gt;</text>
+      <text class="d-mute" x="206" y="386">the hive lease, compare-and-swap on a ref</text>
+      <text class="d-mute" x="54" y="406">frames: bh hq clone → read fleet config · publish manifests and heartbeats</text>
+      <text class="d-mute" x="54" y="420">as signed commits · director / custodian write via bh hq push</text>
+      <text class="d-mute" x="54" y="434">bh hq push never force-pushes; a three-level backup precedes the first wire</text>
 
       <path class="flow-h" d="M 157 226 V 312" marker-end="url(#fh-h)"/>
       <path class="flow-h" d="M 439 226 V 312" marker-end="url(#fh-h)"/>
@@ -77,10 +79,10 @@
 
       <rect class="d-chip" x="40" y="446" width="250" height="124" rx="8"/>
       <text class="d-title" x="54" y="466">lease</text>
-      <text class="d-mute" x="54" y="482">one primary executor per hive,</text>
+      <text class="d-mute" x="54" y="482">at most one primary per hive,</text>
       <text class="d-mute" x="54" y="496">compare-and-swap in HQ; viewers</text>
-      <text class="d-mute" x="54" y="510">never claim. A second host waits</text>
-      <text class="d-mute" x="54" y="524">out the TTL or adopts explicitly.</text>
+      <text class="d-mute" x="54" y="510">never claim. Expiry is a hint: on</text>
+      <text class="d-mute" x="54" y="524">git HQ a past lease can be adopted.</text>
       <text class="d-code" x="54" y="546">bh host lease adopt | release</text>
       <text class="d-code" x="54" y="560">bh host list --lease-hive &lt;hive&gt;</text>
 
@@ -95,22 +97,24 @@
 
       <!-- dolt-server mode -->
       <rect class="d-box-dir" x="588" y="280" width="548" height="304" rx="10"/>
-      <text class="lane-label" x="604" y="302">hq.mode: dolt-server — proposed binding</text>
+      <text class="lane-label" x="604" y="302">hq.mode: dolt-server — shipped, opt-in</text>
       <rect class="d-chip-dir" x="1010" y="290" width="112" height="16" rx="8"/>
       <text class="d-mute" x="1066" y="302" text-anchor="middle" style="font-size:9.5px">no cutover recorded</text>
 
-      <rect class="d-box" x="604" y="316" width="516" height="118" rx="8"/>
-      <text class="d-title" x="618" y="336">central Dolt SQL server · one database for membership</text>
+      <rect class="d-box" x="604" y="316" width="516" height="122" rx="8"/>
+      <text class="d-title" x="618" y="336">shared Dolt SQL database · config and runtime tables</text>
       <text class="d-code" x="618" y="354">config tables</text>
       <text class="d-mute" x="716" y="354">committed snapshot, one publisher, explicit authoritative revision</text>
-      <text class="d-code" x="618" y="372">frame_leases · frame_reports</text>
-      <text class="d-mute" x="820" y="372">live working set · dolt_ignore · never committed</text>
-      <text class="d-mute" x="618" y="392">frames: per-incarnation SQL principal, table grants only — SQL auth never makes</text>
-      <text class="d-mute" x="618" y="406">a lease authoritative; every envelope still carries the frame's SSH signature</text>
-      <text class="d-mute" x="618" y="424">trusted observer verifies signatures and replay receipts before anything counts</text>
+      <text class="d-code" x="618" y="370">hq_live_hive_leases</text>
+      <text class="d-mute" x="758" y="370">placement: one row per hive, CAS on a director credential only</text>
+      <text class="d-code" x="618" y="386">frame_…_session · _evidence</text>
+      <text class="d-mute" x="806" y="386">liveness stamped by the server clock, never the frame</text>
+      <text class="d-mute" x="618" y="406">frames: per-incarnation SQL account, TLS required, table grants only, SELECT on</text>
+      <text class="d-mute" x="618" y="420">placement; attach from host-local trust metadata — no HQ checkout, no HQ token</text>
+      <text class="d-mute" x="618" y="434">entered by bh hq migrate: plan, then confirm · config only, never a Beads migration</text>
 
       <path class="flow-h dashed" d="M 721 136 C 721 200, 760 250, 790 312" marker-end="url(#fh-h)"/>
-      <text class="d-mute" x="800" y="252" style="font-size:9.5px">SQL + signed envelopes · no HQ checkout</text>
+      <text class="d-mute" x="800" y="252" style="font-size:9.5px">SQL from host-local trust metadata · no HQ checkout</text>
 
       <rect class="d-chip" x="604" y="446" width="250" height="124" rx="8"/>
       <text class="d-title" x="618" y="466">readiness is three checks</text>
@@ -126,9 +130,9 @@
       <text class="d-mute" x="884" y="482">a configured SQL failure is</text>
       <text class="d-mute" x="884" y="496">unavailable: new intake denied,</text>
       <text class="d-mute" x="884" y="510">no fallback to git, no stale</text>
-      <text class="d-mute" x="884" y="524">cached authority. Incumbent</text>
-      <text class="d-mute" x="884" y="538">leases keep renewing under the</text>
-      <text class="d-mute" x="884" y="552">original CAS and expiry rules.</text>
+      <text class="d-mute" x="884" y="524">cached authority. An outage</text>
+      <text class="d-mute" x="884" y="538">blocks handoff, never writes;</text>
+      <text class="d-mute" x="884" y="552">incumbent leases keep renewing.</text>
 
       <!-- what does not change -->
       <text class="d-mute" x="580" y="596" text-anchor="middle">In both modes HQ's own beads replicate as one Dolt database on one remote path, and every host rebuilds its hub locally — neither moves when the config carrier does.</text>
@@ -137,16 +141,19 @@
   <div class="legend display">
     <span><span class="sw" style="background:var(--honey)"></span>frame ↔ HQ</span>
     <span><span class="sw" style="background:var(--ink-3)"></span>frame ↔ hive remote</span>
-    <span><span class="sw dash"></span>proposed / standby</span>
+    <span><span class="sw dash"></span>opt-in / standby</span>
   </div>
   <figcaption>Three stores, three jobs, and only one of them changes shape with
   <code>hq.mode</code>. Each <b>hive</b> keeps its issue history on its own remote; each host keeps a
   disposable <b>hub</b> it rebuilds with <code>bh sync</code>; <b>HQ</b> alone is authoritative for
-  fleet membership, leases and HQ-origin beads. In <b>git mode</b> the fleet configuration travels
-  as signed commits in an HQ repository every frame clones. In <b>dolt-server mode</b> the same
-  configuration is a committed snapshot in a central SQL store, the live lease and heartbeat tables
-  are deliberately never committed, and a frame needs no HQ checkout at all — but SQL credentials
-  are never trusted on their own: the frame's SSH signature on every envelope is what makes a lease
-  or heartbeat count, exactly as in git mode. A drained frame attached to a leased hive is standby
-  for failover, not a second worker on the same hive.</figcaption>
+  fleet configuration, membership, placement and HQ-origin beads. In <b>git mode</b> (the default)
+  the fleet configuration travels as signed commits in an HQ repository every frame clones, and the
+  hive lease is a compare-and-swap ref. In <b>dolt-server mode</b> — opt-in, selected by
+  <code>hq.mode</code> and entered through a reviewed, config-only migration — the same configuration
+  is a committed snapshot in a shared SQL database, placement is one row per hive that only a director
+  credential can change, liveness is a pair of per-incarnation rows stamped by the server's clock so a
+  frame cannot vouch for its own freshness, and a frame attaches from host-local trust metadata with no
+  HQ checkout at all. The selector fails closed: an SQL outage denies new intake and never falls back to
+  git. A drained frame attached to a placed hive is standby for failover, not a second worker on the
+  same hive.</figcaption>
 </figure>
