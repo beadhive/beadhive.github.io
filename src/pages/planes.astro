@@ -14,8 +14,8 @@ export const meta = {
 
 const ideationFlow = [
   { title: 'Idea or report', detail: 'Vision, roadmap, operator input' },
-  { title: 'Untriaged intake', detail: 'bh report · bh work intake' },
-  { title: 'Human triage', detail: 'accept · reject · reroute · promote' },
+  { title: 'Untriaged intake', detail: 'bh report · bh work import / discover · bh work intake' },
+  { title: 'Human triage', detail: 'accept · reject · reroute · promote · needs-info · link' },
   { title: 'Planning frame', detail: 'bh plan adopt' },
 ];
 
@@ -60,6 +60,7 @@ const proofFlow = [
 
 const references = [
   { label: 'Planning plane + spike loop', href: 'https://github.com/beadhive/beadhive/blob/main/docs/PLANNING-PLANE.md' },
+  { label: 'External intake module (GitHub issues, supervised triage)', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/external-intake-module-adr.md' },
   { label: 'Development lifecycle', href: 'https://github.com/beadhive/beadhive/blob/main/docs/WORK.md' },
   { label: 'Graph-derived attest keys', href: 'https://github.com/beadhive/beadhive/blob/main/docs/ATTEST-KEYS.md' },
   { label: 'Attested Green decisions', href: 'https://github.com/beadhive/beadhive/blob/main/docs/design/attested-green-adr.md' },
@@ -97,7 +98,7 @@ const references = [
       <aside class="map-console" aria-label="Lifecycle overview">
         <div class="console-head"><span>BEADHIVE / WORKFLOW</span><span>LIFECYCLE</span></div>
         <ol class="plane-spine">
-          <li class="spine-concept"><span class="spine-mark">I</span><span><b>Ideation</b><small>intake exists · plane is future</small></span><em>01</em></li>
+          <li class="spine-concept"><span class="spine-mark">I</span><span><b>Ideation</b><small>GitHub intake ships · plane is future</small></span><em>01</em></li>
           <li><span class="spine-mark">P</span><span><b>Planning</b><small>idea → approved molecule</small></span><em>02</em></li>
           <li><span class="spine-mark">D</span><span><b>Development</b><small>CLI calls this Integration</small></span><em>03</em></li>
           <li><span class="spine-mark">R</span><span><b>Release</b><small>attested tree → atomic push</small></span><em>04</em></li>
@@ -114,10 +115,12 @@ const references = [
         <div><p class="kicker">IDEATION PLANE</p><h2 id="ideation-title" class="display">Turn signals into a useful question.</h2></div>
         <span class="tag direction-tag">Future plane · intake ships today</span>
       </div>
-      <p class="section-intro">Beadhive has report intake and planner adoption — the <a href="/fleet/#hq-intake">triage
-        verbs</a> live on the Fleet page — while a distinct
-        ideation plane is still a future concept. This transition shows the current entry points
-        without claiming that candidate discovery is automated.</p>
+      <p class="section-intro">Beadhive has report intake, planner adoption and — opt-in — external
+        GitHub issue intake with a supervised reply loop: issues pulled in as held reports, triaged
+        with the same verbs, linked to the work that addresses them, and answered only through
+        operator-approved drafts. The whole loop is on the <a href="/intake/">Intake page</a>. A
+        distinct ideation plane is still a future concept. This transition shows the current entry
+        points without claiming that candidate discovery is automated.</p>
       <ol class="state-flow flow-4" aria-label="Current intake path and proposed ideation handoff">
         {ideationFlow.map((step, index) => (
           <li class="state-node">
@@ -128,9 +131,11 @@ const references = [
         ))}
       </ol>
       <div class="branch-note"><span class="branch-arrow">↳</span>
-        <p><b>Design boundary</b> · <code>bh report</code> creates intake; triage can promote it;
-          <code>bh plan adopt</code> seeds a planning frame. A richer loop from repo vision and
-          accumulated feedback into candidate work needs its own contract.</p>
+        <p><b>Design boundary</b> · <code>bh report</code> creates intake, and so do
+          <code>bh work import</code> and <code>bh work discover</code> for GitHub issues (opt-in;
+          see <a href="/intake/">Intake</a>); triage can promote it; <code>bh plan adopt</code>
+          seeds a planning frame. A richer loop from repo vision and accumulated feedback into
+          candidate work needs its own contract.</p>
       </div>
     </div>
   </section>

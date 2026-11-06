@@ -10,7 +10,7 @@
 <figure id="fig-intake-routing">
   <div class="diagram">
     <svg viewBox="0 0 1160 540" role="img"
-      aria-label="Routing diagram. Sources on the left: bh report into a known hive, GitHub issue import and legacy import all land in that hive's untriaged intake queue; bh escalate lands in HQ's own intake queue. Every hive queue is aggregated by bh sync into the fleet-wide hub inbox the director reads. Dispositions on the right: accept clears work into the backlog, reject closes with a reporter-visible reason, reroute re-files into another hive or holds for the director, promote hands to the planner who adopts it into a gated molecule. A dashed direction branch shows a report-channel descriptor resolving a tool's target so a known target files directly and only an unknown one escalates.">
+      aria-label="Routing diagram. Sources on the left: bh report into a known hive, an opt-in, read-only GitHub issue import (bh work import or discover) and a legacy import all land in that hive's untriaged intake queue; bh escalate lands in HQ's own intake queue. Every hive queue is aggregated by bh sync into the fleet-wide hub inbox the director reads. Dispositions on the right: accept clears work into the backlog, reject closes with a recorded reason (telling a GitHub reporter is a separate drafted, operator-approved comment), reroute re-files into another hive or holds for the director, promote hands to the planner who adopts it into a gated molecule. A dashed direction branch shows a report-channel descriptor resolving a tool's target so a known target files directly and only an unknown one escalates.">
       <defs>
         <marker id="ir-n" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/></marker>
@@ -33,8 +33,8 @@
       <text class="d-mute" x="38" y="94">hive, how one repo tells another it is broken · origin:report</text>
 
       <rect class="d-chip" x="24" y="116" width="300" height="40" rx="6"/>
-      <text class="d-code" x="38" y="134">GitHub issue import</text>
-      <text class="d-mute" x="38" y="148">channel derived from source_system · origin:github</text>
+      <text class="d-code" x="38" y="134">bh work import &lt;url&gt; · bh work discover</text>
+      <text class="d-mute" x="38" y="148">opt-in, read-only pull · held report · origin:github</text>
 
       <rect class="d-chip" x="24" y="168" width="300" height="40" rx="6"/>
       <text class="d-code" x="38" y="186">legacy import</text>
@@ -69,8 +69,8 @@
       <rect class="d-box" x="400" y="44" width="330" height="96" rx="8"/>
       <text class="d-title" x="414" y="64">per-hive queue · bh work intake</text>
       <text class="d-mute" x="414" y="80">the dispatcher fields its own hive's queue</text>
-      <text class="d-mute" x="414" y="94">bd find-duplicates runs on entry and again at triage,</text>
-      <text class="d-mute" x="414" y="108">so a colliding request surfaces instead of burying it</text>
+      <text class="d-mute" x="414" y="94">bd find-duplicates runs when bh report files and when the</text>
+      <text class="d-mute" x="414" y="108">queue is read, so a colliding request surfaces, not buries</text>
       <text class="d-code" x="414" y="128">bh work intake --source report|github|import</text>
 
       <!-- fleet inbox -->
@@ -104,7 +104,7 @@
 
       <rect class="d-chip" x="800" y="116" width="336" height="48" rx="6"/>
       <text class="d-code" x="814" y="136">bh work reject &lt;id&gt; --reason "…"</text>
-      <text class="d-mute" x="814" y="152">closed with a reason the reporter can read · intake:rejected</text>
+      <text class="d-mute" x="814" y="152">recorded reason · GitHub reply is a draft · intake:rejected</text>
 
       <rect class="d-chip" x="800" y="176" width="336" height="76" rx="6"/>
       <text class="d-code" x="814" y="196">bh work reroute &lt;id&gt; --to &lt;hive&gt;</text>
@@ -142,5 +142,7 @@
   with the same four verbs. Nothing routes itself today. The report-channel descriptor is the piece
   that would let a tool say where its issues belong, so that a known target files directly and only
   the genuinely unknown case climbs to HQ; the descriptor is specified and validated, and the
-  consumer that would read it is deliberately a later bead.</figcaption>
+  consumer that would read it is deliberately a later bead. What happens to a GitHub-bound
+  report after disposition — tracking the fix, drafted replies, milestones, labels — is the
+  supervised loop on the <a href="/intake/">Intake page</a>.</figcaption>
 </figure>
