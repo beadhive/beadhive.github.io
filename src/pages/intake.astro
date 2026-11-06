@@ -1,0 +1,334 @@
+---
+import Layout from '../layouts/Layout.astro';
+import IntakeLoop from '../components/diagrams/IntakeLoop.astro';
+import IntakeRouting from '../components/diagrams/IntakeRouting.astro';
+
+// Exported so /llms.txt can enumerate this page without a second copy of its
+// title and description. A new page with a `meta` export appears there for free.
+//
+// Register: this page is narrative-level. Upstream has no operator guide for
+// these verbs yet, so it describes the loop and the boundaries and links the
+// configuration reference rather than restating keys. Every capability past
+// the plain intake queue is opt-in (off by default); say so, every time.
+export const meta = {
+  order: 8,
+  label: 'Intake',
+  title: 'GitHub intake and supervised triage · Beadhive',
+  description:
+    'How a GitHub issue becomes a held report in a hive, is triaged with the ordinary verbs, ' +
+    'tracks the work that addresses it, and is kept informed through a supervised outbox — ' +
+    'every stage opt-in, nothing posted to GitHub without an operator approving the exact ' +
+    'text, and no LLM call made by bh.',
+};
+---
+<Layout active="intake" title={meta.title} description={meta.description}>
+<div class="pagegrid">
+  <nav class="toc" aria-label="On this page">
+    <p class="toc-title">On this page</p>
+    <a class="head" href="#frame">Where reporters are, where work is</a>
+    <a class="sub" href="#optin">Opt-in, and the approval boundary</a>
+    <a class="head" href="#pull">Pulling issues in</a>
+    <a class="head" href="#triage">Triage, and waiting on the reporter</a>
+    <a class="head" href="#track">Tracking versus investigating</a>
+    <a class="head" href="#outbox">The outbox</a>
+    <a class="sub" href="#milestones">Delivery milestones</a>
+    <a class="sub" href="#labels">The label projection</a>
+    <a class="head" href="#batch">Review-gated batch triage</a>
+    <a class="head" href="#templates">Issue forms and the checklist</a>
+    <a class="head" href="#direction">What is still direction</a>
+    <a class="head" href="#sources">Sources</a>
+  </nav>
+  <div class="pagemain">
+
+<section id="frame">
+  <div class="wrap">
+    <div class="eyebrow display"><span class="chap">08</span> Intake</div>
+    <h1 class="display doc-title">GitHub is where reporters are. The hive is where work is.</h1>
+    <p class="lede-sm">Nothing crosses between them without an operator. This page is the
+    loop a GitHub issue goes through once a hive decides to field it — and the boundary that
+    keeps agents from ever speaking for you.</p>
+    <p>A hive already has an intake queue: <code>bh report</code> and <code>bh escalate</code>
+    file into it, <code>bh work intake</code> reads it, and four typed verbs dispose of it (the
+    <a href="/fleet/#hq-intake">Fleet page</a> covers that path). This page is the larger
+    inbound channel. GitHub Issues can be <b>pulled</b> into a hive as held, untriaged
+    reports; triaged with the same verbs as any other report; <b>linked</b> to the internal
+    work that addresses them; and <b>kept informed</b> through a supervised outbox, where
+    every comment or label change is a draft an operator must read, approve and send.</p>
+    <IntakeLoop />
+  </div>
+</section>
+
+<section id="optin">
+  <div class="wrap">
+    <h2 class="display">Opt-in, and the approval boundary <span class="status shipped">shipped · opt-in</span></h2>
+    <p>Everything on this page beyond the plain queue and its four dispositions is
+    <b>off by default</b>. Upgrading changes nothing until an operator turns a switch on, and
+    with every default in place <code>bh report</code>, merge and release behave exactly as
+    they always have. The switches are host-owned — a fleet-level config push cannot flip them
+    — and each stage has its own, so a hive can pull issues in without ever drafting a reply,
+    or draft replies without ever projecting labels. They live under two sections of the
+    <a href="https://github.com/beadhive/beadhive/blob/main/docs/CONFIGURATION.md">configuration
+    reference</a>: <code>intake.external</code> for the loop itself and
+    <code>plugins.tracker-github</code> for the adapter that talks to GitHub.</p>
+    <p>The boundary is stated once here and holds everywhere below:</p>
+    <ul>
+      <li><b>Reads are read-only.</b> Import, discovery and thread ingestion never write to
+      the issue. Credentials are resolved per operation from the environment or the
+      <code>gh</code> CLI and never stored by Beadhive.</li>
+      <li><b>There are exactly two possible writes:</b> post a comment, and change labels under
+      a prefix Beadhive owns. There is no operation to open, close, edit or transfer an issue.</li>
+      <li><b>A write needs three independent things.</b> The adapter's own write flag, the
+      outbox switch, and a per-operation, single-use grant minted by an operator approving the
+      digest of the exact rendered bytes. No config key, at any layer, can enable or pre-approve
+      a write.</li>
+      <li><b>Agents cannot approve.</b> Developer, dispatcher, crew and coordinator seats can
+      triage, link and draft; none of them can approve, and timers, config, environment
+      variables and flags cannot produce an approval either.</li>
+      <li><b><code>bh</code> makes no LLM call</b> anywhere in intake or triage. Where analysis is
+      needed, it is supplied from outside and handed in as a document.</li>
+    </ul>
+    <div class="note"><b>Nothing is sent without an operator.</b> Every reply, question, status
+    note and label change is a draft first. An operator reads the exact text, approves it, and
+    sends it. There is no auto-reply, and nothing a reporter sees was composed by a model
+    inside Beadhive.</div>
+  </div>
+</section>
+
+<section id="pull">
+  <div class="wrap">
+    <h2 class="display">Pulling issues in <span class="status shipped">shipped · opt-in</span></h2>
+    <p><code>bh work import &lt;issue-url&gt;</code> brings one issue in as an untriaged report
+    with <code>origin:github</code>. It is keyed on the issue's canonical URL, so importing it
+    again updates the stored snapshot rather than duplicating it, and never resets triage. A
+    dry run classifies the URL and writes nothing. Closed issues import exactly like open ones;
+    pull requests, issues in other projects and anything not visible to the credential are
+    refused before any request is made.</p>
+    <p><code>bh work discover</code> is the same upsert run over the repository. The incremental
+    pass resumes from a checkpoint that advances only once a page is durably stored, so a
+    re-run changes nothing; a full pass re-pulls everything, closed issues included, and marks
+    a report whose issue has vanished as missing — it never deletes or closes one. The host
+    daemon can run discovery on a timer; that needs its own switch and an explicit interval,
+    and the daemon refuses to start if the adapter is not wired.</p>
+    <p>An imported report is <b>held</b>. It carries a hold gate for life: it never appears in
+    ready work, <code>bh work claim</code> and <code>assign</code> refuse it, and no seat can
+    resolve the hold. A report is never the work. The work that addresses it is a separate
+    bead the report tracks — which is what keeps a bug report from being handed to a developer
+    as if it were a specification. <code>bh doctor</code> sweeps for missing or orphaned holds
+    in any hive whose store binds a tracker adapter.</p>
+    <p>Two things that look similar and are not: discovery here means polling GitHub for
+    issues, not finding candidate work for the planner; and pulling issues into intake is
+    distinct from the public-store projection (<code>bh hive remote sync … --pull-only</code>),
+    which mirrors a hive's GitHub Issues into its public bead store. Intake reads GitHub itself
+    through the tracker port and never reads or links that projection.</p>
+  </div>
+</section>
+
+<section id="triage">
+  <div class="wrap">
+    <h2 class="display">Triage, and waiting on the reporter <span class="status shipped">shipped</span></h2>
+    <p>A GitHub-bound report sits in the same queue as a cross-hive report or an escalation,
+    and the same four verbs dispose of it: <code>bh work accept</code> clears it into the
+    backlog, <code>bh work reject</code> closes it with a recorded reason, <code>bh work
+    reroute</code> re-files it into the right hive or bounces it to a superintendent, and
+    <code>bh work promote</code> hands it to the planner, whose <code>bh plan adopt</code>
+    seeds a molecule from it. Likely duplicates are flagged when the queue is read; batch triage
+    (below) clusters them. One queue for every channel means one triage and one set of verbs.</p>
+    <p>Two things change for a report that came from GitHub. First, a plain
+    <code>reject</code> is a local close — the reason is recorded on the bead, and telling the
+    reporter is a separate drafted, operator-approved comment. Second, the report can
+    <b>wait</b>. <code>bh work needs-info &lt;report&gt; --ask "…"</code> drafts the question as a
+    supervised reply and moves the report out of the untriaged queue (still held, never
+    claimable); <code>bh work wake</code> moves it back when the ingested thread holds a reply
+    from a <em>human</em> — our own posted messages never wake it, and the reply stays unread for
+    the next triage pass. Every disposition fields a waiting report exactly as it fields an
+    untriaged one. Both verbs are opt-in.</p>
+    <p>The thread itself is read with three verbs, all read-only toward GitHub and all opt-in.
+    <code>bh work thread ingest</code> pulls a bound report's comments since a checkpoint into a
+    private record and recognises Beadhive's own posted messages so they are never mistaken
+    for new evidence. <code>bh work thread show</code> renders what is stored — which comments
+    are new since triage last read, and both kinds of link — without a request.
+    <code>bh work thread considered --through &lt;seq&gt;</code> records that triage has read the
+    thread that far; it never changes the report's state. A deleted comment is only tombstoned
+    after repeated snapshots agree it is gone.</p>
+    <IntakeRouting />
+  </div>
+</section>
+
+<section id="track">
+  <div class="wrap">
+    <h2 class="display">Tracking versus investigating <span class="status shipped">shipped · opt-in</span></h2>
+    <p>Two kinds of link, kept deliberately apart. <code>bh work link &lt;report&gt; --to
+    &lt;work&gt;</code> makes the report <b>track</b> a work bead: several reports can track the
+    same fix, the report stays held, and nothing is sent. <code>bh work accept --work &lt;id&gt;</code>
+    or <code>--new-work</code> does the accept and the link in one step; the fresh work bead has
+    no GitHub binding and a description written by triage, not copied from the issue. A link is
+    refused if the target is itself a bound report, lives in another store, is still untriaged,
+    or is already tracked by something else (unless replaced on purpose).</p>
+    <p><code>bh work investigate</code> attaches <b>reproduction</b> work with a different edge.
+    Claiming, closing or merging an investigating bead drafts no milestone, writes no delivery
+    state and never closes the report — so a hive can spend effort finding out whether a report
+    is real without telling the reporter anything until there is something true to say.
+    Several beads may investigate one report; only one piece of work can be the one it tracks.</p>
+    <p>What finishes a report is a hive choice: by default it closes once the work it tracks
+    has merged; a hive can instead keep it open and held until the fix is verified to be in a
+    release.</p>
+  </div>
+</section>
+
+<section id="outbox">
+  <div class="wrap">
+    <h2 class="display">The outbox <span class="status shipped">shipped · opt-in</span></h2>
+    <p>The outbox is the <em>only</em> way anything leaves toward GitHub. <code>bh work outbox
+    draft &lt;report&gt; --text "…"</code> drafts a reply and sends nothing. <code>bh work outbox
+    show &lt;id&gt;</code> renders the exact message and prints its digest. <code>bh work outbox
+    approve &lt;id&gt; --op &lt;kind&gt;:&lt;digest&gt;</code> is the operator's act: it approves that
+    digest and mints one single-use grant per operation — a comment approval never approves a
+    label change — and still sends nothing. <code>bh work outbox send &lt;id&gt;</code> posts one
+    approved operation, write-ahead with a receipt, and only if the fresh render still matches
+    the approved digest; if the text has drifted since approval, nothing is posted.</p>
+    <p>A <b>leak check</b> runs at draft, at every render and on the exact bytes at send. Secrets,
+    a label outside the owned prefix, and the absence of a bound sanitizer block outright and
+    cannot be overridden. Internal bead ids, branch names, private labels, seat names and host
+    paths block unless an operator names that specific finding as deliberately published. A
+    closing keyword like <code>fixes #N</code> draws a warning. The failure modes are handled
+    without re-sending: <code>reconcile</code> settles an unknown outcome by reading the issue
+    back, <code>discard</code> abandons an unsent operation with a reason, and
+    <code>retry</code> returns a failed one to drafted, where it needs a new render, digest and
+    approval.</p>
+
+    <h3 class="display" id="milestones">Delivery milestones <span class="status shipped">opt-in · each its own switch</span></h3>
+    <p>Milestones are how the reporter learns what happened without anyone composing a message.
+    Each one <em>only drafts</em> a record in the outbox: it never sends and never mints a grant.
+    The wording is a fixed constant per event, so a milestone carries no bead id, branch, path
+    or seat by construction, and the hook that writes them is a no-op unless intake is on and
+    can never fail a merge, release or claim.</p>
+    <div class="tablewrap">
+      <table>
+        <tr><th>Milestone</th><th>Drafted when</th><th>What the reporter would read</th></tr>
+        <tr><td><code>started</code></td><td>the first claim of work the report tracks (a re-claim or resume drafts nothing)</td><td>work to address this issue has started</td></tr>
+        <tr><td><code>blocked</code></td><td>an operator runs <code>bh work delivery blocked &lt;work&gt; --reason</code> with a public reason that passes the leak check</td><td>a fixed lead plus the operator's reason</td></tr>
+        <tr><td><code>deprioritised</code></td><td>an operator runs <code>bh work delivery deprioritised &lt;work&gt; --reason</code></td><td>a fixed lead plus the operator's reason</td></tr>
+        <tr><td><code>merged</code></td><td>the tracked work merges; every tracking report moves to <code>delivery:merged</code></td><td>a change addressing this issue has merged and will be in an upcoming release</td></tr>
+        <tr><td><code>released</code></td><td>an operator runs <code>bh work delivery release &lt;tag&gt;</code> and read-only git verifies the tag contains the merge; "no" and "unknown" change nothing</td><td>a change addressing this issue is available in that release</td></tr>
+      </table>
+    </div>
+    <p>Progress notices draft only while delivery is still pending, a newer milestone supersedes
+    an unsent older one, and a report linked late to work that has already merged can catch up
+    on what it missed — also a switch, off by default.</p>
+
+    <h3 class="display" id="labels">The label projection <span class="status shipped">opt-in</span></h3>
+    <p>A hive can mirror its own state onto GitHub labels under one prefix it owns
+    (<code>bh:</code> by default) — intake state, delivery state, type, priority and the rest,
+    each as <code>bh:&lt;dimension&gt;/&lt;value&gt;</code>. Labels outside that prefix are never
+    added, removed or even reported on, and every projected name and description goes through
+    the leak check. The projection switch by itself reads and writes nothing; it only shapes
+    the catalog.</p>
+    <p>The verbs follow the outbox's shape. <code>bh work labels define</code> renders a plan for
+    the repository's label <em>definitions</em> with a digest, and an operator applies it from
+    an operator seat with one grant per write, audited. <code>bh work labels sync</code> drafts
+    at most one label-change record per issue, converging its owned labels onto bead state — it
+    refuses to add a label the repository has not defined. <code>bh work labels review</code>
+    renders the drafted batch; <code>bh work labels approve --batch</code> is the operator's act,
+    minting one grant per issue and skipping any issue whose live labels moved since the draft;
+    and a send is still <code>bh work outbox send … --kind labels</code>. Humans editing those
+    labels by hand win until the next milestone. Optionally, every disposition, link and
+    milestone refreshes the report's draft too — drafts only, never failing the transition.</p>
+  </div>
+</section>
+
+<section id="batch">
+  <div class="wrap">
+    <h2 class="display">Review-gated batch triage <span class="status shipped">shipped · opt-in</span></h2>
+    <p>For a backlog rather than a trickle. <code>bh work triage review --pending</code> builds
+    review packets: each report's body <em>and its full thread</em>, any stored proposal with
+    its reviews, its duplicate cluster, and a global index of titles and dispositions. Clusters
+    are never split across batches, and a packet without its full thread is refused, so the
+    reviewer never judges a report with half the evidence. Duplicate families are found three
+    independent ways: the store's own duplicate scan, text similarity, and a code path both
+    reports' evidence cites.</p>
+    <p>An analyst — an agent or a person, <em>outside</em> <code>bh</code> — reads a packet and
+    writes a proposal; <code>bh work triage propose &lt;report&gt; &lt;file&gt;</code> stores it as a
+    private document on the report, leak-linted first and never published. A verifier hands in
+    a verdict the same way: confirmed, corrected or unsure. <code>bh</code> stores and checks;
+    it never calls a model.</p>
+    <p><code>bh work triage check</code> runs deterministic, fail-closed checks against the
+    repository before anything is applied: the targets a proposal names exist and are open, a
+    claimed fix's commits are ancestors of the integration branch and the fix version is
+    <em>computed</em> from tags rather than taken on trust, duplicate families resolve, reporter-
+    facing text is leak-clean and within length, and nothing has gone stale underneath the
+    analysis. Then <code>bh work triage apply --reviewed</code> — operator-run, with a dry run
+    that writes nothing — applies only proposals a reviewer confirmed and which pass every
+    check. Each maps onto the ordinary triage verbs, so every refusal above still holds; any
+    reply or question it produces is a draft in the outbox; a second apply changes nothing.</p>
+  </div>
+</section>
+
+<section id="templates">
+  <div class="wrap">
+    <h2 class="display">Issue forms and the checklist <span class="status shipped">shipped</span></h2>
+    <p>Beadhive's own repository ships versioned issue forms for bugs and feature requests,
+    each carrying a template marker, with blank issues still allowed and security reports
+    pointed at the private advisory flow. Alongside them is an information-sufficiency
+    checklist: per type, which facts are required before triage can decide anything (what
+    happened, what was expected, how to reproduce, the affected version, the impact) and which
+    are optional.</p>
+    <p>Two honest limits. The checklist is a document the triage step reads — <code>bh</code> does
+    not evaluate it — and the forms are what Beadhive ships for its own tracker, not something
+    installed into every hive. The checklist's rule is worth adopting anyway: ask only for the
+    facts needed to decide, treat a bare "n/a" as missing, and ask in one message that names the
+    investigation the missing fact blocks. The reply is, as always, a draft the operator
+    approves.</p>
+  </div>
+</section>
+
+<section id="direction">
+  <div class="wrap">
+    <h2 class="display">What is still direction <span class="status direction">direction</span></h2>
+    <p>Design text that has not become a verb or a switch, listed so the page above cannot be
+    read as promising it:</p>
+    <ul>
+      <li><b>Webhook-driven wake-ups.</b> Ingestion today is pull-only polling; nothing is pushed
+      into a hive in real time.</li>
+      <li><b>Reminders and inactivity closure</b> for a reporter who never answers, and a path for
+      reopening. The design says this should be explicit hive policy; no key exists.</li>
+      <li><b>Revert detection and a "corrected" notice.</b> The vocabulary has room for it; no verb
+      writes it.</li>
+      <li><b>Unattended publication.</b> Supervised is the only outbox mode and the only mode the
+      config accepts.</li>
+      <li><b>Other trackers.</b> The port is tracker-neutral by design; GitHub is the only adapter
+      that exists.</li>
+      <li><b>Automatic routing by report channel.</b> The descriptor spec ships; nothing reads it yet
+      (the dashed branch in the routing diagram above).</li>
+      <li><b>An ideation plane.</b> Intake and planner adoption are the shipped parts; deriving
+      candidate work from a repo's vision and accumulated evidence has no contract yet — see
+      the <a href="/planes/#ideation">Planes page</a>.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="sources">
+  <div class="wrap">
+    <div class="eyebrow display">Go deeper</div>
+    <h2 class="display">Sources</h2>
+    <p>Upstream has no operator guide for these verbs yet; the authoritative operator-facing text
+    is the configuration reference, the upgrade notes, and each verb's <code>--help</code>. This
+    page draws on:</p>
+    <div class="tablewrap">
+      <table>
+        <tr><th>Doc</th><th>Covers</th></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/CONFIGURATION.md"><code>docs/CONFIGURATION.md</code></a></td><td>Every switch and its default — <code>intake.external</code> and <code>plugins.tracker-github</code> — and the three-things rule for a write.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/UPGRADING.md"><code>docs/UPGRADING.md</code></a></td><td>What turning each stage on changes, the operator-seat-only verbs, and fleet rollout order.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/INTAKE-TEMPLATES.md"><code>docs/INTAKE-TEMPLATES.md</code></a></td><td>The issue forms, the template marker, and the information-sufficiency checklist.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/design/external-intake-module-adr.md"><code>docs/design/external-intake-module-adr.md</code></a></td><td>The accepted design: held reports, tracks versus investigates, the outbox state machine, the leak check, labels, batch triage.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/design/external-issue-intake.md"><code>docs/design/external-issue-intake.md</code></a></td><td>The <em>why</em>, and the direction items above (webhooks, reminders, publication policy); the ADR prevails where they differ.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/design/tracker-adapter-port-adr.md"><code>docs/design/tracker-adapter-port-adr.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/design/tracker-adapter-plugin-adr.md"><code>tracker-adapter-plugin-adr.md</code></a></td><td>The tracker port and the GitHub plugin: capability flags, per-operation credentials, single-use grants.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/design/github-issue-projection.md"><code>docs/design/github-issue-projection.md</code></a></td><td>The separate, pull-only public-store projection, and why intake does not read it.</td></tr>
+        <tr><td><a href="https://github.com/beadhive/beadhive/blob/main/docs/MODULES.md"><code>docs/MODULES.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/HQ.md"><code>docs/HQ.md</code></a> · <a href="https://github.com/beadhive/beadhive/blob/main/docs/PLANNING-PLANE.md"><code>docs/PLANNING-PLANE.md</code></a></td><td>The intake module's boundaries; <code>bh hub intake</code> versus <code>bh hq intake</code>; <code>bh plan adopt</code>.</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+  </div>
+</div>
+</Layout>
