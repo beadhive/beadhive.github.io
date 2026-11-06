@@ -84,8 +84,18 @@ const REFERENCE = [
   ['Hub (read aggregate) and HQ (authoritative fleet store)', 'docs/HUB.md'],
   ['Labels, the registry and validation', 'docs/LABELS.md'],
   ['The command surface', 'docs/CLI.md'],
-  ['Configuration reference', 'docs/CONFIGURATION.md'],
+  ['Configuration reference, including the plugin switches and install extras', 'docs/CONFIGURATION.md'],
+  ['Upgrading: what each release turns on (nothing, until a switch is set)', 'docs/UPGRADING.md'],
   ['How far it goes: the four rungs people settle on, and what each costs', 'docs/ADOPTION.md'],
+  ['HQ: the authoritative fleet store, authority modes, placement and failover', 'docs/HQ.md'],
+  ['Frames: fleet membership, HQ modes, lifecycle and eligibility', 'docs/FRAME-FLEET-MEMBERSHIP.md'],
+  ['Where bead data lives: two stores per repository', 'docs/TWO-STORES.md'],
+  ['Decision: HQ declares a Dolt remote, the host authenticates', 'docs/design/hq-dolt-remote-descriptor-adr.md'],
+  ['External intake: GitHub issues and the supervised triage loop', 'docs/design/external-intake-module-adr.md'],
+  ['Intake templates and the information-sufficiency checklist', 'docs/INTAKE-TEMPLATES.md'],
+  ['Backfill: passes, plans and the safety envelope', 'docs/BACKFILL.md'],
+  ['The opt-in XTDB BeadLog store', 'docs/XTDB-STORE.md'],
+  ['Worktrees: admission, automatic reclaim and the live-count cap', 'docs/WORKTREES.md'],
 ] as const;
 
 export const GET: APIRoute = () => {
@@ -102,7 +112,7 @@ export const GET: APIRoute = () => {
     'the ones that matter, and what production teaches is meant to come back round into the',
     'next plan. Beads are the unit of work — a git-embedded issue graph with real dependency',
     'edges — so "what should be worked on next" is computed rather than guessed. `bh` is the',
-    'CLI; there is no server to run.',
+    'CLI; there is no server you have to run.',
     '',
     '## Field guide',
     '',
